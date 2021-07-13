@@ -2,25 +2,19 @@ package network.xyo.client
 
 import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.GrantPermissionRule
-
-import org.junit.Test
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import network.xyo.client.address.XyoAddress
 import org.junit.Before
-import org.junit.runner.RunWith
-
-import org.junit.Assert.*
 import org.junit.Rule
+import org.junit.Test
+import org.junit.jupiter.api.Assertions.*
 
-/**
- * Instrumented test, which will execute on an Android device.
- *
- * See [testing documentation](http://d.android.com/tools/testing).
- */
-@RunWith(AndroidJUnit4::class)
 class XyoPanelTest {
-
-    @Rule @JvmField
+    @Rule
+    @JvmField
     val grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(android.Manifest.permission.INTERNET)
 
 
@@ -33,7 +27,47 @@ class XyoPanelTest {
     }
 
     @Test
-    fun createClient() {
+    fun testCreatePanel() {
+        val apiDomain = "https://beta.archivist.xyo.network"
+        val archive = "test"
+        val address = XyoAddress()
+        val witness = XyoWitness<XyoPayload>(address)
+        val panel = XyoPanel(archive, apiDomain, listOf(witness))
+        assertNotNull(address)
+        assertNotNull(panel)
+    }
 
+    @Test
+    fun testPanelReport() {
+        GlobalScope.launch {
+            val apiDomain = "https://beta.archivist.xyo.network"
+            val archive = "test"
+            val witness = XyoWitness(fun(previousHash: String?): XyoPayload {
+                return XyoPayload("network.xyo.basic", previousHash)
+            })
+            val panel = XyoPanel(archive, apiDomain, listOf(witness, XyoSystemInfoWitness()))
+            val result = panel.report()
+            assertEquals(0, result.size)
+        }
+    }
+
+    @Test
+    fun testSimplePanelReport() {
+        runBlocking {
+            val panel = XyoPanel(fun(previousHash: String?): XyoEventPayload {
+                return XyoEventPayload("test_event", previousHash)
+            })
+            val result = panel.report()
+            assertEquals(0, result.size)
+        }
+    }
+
+    @Test
+    fun testReportEvent() {
+        GlobalScope.launch {
+            val panel = XyoPanel(null, null, listOf(XyoSystemInfoWitness()))
+            val result = panel.report()
+            assertEquals(0, result.size)
+        }
     }
 }

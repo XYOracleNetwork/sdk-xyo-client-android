@@ -9,16 +9,16 @@ import java.security.spec.ECGenParameterSpec
 
 
 open class XyoAddress {
-    private var _keyPair: KeyPair? = null
+    private var _keyPair: KeyPair
 
     open val privateKey: String?
         get() {
-            return _keyPair?.private?.toString()
+            return _keyPair.private.toString()
         }
 
-    open val publicKey: String?
+    open val publicKey: String
         get() {
-            return _keyPair?.public?.toString()
+            return _keyPair.public.toString()
         }
 
     constructor() {
@@ -45,7 +45,7 @@ open class XyoAddress {
 
     open fun sign(hash: String): ByteArray {
         val signature: Signature = Signature.getInstance("SHA256withECDSA")
-        signature.initSign(_keyPair?.private)
+        signature.initSign(_keyPair.private)
         signature.update(hash.toByteArray())
         return signature.sign()
     }
