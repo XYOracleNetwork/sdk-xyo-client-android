@@ -39,7 +39,7 @@ class XyoPanelTest {
 
     @Test
     fun testPanelReport() {
-        GlobalScope.launch {
+        xyoScope.launch {
             val apiDomain = "https://beta.archivist.xyo.network"
             val archive = "test"
             val witness = XyoWitness(fun(previousHash: String?): XyoPayload {
@@ -64,7 +64,7 @@ class XyoPanelTest {
 
     @Test
     fun testReportEvent() {
-        GlobalScope.launch {
+        xyoScope.launch {
             val panel = XyoPanel(null, null, listOf(XyoSystemInfoWitness()))
             val result = panel.report()
             assertEquals(0, result.size)
