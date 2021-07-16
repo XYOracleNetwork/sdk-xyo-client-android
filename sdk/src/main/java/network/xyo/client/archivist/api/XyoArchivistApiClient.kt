@@ -1,12 +1,11 @@
 package network.xyo.client.archivist.api
 
 import android.util.Log
-import com.google.gson.Gson
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
 import network.xyo.client.XyoBoundWitnessJson
-import network.xyo.client.xyoScope
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -38,7 +37,11 @@ open class XyoArchivistApiClient(private val config: XyoArchivistApiConfig) {
     suspend fun postBoundWitnessesAsync (
         entries: Array<XyoBoundWitnessJson>
     ): PostBoundWitnessesResult {
-        val payloadString: String = Gson().toJson(entries)
+        val moshi = Moshi.Builder()
+            .addLast(KotlinJsonAdapterFactory())
+            .build()
+        val adapter = moshi.adapter(entries.javaClass)
+        val payloadString = adapter.toJson(entries)
         val apiDomain = config.apiDomain
         val archive = config.archive
 

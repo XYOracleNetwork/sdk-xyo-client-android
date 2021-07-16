@@ -1,8 +1,11 @@
 package network.xyo.client
 
-import com.google.gson.Gson
+import android.util.Log
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import network.xyo.client.address.XyoAddress
 import java.security.MessageDigest
+
 
 class BoundWitnessBuilder {
     private var _witnesses = emptyList<XyoAddress>()
@@ -68,14 +71,20 @@ class BoundWitnessBuilder {
     }
 
     companion object {
-        fun <T>hash(json: T): String {
-            val jsonString = Gson().toJson(json)
-            val md = MessageDigest.getInstance("SHA")
+        fun hash(obj: Any): String {
+            val moshi = Moshi.Builder()
+                .addLast(KotlinJsonAdapterFactory())
+                .build()
+            val adapter = moshi.adapter(obj.javaClass)
+            val jsonString = adapter.toJson(obj)
+            Log.d("jsonString", jsonString)
+            val md = MessageDigest.getInstance("SHA256")
             md.update(jsonString.encodeToByteArray())
-            return md.digest().toString()
+            val bytes = md.digest()
+            return bytesToHex(bytes)
         }
 
-        private val hexArray = "0123456789ABCDEF".toCharArray()
+        private val hexArray = "0123456789abcdef".toCharArray()
 
         fun bytesToHex(bytes: ByteArray): String {
             val hexChars = CharArray(bytes.size * 2)
