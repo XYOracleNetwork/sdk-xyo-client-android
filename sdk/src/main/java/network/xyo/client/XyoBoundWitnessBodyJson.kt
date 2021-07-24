@@ -2,12 +2,12 @@ package network.xyo.client
 
 open class XyoBoundWitnessBodyJson(): XyoBoundWitnessBodyInterface {
 
-    final override var addresses = emptyArray<String>()
-    final override var previous_hashes = emptyArray<String?>()
-    final override var payload_hashes = emptyArray<String>()
-    final override var payload_schemas = emptyArray<String>()
+    final override var addresses = emptyList<String>()
+    final override var previous_hashes = emptyList<String?>()
+    final override var payload_hashes = emptyList<String>()
+    final override var payload_schemas = emptyList<String>()
 
-    constructor (addresses: Array<String>, previous_hashes: Array<String?>, payload_hashes: Array<String>, payload_schemas: Array<String>) : this() {
+    constructor (addresses: List<String>, previous_hashes: List<String?>, payload_hashes: List<String>, payload_schemas: List<String>) : this() {
         this.addresses = addresses
         this.previous_hashes = previous_hashes
         this.payload_hashes = payload_hashes

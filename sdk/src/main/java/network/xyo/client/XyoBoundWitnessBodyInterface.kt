@@ -1,8 +1,8 @@
 package network.xyo.client
 
 interface XyoBoundWitnessBodyInterface {
-    var addresses: Array<String>
-    var previous_hashes: Array<String?>
-    var payload_hashes: Array<String>
-    var payload_schemas: Array<String>
+    var addresses: List<String>
+    var previous_hashes: List<String?>
+    var payload_hashes: List<String>
+    var payload_schemas: List<String>
 }

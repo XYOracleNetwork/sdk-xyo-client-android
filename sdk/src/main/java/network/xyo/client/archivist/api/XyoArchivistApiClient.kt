@@ -1,17 +1,21 @@
 package network.xyo.client.archivist.api
 
 import android.util.Log
-import com.google.gson.Gson
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
 import network.xyo.client.XyoBoundWitnessJson
-import network.xyo.client.xyoScope
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import okio.IOException
+
+class PostBoundWitnessesResult (
+    val count: Int,
+    val errors: List<Error>? = null
+    )
 
 open class XyoArchivistApiClient(private val config: XyoArchivistApiConfig) {
 
@@ -31,10 +35,13 @@ open class XyoArchivistApiClient(private val config: XyoArchivistApiConfig) {
         }
 
     suspend fun postBoundWitnessesAsync (
-        entries: Array<XyoBoundWitnessJson>,
-        closure: ((count: Int?, error: Error?) -> Void)? = null
-    ) = xyoScope.async {
-        val payloadString: String = Gson().toJson(entries)
+        entries: Array<XyoBoundWitnessJson>
+    ): PostBoundWitnessesResult {
+        val moshi = Moshi.Builder()
+            .addLast(KotlinJsonAdapterFactory())
+            .build()
+        val adapter = moshi.adapter(entries.javaClass)
+        val payloadString = adapter.toJson(entries)
         val apiDomain = config.apiDomain
         val archive = config.archive
 
@@ -43,25 +50,25 @@ open class XyoArchivistApiClient(private val config: XyoArchivistApiConfig) {
             .post(payloadString.toRequestBody(MEDIA_TYPE_JSON))
             .build()
 
-        return@async withContext(Dispatchers.IO) {
+        return withContext(Dispatchers.IO) {
             try {
                 return@withContext okHttp.newCall(request).execute().use { response ->
                     if (!response.isSuccessful) {
-                        closure?.let { it(0, Error(response.message)) }
-                        return@use false
+                        return@use PostBoundWitnessesResult(0, arrayListOf(Error(response.message)))
                     }
-                    return@use true
+                    return@use PostBoundWitnessesResult(1)
                 }
             } catch (ex: IOException) {
                 Log.e("xyoClient", ex.message ?: ex.toString())
+                return@withContext PostBoundWitnessesResult(0, arrayListOf(Error(ex.message)))
             }
         }
     }
 
     suspend fun postBoundWitnessAsync(
         entry: XyoBoundWitnessJson
-    ) = xyoScope.async {
-        return@async postBoundWitnessesAsync(arrayOf(entry)).await()
+    ): PostBoundWitnessesResult {
+        return postBoundWitnessesAsync(arrayOf(entry))
     }
 
     companion object {
