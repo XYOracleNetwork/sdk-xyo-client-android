@@ -50,10 +50,7 @@ class XyoPanel {
             .build()
         var results = emptyList<PostBoundWitnessesResult>()
         _archivists.forEach { archivist ->
-            val result = archivist.postBoundWitnessAsync(bw)
-            if (result.errors != null) {
-                results = results.plus(result)
-            }
+            results = results.plus(archivist.postBoundWitnessAsync(bw))
         }
         return results
     }
