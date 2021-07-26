@@ -1,5 +1,6 @@
 package network.xyo.client
 
+import network.xyo.client.archivist.api.PostBoundWitnessesResult
 import network.xyo.client.archivist.api.XyoArchivistApiClient
 import network.xyo.client.archivist.api.XyoArchivistApiConfig
 
@@ -27,7 +28,7 @@ class XyoPanel {
     private var _archivists: List<XyoArchivistApiClient> = emptyList()
     private var _witnesses: List<XyoWitness<XyoPayload>> = emptyList()
 
-    suspend fun event(event: String): List<Error> {
+    suspend fun event(event: String): List<PostBoundWitnessesResult> {
         val adhocWitnessList = listOf(
             XyoWitness(
                 {
@@ -38,24 +39,23 @@ class XyoPanel {
         return this.report(adhocWitnessList)
     }
 
-    suspend fun report(adhocWitnesses: List<XyoWitness<XyoPayload>> = emptyList()): List<Error> {
+    suspend fun report(adhocWitnesses: List<XyoWitness<XyoPayload>> = emptyList()): List<PostBoundWitnessesResult> {
         val witnesses = emptyList<XyoWitness<XyoPayload>>().plus(adhocWitnesses).plus(this._witnesses)
         val payloads = witnesses.map { witness ->
                 witness.observe()
         }
-        val bw = BoundWitnessBuilder()
+        val bw = XyoBoundWitnessBuilder()
             .payloads(payloads.mapNotNull { payload -> payload })
             .witnesses(witnesses)
             .build()
-        var errors = emptyList<Error>()
-        var archivistCount = _archivists.size
+        var results = emptyList<PostBoundWitnessesResult>()
         _archivists.forEach { archivist ->
             val result = archivist.postBoundWitnessAsync(bw)
             if (result.errors != null) {
-                errors = errors.plus(result.errors)
+                results = results.plus(result)
             }
         }
-        return errors
+        return results
     }
 
     companion object {

@@ -7,20 +7,20 @@ import network.xyo.client.address.XyoAddress
 import java.security.MessageDigest
 
 
-class BoundWitnessBuilder {
+class XyoBoundWitnessBuilder {
     private var _witnesses = emptyList<XyoAddress>()
     private var _previous_hashes = emptyList<String?>()
     private var _payload_hashes = emptyList<String>()
     private var _payload_schemas = emptyList<String>()
     private var _payloads = emptyList<XyoPayload>()
 
-    fun witness(address: XyoAddress, previousHash: String? = null): BoundWitnessBuilder {
+    fun witness(address: XyoAddress, previousHash: String? = null): XyoBoundWitnessBuilder {
         _witnesses.plus(address)
         _previous_hashes.plus(previousHash)
         return this
     }
 
-    fun witnesses(witnesses: List<XyoWitness<XyoPayload>>): BoundWitnessBuilder {
+    fun witnesses(witnesses: List<XyoWitness<XyoPayload>>): XyoBoundWitnessBuilder {
         _witnesses.plus(witnesses.map { witness -> witness.address })
         _previous_hashes.plus(witnesses.map { witness -> witness.previousHash })
         return this
@@ -35,14 +35,14 @@ class BoundWitnessBuilder {
         )
     }
 
-    fun <T: XyoPayload>payload(schema: String, payload: T): BoundWitnessBuilder {
+    fun <T: XyoPayload>payload(schema: String, payload: T): XyoBoundWitnessBuilder {
         _payloads.plus(payload)
-        _payload_hashes.plus(BoundWitnessBuilder.hash(payload))
+        _payload_hashes.plus(XyoBoundWitnessBuilder.hash(payload))
         _payload_schemas.plus(schema)
         return this
     }
 
-    fun payloads(payloads: List<XyoPayload>): BoundWitnessBuilder {
+    fun payloads(payloads: List<XyoPayload>): XyoBoundWitnessBuilder {
         _payloads.plus(payloads)
         _payload_hashes.plus(payloads.map {payload -> payload.sha256()})
         _payload_schemas.plus(payloads.map {payload -> payload.schema})
@@ -80,7 +80,7 @@ class BoundWitnessBuilder {
             Log.d("jsonString", jsonString)
             val md = MessageDigest.getInstance("SHA256")
             md.update(jsonString.encodeToByteArray())
-            val bytes = md.digest()
+            val bytes: ByteArray = md.digest()
             return bytesToHex(bytes)
         }
 
