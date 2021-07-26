@@ -12,9 +12,9 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import okio.IOException
 
-class PostBoundWitnessesResult (
+data class PostBoundWitnessesResult (
     val count: Int,
-    val errors: List<Error>? = null
+    val errors: ArrayList<Error>? = null
     )
 
 open class XyoArchivistApiClient(private val config: XyoArchivistApiConfig) {
@@ -34,7 +34,7 @@ open class XyoArchivistApiClient(private val config: XyoArchivistApiConfig) {
             this.config.token = value
         }
 
-    suspend fun postBoundWitnessesAsync (
+    private suspend fun postBoundWitnessesAsync (
         entries: Array<XyoBoundWitnessJson>
     ): PostBoundWitnessesResult {
         val moshi = Moshi.Builder()

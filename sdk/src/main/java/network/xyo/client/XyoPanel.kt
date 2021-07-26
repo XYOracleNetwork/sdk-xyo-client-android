@@ -4,6 +4,8 @@ import network.xyo.client.archivist.api.PostBoundWitnessesResult
 import network.xyo.client.archivist.api.XyoArchivistApiClient
 import network.xyo.client.archivist.api.XyoArchivistApiConfig
 
+data class XyoPanelReportResult(val bw: XyoBoundWitnessJson, val apiResults: List<PostBoundWitnessesResult>)
+
 class XyoPanel {
     constructor(archivists: List<XyoArchivistApiClient>, witnesses: List<XyoWitness<XyoPayload>>) {
         this._archivists = archivists
@@ -28,7 +30,7 @@ class XyoPanel {
     private var _archivists: List<XyoArchivistApiClient> = emptyList()
     private var _witnesses: List<XyoWitness<XyoPayload>> = emptyList()
 
-    suspend fun event(event: String): List<PostBoundWitnessesResult> {
+    suspend fun event(event: String): XyoPanelReportResult {
         val adhocWitnessList = listOf(
             XyoWitness(
                 {
@@ -39,7 +41,7 @@ class XyoPanel {
         return this.report(adhocWitnessList)
     }
 
-    suspend fun report(adhocWitnesses: List<XyoWitness<XyoPayload>> = emptyList()): List<PostBoundWitnessesResult> {
+    suspend fun report(adhocWitnesses: List<XyoWitness<XyoPayload>> = emptyList()): XyoPanelReportResult {
         val witnesses = emptyList<XyoWitness<XyoPayload>>().plus(adhocWitnesses).plus(this._witnesses)
         val payloads = witnesses.map { witness ->
                 witness.observe()
@@ -52,7 +54,7 @@ class XyoPanel {
         _archivists.forEach { archivist ->
             results = results.plus(archivist.postBoundWitnessAsync(bw))
         }
-        return results
+        return XyoPanelReportResult(bw, results)
     }
 
     companion object {
