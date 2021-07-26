@@ -36,7 +36,7 @@ class TestPayload2: XyoPayload("network.xyo.test") {
     var number_field = 1
 }
 
-val knownHash = "af0ba507a43ce9cde64afd7bca25b901745b8aa8aa99cac1d53f732638bf967d"
+val knownHash = "44c70d8bc8e2769312d0411670a6a07de9d65714769765fbaff353fa061ff2a7"
 
 class XyoBoundWitnessTest {
 
@@ -63,10 +63,10 @@ class XyoBoundWitnessTest {
     @Test
     fun testPayload1() {
         val payload = TestPayload1()
-        val hash = BoundWitnessBuilder.hash(payload)
+        val hash = XyoBoundWitnessBuilder.hash(payload)
         assertEquals("13898b1fc7ef16c6eb8917b4bdd1aabbc1981069f035c51d4166a171273bfe3d", hash )
         val address = XyoAddress("test")
-        val bw = BoundWitnessBuilder().witness(address).payload("network.xyo.test", TestPayload1())
+        val bw = XyoBoundWitnessBuilder().witness(address).payload("network.xyo.test", TestPayload1())
         val bwJson = bw.build()
         assertEquals(knownHash, bwJson._hash)
     }
@@ -78,7 +78,7 @@ class XyoBoundWitnessTest {
             val config = XyoArchivistApiConfig("test", "https://beta.archivist.xyo.network")
             val api = XyoArchivistApiClient.get(config)
             val bw =
-                BoundWitnessBuilder().witness(address).payload("network.xyo.test", TestPayload1())
+                XyoBoundWitnessBuilder().witness(address).payload("network.xyo.test", TestPayload1())
             val bwJson = bw.build()
             assertEquals(knownHash, bwJson._hash)
             val postResult = api.postBoundWitnessAsync(bwJson)
@@ -89,7 +89,7 @@ class XyoBoundWitnessTest {
     @Test
     fun testPayload2() {
         val address = XyoAddress("test")
-        val bw = BoundWitnessBuilder().witness(address).payload("network.xyo.test", TestPayload2())
+        val bw = XyoBoundWitnessBuilder().witness(address).payload("network.xyo.test", TestPayload2())
         val bwJson = bw.build()
         assertEquals(knownHash, bwJson._hash)
     }
@@ -100,7 +100,7 @@ class XyoBoundWitnessTest {
             val address = XyoAddress("test")
             val config = XyoArchivistApiConfig("test", "https://beta.archivist.xyo.network")
             val api = XyoArchivistApiClient.get(config)
-            val bw = BoundWitnessBuilder().witness(address).payload("network.xyo.test", TestPayload2())
+            val bw = XyoBoundWitnessBuilder().witness(address).payload("network.xyo.test", TestPayload2())
             val bwJson = bw.build()
             assertEquals(knownHash, bwJson._hash)
             val postResult = api.postBoundWitnessAsync(bwJson)
