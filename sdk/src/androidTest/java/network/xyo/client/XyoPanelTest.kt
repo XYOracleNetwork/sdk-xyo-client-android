@@ -46,7 +46,7 @@ class XyoPanelTest {
             })
             val panel = XyoPanel(archive, apiDomain, listOf(witness, XyoSystemInfoWitness()))
             val result = panel.report()
-            assertEquals(0, result.size)
+            result.apiResults.forEach { assertEquals(it.errors, null) }
         }
     }
 
@@ -57,7 +57,7 @@ class XyoPanelTest {
                 return XyoEventPayload("test_event", previousHash)
             })
             val result = panel.report()
-            assertEquals(0, result.size)
+            result.apiResults.forEach { assertEquals(it.errors, null) }
         }
     }
 
@@ -66,7 +66,7 @@ class XyoPanelTest {
         xyoScope.launch {
             val panel = XyoPanel(null, null, listOf(XyoSystemInfoWitness()))
             val result = panel.report()
-            assertEquals(0, result.size)
+            result.apiResults.forEach { assertEquals(it.errors, null) }
         }
     }
 }
