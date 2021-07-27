@@ -5,8 +5,10 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.wifi.WifiManager
+import com.squareup.moshi.JsonClass
 import java.net.NetworkInterface
 
+@JsonClass(generateAdapter = true)
 class XyoSystemInfoNetworkWifi (
     val ip: String?,
     val mac: String?,

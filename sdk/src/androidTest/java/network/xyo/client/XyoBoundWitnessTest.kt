@@ -39,7 +39,7 @@ class TestPayload2: XyoPayload("network.xyo.test") {
     var number_field = 1
 }
 
-val knownHash = "44c70d8bc8e2769312d0411670a6a07de9d65714769765fbaff353fa061ff2a7"
+val knownHash = "c0bcdb4e7b68015be6d8104be738305dbf2e4fd447571fd8f8942fd3853b5c77"
 
 class XyoBoundWitnessTest {
 
@@ -66,7 +66,7 @@ class XyoBoundWitnessTest {
     @Test
     fun testPayload1() {
         val payload = TestPayload1()
-        val hash = XyoBoundWitnessBuilder.hash(payload)
+        val hash = XyoBoundWitnessBuilder.sha256(payload)
         assertEquals("13898b1fc7ef16c6eb8917b4bdd1aabbc1981069f035c51d4166a171273bfe3d", hash )
         val address = XyoAddress("test")
         val bw = XyoBoundWitnessBuilder().witness(address).payload("network.xyo.test", TestPayload1())

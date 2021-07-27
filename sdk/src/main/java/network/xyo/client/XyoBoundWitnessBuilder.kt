@@ -9,12 +9,12 @@ import java.security.MessageDigest
 
 class XyoBoundWitnessBuilder {
     private var _witnesses = mutableListOf<XyoAddress>()
-    private var _previous_hashes = mutableListOf<String?>()
+    private var _previous_hashes = mutableListOf<String>()
     private var _payload_hashes = mutableListOf<String>()
     private var _payload_schemas = mutableListOf<String>()
     private var _payloads = mutableListOf<XyoPayload>()
 
-    fun witness(address: XyoAddress, previousHash: String? = null): XyoBoundWitnessBuilder {
+    fun witness(address: XyoAddress, previousHash: String = ""): XyoBoundWitnessBuilder {
         _witnesses.add(address)
         _previous_hashes.add(previousHash)
         return this
@@ -37,7 +37,7 @@ class XyoBoundWitnessBuilder {
 
     fun <T: XyoPayload>payload(schema: String, payload: T): XyoBoundWitnessBuilder {
         _payloads.add(payload)
-        _payload_hashes.add(hash(payload))
+        _payload_hashes.add(sha256(payload))
         _payload_schemas.add(schema)
         return this
     }
@@ -46,7 +46,7 @@ class XyoBoundWitnessBuilder {
         payloads.forEach {
             _payloads.add(it)
         }
-        payloads.forEach {payload -> _payload_hashes.add(payload.sha256())}
+        payloads.forEach {payload -> _payload_hashes.add(sha256(payload))}
         payloads.forEach {payload -> _payload_schemas.add(payload.schema)}
         return this
     }
@@ -60,7 +60,7 @@ class XyoBoundWitnessBuilder {
     fun build(): XyoBoundWitnessJson {
         val bw = XyoBoundWitnessJson()
         val hashable = hashableFields()
-        val hash = hash(hashable)
+        val hash = sha256(hashable)
         bw._signatures = this.sign(hash)
         bw._hash = hash
         bw._client = "kotlin"
@@ -73,13 +73,12 @@ class XyoBoundWitnessBuilder {
     }
 
     companion object {
-        fun hash(obj: Any): String {
+        fun sha256(obj: Any): String {
             val moshi = Moshi.Builder()
                 .addLast(KotlinJsonAdapterFactory())
                 .build()
             val adapter = moshi.adapter(obj.javaClass)
             val jsonString = adapter.toJson(obj)
-            Log.d("jsonString", jsonString)
             val md = MessageDigest.getInstance("SHA256")
             md.update(jsonString.encodeToByteArray())
             val bytes: ByteArray = md.digest()

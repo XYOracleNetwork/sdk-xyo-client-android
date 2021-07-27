@@ -1,7 +1,9 @@
 package network.xyo.client.witness.system.info
 
 import android.content.Context
+import com.squareup.moshi.JsonClass
 
+@JsonClass(generateAdapter = true)
 class XyoSystemInfoNetwork (
     val cellular: XyoSystemInfoNetworkCellular?,
     val wifi: XyoSystemInfoNetworkWifi?,
