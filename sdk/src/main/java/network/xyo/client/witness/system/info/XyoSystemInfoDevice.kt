@@ -2,7 +2,9 @@ package network.xyo.client.witness.system.info
 
 import android.content.Context
 import android.os.Build
+import com.squareup.moshi.JsonClass
 
+@JsonClass(generateAdapter = true)
 class XyoSystemInfoDevice(
     val board: String?,
     val bootloader: String?,

@@ -16,12 +16,12 @@ open class XyoAddress {
 
     open val privateKey: String?
         get() {
-            return _keyPair.private.toString()
+            return bytesToHex(_keyPair.private.encoded)
         }
 
     open val publicKey: String
         get() {
-            return _keyPair.public.toString()
+            return bytesToHex(_keyPair.public.encoded)
         }
 
     constructor() {

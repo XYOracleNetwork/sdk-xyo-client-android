@@ -8,8 +8,10 @@ import android.net.NetworkCapabilities
 import android.telephony.TelephonyManager
 import android.util.Log
 import androidx.core.app.ActivityCompat
+import com.squareup.moshi.JsonClass
 import java.net.NetworkInterface
 
+@JsonClass(generateAdapter = true)
 data class XyoSystemInfoNetworkCellularProvider(
     val name: String?,
 )

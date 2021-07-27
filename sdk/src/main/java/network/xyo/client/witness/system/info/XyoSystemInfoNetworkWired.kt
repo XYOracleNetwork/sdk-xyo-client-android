@@ -3,8 +3,10 @@ package network.xyo.client.witness.system.info
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import com.squareup.moshi.JsonClass
 import java.net.NetworkInterface
 
+@JsonClass(generateAdapter = true)
 class XyoSystemInfoNetworkWired(
     val ip: String?
 ) {
