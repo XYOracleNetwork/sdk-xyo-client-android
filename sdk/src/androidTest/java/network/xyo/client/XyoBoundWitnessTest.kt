@@ -3,7 +3,10 @@ package network.xyo.client
 import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import network.xyo.client.address.XyoAddress
 import network.xyo.client.archivist.api.XyoArchivistApiClient
 import network.xyo.client.archivist.api.XyoArchivistApiConfig
@@ -42,7 +45,7 @@ class XyoBoundWitnessTest {
 
     @Rule
     @JvmField
-    val grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(android.Manifest.permission.INTERNET)
+    val grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(android.Manifest.permission.INTERNET, android.Manifest.permission.ACCESS_WIFI_STATE)
 
 
     lateinit var appContext: Context
@@ -73,7 +76,7 @@ class XyoBoundWitnessTest {
 
     @Test
     fun testPayload1WithSend() {
-        xyoScope.launch {
+        runBlocking {
             val address = XyoAddress("test")
             val config = XyoArchivistApiConfig("test", "https://beta.archivist.xyo.network")
             val api = XyoArchivistApiClient.get(config)
@@ -82,7 +85,7 @@ class XyoBoundWitnessTest {
             val bwJson = bw.build()
             assertEquals(knownHash, bwJson._hash)
             val postResult = api.postBoundWitnessAsync(bwJson)
-            assertEquals(0, postResult.errors?.size)
+            assertEquals(null, postResult.errors)
         }
     }
 
@@ -96,7 +99,7 @@ class XyoBoundWitnessTest {
 
     @Test
     fun testPayload2WithSend() {
-        xyoScope.launch {
+        runBlocking {
             val address = XyoAddress("test")
             val config = XyoArchivistApiConfig("test", "https://beta.archivist.xyo.network")
             val api = XyoArchivistApiClient.get(config)
@@ -104,7 +107,7 @@ class XyoBoundWitnessTest {
             val bwJson = bw.build()
             assertEquals(knownHash, bwJson._hash)
             val postResult = api.postBoundWitnessAsync(bwJson)
-            assertEquals(0, postResult.errors?.size)
+            assertEquals(null, postResult.errors)
         }
     }
 }
