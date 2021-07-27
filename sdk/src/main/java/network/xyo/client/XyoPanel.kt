@@ -1,58 +1,62 @@
 package network.xyo.client
 
+import android.content.Context
 import network.xyo.client.archivist.api.PostBoundWitnessesResult
 import network.xyo.client.archivist.api.XyoArchivistApiClient
 import network.xyo.client.archivist.api.XyoArchivistApiConfig
 
 data class XyoPanelReportResult(val bw: XyoBoundWitnessJson, val apiResults: List<PostBoundWitnessesResult>)
 
-class XyoPanel {
-    constructor(archivists: List<XyoArchivistApiClient>, witnesses: List<XyoWitness<XyoPayload>>) {
-        this._archivists = archivists
-        this._witnesses = witnesses
-    }
+class XyoPanel(val context: Context, val archivists: List<XyoArchivistApiClient>, val witnesses: List<XyoWitness<XyoPayload>>?) {
+    constructor(
+        context: Context,
+        archive: String? = null,
+        apiDomain: String? = null,
+        witnesses: List<XyoWitness<XyoPayload>>? = null,
+        token: String? = null
+    ) :
+        this(
+            context,
+            listOf(
+                XyoArchivistApiClient.get(
+                    XyoArchivistApiConfig(
+                        archive ?: XyoPanel.DefaultApiArchive,
+                        apiDomain ?: XyoPanel.DefaultApiDomain
+                    )
+                )
+            ),
+            witnesses
+        )
 
-    constructor(archive: String? = null, apiDomain: String? = null, witnesses: List<XyoWitness<XyoPayload>>? = null, token: String? = null) {
-        val apiConfig = XyoArchivistApiConfig(archive ?: XyoPanel.DefaultApiArchive, apiDomain ?: XyoPanel.DefaultApiDomain)
-        val archivist = XyoArchivistApiClient.get(apiConfig)
-        this._archivists = listOf(archivist)
-        if (witnesses != null) {
-            this._witnesses = witnesses
-        }
-    }
-
-    constructor(observe: ((previousHash: String?) -> XyoEventPayload?)?) {
-        if (observe != null) {
-            this._witnesses = listOf(XyoWitness(observe))
-        }
-    }
-
-    private var _archivists: List<XyoArchivistApiClient> = emptyList()
-    private var _witnesses: List<XyoWitness<XyoPayload>> = emptyList()
+    constructor(
+        context: Context,
+        observe: ((context: Context, previousHash: String?) -> XyoEventPayload?)?
+    ):this(
+        context,
+        emptyList<XyoArchivistApiClient>(),
+        listOf(XyoWitness(observe)))
 
     suspend fun event(event: String): XyoPanelReportResult {
         val adhocWitnessList = listOf(
-            XyoWitness(
-                {
-                        previousHash -> XyoEventPayload(event, previousHash)
-                }
-            )
+            XyoWitness<XyoEventPayload>({
+                context, previousHash -> XyoEventPayload(event, previousHash)
+            })
         )
         return this.report(adhocWitnessList)
     }
 
     suspend fun report(adhocWitnesses: List<XyoWitness<XyoPayload>> = emptyList()): XyoPanelReportResult {
-        val witnesses = emptyList<XyoWitness<XyoPayload>>().plus(adhocWitnesses).plus(this._witnesses)
+        val witnesses: List<XyoWitness<XyoPayload>> = (this.witnesses ?: emptyList()).plus(adhocWitnesses)
         val payloads = witnesses.map { witness ->
-                witness.observe()
+                witness.observe(context)
         }
         val bw = XyoBoundWitnessBuilder()
             .payloads(payloads.mapNotNull { payload -> payload })
             .witnesses(witnesses)
             .build()
-        var results = emptyList<PostBoundWitnessesResult>()
-        _archivists.forEach { archivist ->
-            results = results.plus(archivist.postBoundWitnessAsync(bw))
+        val results = mutableListOf<PostBoundWitnessesResult>()
+        archivists.forEach { archivist ->
+            results.add(archivist.postBoundWitnessAsync(bw))
         }
         return XyoPanelReportResult(bw, results)
     }

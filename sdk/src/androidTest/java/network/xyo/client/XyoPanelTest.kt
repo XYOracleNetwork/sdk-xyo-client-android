@@ -6,6 +6,7 @@ import androidx.test.rule.GrantPermissionRule
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import network.xyo.client.address.XyoAddress
+import network.xyo.client.witness.system.info.XyoSystemInfoWitness
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -14,8 +15,7 @@ import org.junit.jupiter.api.Assertions.*
 class XyoPanelTest {
     @Rule
     @JvmField
-    val grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(android.Manifest.permission.INTERNET)
-
+    val grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(android.Manifest.permission.INTERNET, android.Manifest.permission.ACCESS_WIFI_STATE)
 
     lateinit var appContext: Context
 
@@ -31,29 +31,31 @@ class XyoPanelTest {
         val archive = "test"
         val address = XyoAddress()
         val witness = XyoWitness<XyoPayload>(address)
-        val panel = XyoPanel(archive, apiDomain, listOf(witness))
+        val panel = XyoPanel(appContext, archive, apiDomain, listOf(witness))
         assertNotNull(address)
         assertNotNull(panel)
     }
 
     @Test
     fun testPanelReport() {
-        xyoScope.launch {
+        runBlocking {
             val apiDomain = "https://beta.archivist.xyo.network"
             val archive = "test"
-            val witness = XyoWitness(fun(previousHash: String?): XyoPayload {
+            val witness = XyoWitness(fun(context: Context, previousHash: String?): XyoPayload {
                 return XyoPayload("network.xyo.basic", previousHash)
             })
-            val panel = XyoPanel(archive, apiDomain, listOf(witness, XyoSystemInfoWitness()))
+            val panel = XyoPanel(appContext, archive, apiDomain, listOf(witness, XyoSystemInfoWitness()))
             val result = panel.report()
-            result.apiResults.forEach { assertEquals(it.errors, null) }
+            result.apiResults.forEach {
+                assertEquals(it.errors, null)
+            }
         }
     }
 
     @Test
     fun testSimplePanelReport() {
         runBlocking {
-            val panel = XyoPanel(fun(previousHash: String?): XyoEventPayload {
+            val panel = XyoPanel(appContext, fun(_context:Context, previousHash: String?): XyoEventPayload {
                 return XyoEventPayload("test_event", previousHash)
             })
             val result = panel.report()
@@ -63,8 +65,8 @@ class XyoPanelTest {
 
     @Test
     fun testReportEvent() {
-        xyoScope.launch {
-            val panel = XyoPanel(null, null, listOf(XyoSystemInfoWitness()))
+        runBlocking {
+            val panel = XyoPanel(appContext, null, null, listOf(XyoSystemInfoWitness()))
             val result = panel.report()
             result.apiResults.forEach { assertEquals(it.errors, null) }
         }
