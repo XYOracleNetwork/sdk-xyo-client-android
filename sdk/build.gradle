@@ -14,12 +14,12 @@ def verCode = majorVersion  * 10000000 + minorVersion * 10000 + patchVersion
 def verString = "" + majorVersion + "." + minorVersion + "(Build " + patchVersion + ")"
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 31
     buildToolsVersion "30.0.3"
 
     defaultConfig {
         minSdkVersion 24
-        targetSdkVersion 30
+        targetSdkVersion 31
         versionCode verCode
         versionName verString
 

@@ -38,7 +38,7 @@ class TestPayload2: XyoPayload("network.xyo.test") {
     var number_field = 1
 }
 
-val knownHash = "c0bcdb4e7b68015be6d8104be738305dbf2e4fd447571fd8f8942fd3853b5c77"
+const val knownHash = "c0bcdb4e7b68015be6d8104be738305dbf2e4fd447571fd8f8942fd3853b5c77"
 
 class XyoBoundWitnessTest {
 

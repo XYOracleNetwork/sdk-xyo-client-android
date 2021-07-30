@@ -1,10 +1,7 @@
 package network.xyo.client
 
 import android.content.Context
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import network.xyo.client.address.XyoAddress
-import java.security.MessageDigest
 
 open class XyoWitness<out T: XyoPayload>(
     val address: XyoAddress,
