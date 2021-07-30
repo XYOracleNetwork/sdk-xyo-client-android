@@ -3,45 +3,28 @@ package network.xyo.client.address
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import network.xyo.client.EcCurve
+import network.xyo.client.XyoSerializable
 import java.math.BigInteger
 import java.security.*
 import java.security.interfaces.ECPrivateKey
 import java.security.interfaces.ECPublicKey
 import java.security.spec.*
-import java.util.*
 
+open class XyoAddress(var _keyPair: KeyPair = generateKeyPair()) {
 
-open class XyoAddress {
-    private var _keyPair: KeyPair
+    constructor(publicKey: ByteArray): this(decodeECKeyPair(publicKey))
+
+    constructor(phrase: String): this(decodeECKeyPair(XyoSerializable.sha256(phrase)))
 
     open val privateKey: String?
         get() {
-            return bytesToHex(_keyPair.private.encoded)
+            return XyoSerializable.bytesToHex(_keyPair.private.encoded)
         }
 
     open val publicKey: String
         get() {
-            return bytesToHex(_keyPair.public.encoded)
+            return XyoSerializable.bytesToHex(_keyPair.public.encoded)
         }
-
-    constructor() {
-        _keyPair = generateKeyPair()
-    }
-
-    constructor(keyPair: KeyPair)
-    {
-        _keyPair = keyPair
-    }
-
-    constructor(publicKey: ByteArray)
-    {
-        _keyPair = decodeECKeyPair(publicKey)
-    }
-
-    constructor(phrase: String)
-    {
-        _keyPair = decodeECKeyPair(sha256(phrase))
-    }
 
     open fun sign(hash: String): ByteArray {
         val signature: Signature = Signature.getInstance("SHA256withECDSA")
@@ -51,28 +34,6 @@ open class XyoAddress {
     }
 
     companion object {
-        fun sha256(value: String): ByteArray {
-            val md = MessageDigest.getInstance("SHA256")
-            md.update(value.encodeToByteArray())
-            return md.digest()
-        }
-
-        fun sha256String(value: String): String {
-            return bytesToHex(sha256(value))
-        }
-
-        private val hexArray = "0123456789abcdef".toCharArray()
-
-        fun bytesToHex(bytes: ByteArray): String {
-            val hexChars = CharArray(bytes.size * 2)
-            for (j in bytes.indices) {
-                val v = bytes[j].toInt() and 0xFF
-
-                hexChars[j * 2] = hexArray[v ushr 4]
-                hexChars[j * 2 + 1] = hexArray[v and 0x0F]
-            }
-            return String(hexChars)
-        }
 
         private fun getECParamSpec(): ECParameterSpec {
             val localKeyPair = generateKeyPair()
