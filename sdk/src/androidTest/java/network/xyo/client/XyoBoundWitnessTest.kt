@@ -3,9 +3,7 @@ package network.xyo.client
 import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
+import com.squareup.moshi.JsonClass
 import kotlinx.coroutines.runBlocking
 import network.xyo.client.address.XyoAddress
 import network.xyo.client.archivist.api.XyoArchivistApiClient
@@ -20,6 +18,7 @@ class TestPayload1SubObject {
     var string_value = "yo"
 }
 
+@JsonClass(generateAdapter = true)
 class TestPayload1: XyoPayload("network.xyo.test") {
     var timestamp = 1618603439107
     var number_field = 1
@@ -66,7 +65,7 @@ class XyoBoundWitnessTest {
     @Test
     fun testPayload1() {
         val payload = TestPayload1()
-        val hash = XyoBoundWitnessBuilder.sha256(payload)
+        val hash = XyoSerializable.sha256String(payload)
         assertEquals("13898b1fc7ef16c6eb8917b4bdd1aabbc1981069f035c51d4166a171273bfe3d", hash )
         val address = XyoAddress("test")
         val bw = XyoBoundWitnessBuilder().witness(address).payload("network.xyo.test", TestPayload1())

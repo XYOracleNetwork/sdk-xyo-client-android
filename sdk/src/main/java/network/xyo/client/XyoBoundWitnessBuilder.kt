@@ -1,11 +1,6 @@
 package network.xyo.client
 
-import android.util.Log
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import network.xyo.client.address.XyoAddress
-import java.security.MessageDigest
-
 
 class XyoBoundWitnessBuilder {
     private var _witnesses = mutableListOf<XyoAddress>()
@@ -37,7 +32,7 @@ class XyoBoundWitnessBuilder {
 
     fun <T: XyoPayload>payload(schema: String, payload: T): XyoBoundWitnessBuilder {
         _payloads.add(payload)
-        _payload_hashes.add(sha256(payload))
+        _payload_hashes.add(XyoSerializable.sha256String(payload))
         _payload_schemas.add(schema)
         return this
     }
@@ -46,21 +41,21 @@ class XyoBoundWitnessBuilder {
         payloads.forEach {
             _payloads.add(it)
         }
-        payloads.forEach {payload -> _payload_hashes.add(sha256(payload))}
+        payloads.forEach {payload -> _payload_hashes.add(XyoSerializable.sha256String(payload))}
         payloads.forEach {payload -> _payload_schemas.add(payload.schema)}
         return this
     }
 
     fun sign(hash: String): List<String> {
         return _witnesses.map {
-            bytesToHex(it.sign(hash))
+            XyoSerializable.bytesToHex(it.sign(hash))
         }
     }
 
     fun build(): XyoBoundWitnessJson {
         val bw = XyoBoundWitnessJson()
         val hashable = hashableFields()
-        val hash = sha256(hashable)
+        val hash = XyoSerializable.sha256String(hashable)
         bw._signatures = this.sign(hash)
         bw._hash = hash
         bw._client = "kotlin"
@@ -70,32 +65,5 @@ class XyoBoundWitnessBuilder {
         bw.payload_hashes = _payload_hashes
         bw.payload_schemas = _payload_schemas
         return bw
-    }
-
-    companion object {
-        fun sha256(obj: Any): String {
-            val moshi = Moshi.Builder()
-                .addLast(KotlinJsonAdapterFactory())
-                .build()
-            val adapter = moshi.adapter(obj.javaClass)
-            val jsonString = adapter.toJson(obj)
-            val md = MessageDigest.getInstance("SHA256")
-            md.update(jsonString.encodeToByteArray())
-            val bytes: ByteArray = md.digest()
-            return bytesToHex(bytes)
-        }
-
-        private val hexArray = "0123456789abcdef".toCharArray()
-
-        fun bytesToHex(bytes: ByteArray): String {
-            val hexChars = CharArray(bytes.size * 2)
-            for (j in bytes.indices) {
-                val v = bytes[j].toInt() and 0xFF
-
-                hexChars[j * 2] = hexArray[v ushr 4]
-                hexChars[j * 2 + 1] = hexArray[v and 0x0F]
-            }
-            return String(hexChars)
-        }
     }
 }
