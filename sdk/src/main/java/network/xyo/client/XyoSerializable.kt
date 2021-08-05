@@ -2,9 +2,13 @@ package network.xyo.client
 
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import org.json.JSONArray
+import org.json.JSONObject
+import java.io.Serializable
 import java.security.MessageDigest
 
-abstract class XyoSerializable  {
+abstract class XyoSerializable: Serializable  {
 
     fun <T>adapter(): JsonAdapter<T> {
         val moshi = Moshi.Builder().build()
@@ -13,9 +17,48 @@ abstract class XyoSerializable  {
 
     companion object {
 
-        fun <T: XyoSerializable>toJson(obj: T): String {
-            val adapter = obj.adapter<T>()
-            return adapter.toJson(obj)
+        fun sortJson(json: String): String {
+            return sortJson(JSONObject(json)).toString()
+        }
+
+        fun sortJson(jsonObject: JSONObject): JSONObject {
+            val keys = jsonObject.keys().asSequence().sorted()
+            val newJsonObject = JSONObject()
+            keys.forEach {
+                val value = jsonObject.get(it)
+                if (value is JSONObject) {
+                    newJsonObject.put(it, sortJson(value))
+                } else if (value is JSONArray) {
+                    newJsonObject.put(it, sortJson(value))
+                } else {
+                    newJsonObject.put(it, value)
+                }
+            }
+            return newJsonObject
+        }
+
+        fun sortJson(jsonArray: JSONArray): JSONArray {
+            val newJsonArray = JSONArray()
+            for (i in 0 until jsonArray.length()) {
+                val value = jsonArray[i]
+                if (value is JSONArray) {
+                    newJsonArray.put(sortJson(value))
+                }
+                else if (value is JSONObject) {
+                    newJsonArray.put(sortJson(value))
+                } else {
+                    newJsonArray.put(value)
+                }
+            }
+            return newJsonArray
+        }
+
+        fun toJson(obj: Any): String {
+            val moshi = Moshi.Builder()
+                .addLast(KotlinJsonAdapterFactory())
+                .build()
+            val adapter = moshi.adapter(obj.javaClass)
+            return sortJson(adapter.toJson(obj))
         }
 
         fun <T: XyoSerializable>fromJson(json: String, obj: T): T? {

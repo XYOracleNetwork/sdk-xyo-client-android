@@ -1,8 +1,6 @@
 package network.xyo.client.archivist.api
 
 import android.util.Log
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -15,15 +13,17 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import okio.IOException
 
-data class XyoArchivistBoundWitnessBody (
+import network.xyo.client.XyoSerializable
+
+class XyoArchivistBoundWitnessBody (
     val boundWitnesses: List<XyoBoundWitnessJson>,
     val payloads: List<XyoPayload>? = null
-        )
+        ) : XyoSerializable()
 
-data class PostBoundWitnessesResult (
+class PostBoundWitnessesResult (
     val count: Int,
     val errors: ArrayList<Error>? = null
-    )
+    ): XyoSerializable()
 
 open class XyoArchivistApiClient(private val config: XyoArchivistApiConfig) {
 
@@ -46,11 +46,7 @@ open class XyoArchivistApiClient(private val config: XyoArchivistApiConfig) {
     private suspend fun postBoundWitnessesAsync (
         entries: List<XyoBoundWitnessJson>
     ): PostBoundWitnessesResult {
-        val moshi = Moshi.Builder()
-            .addLast(KotlinJsonAdapterFactory())
-            .build()
-        val adapter = moshi.adapter(XyoArchivistBoundWitnessBody::class.java)
-        val bodyString = adapter.toJson(XyoArchivistBoundWitnessBody(entries))
+        val bodyString = XyoSerializable.toJson(XyoArchivistBoundWitnessBody(entries))
         val apiDomain = config.apiDomain
         val archive = config.archive
 
