@@ -55,19 +55,8 @@ class XyoPayloadTest {
     @Test
     fun testRoundTripPayload() {
         val payload = TestPayload1()
-        val moshi = Moshi.Builder()
-            .addLast(KotlinJsonAdapterFactory())
-            .build()
-        val adapter = moshi.adapter(TestPayload1::class.java)
-        val payloadJsonString = adapter.toJson(payload)
-        val jsonObject = JSONObject(payloadJsonString)
-        val keys = jsonObject.keys().asSequence().sorted()
-        val newJsonObject = JSONObject()
-        keys.forEach {
-            newJsonObject.put(it, jsonObject.get(it))
-        }
-        val newJsonObjectString = newJsonObject.toString()
-        val payloadMirrored = adapter.fromJson(newJsonObjectString)
+        val payloadJsonString = XyoSerializable.toJson(payload)
+        val payloadMirrored = XyoSerializable.fromJson<TestPayload1>(payloadJsonString, TestPayload1())
         assertNotNull(payloadMirrored)
         if (payloadMirrored != null) {
             assertEquals(payload.schema, payloadMirrored.schema)
