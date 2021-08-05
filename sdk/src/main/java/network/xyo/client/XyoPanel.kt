@@ -1,6 +1,8 @@
 package network.xyo.client
 
 import android.content.Context
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import network.xyo.client.archivist.api.PostBoundWitnessesResult
 import network.xyo.client.archivist.api.XyoArchivistApiClient
 import network.xyo.client.archivist.api.XyoArchivistApiConfig
@@ -36,16 +38,28 @@ class XyoPanel(val context: Context, val archivists: List<XyoArchivistApiClient>
         emptyList<XyoArchivistApiClient>(),
         listOf(XyoWitness(observe)))
 
-    suspend fun event(event: String): XyoPanelReportResult {
+    fun event(event: String) {
+        xyoScope.launch {
+            this@XyoPanel.eventAsync(event)
+        }
+    }
+
+    suspend fun eventAsync(event: String): XyoPanelReportResult {
         val adhocWitnessList = listOf(
             XyoWitness({
                 context, previousHash -> XyoEventPayload(event, previousHash)
             })
         )
-        return this.report(adhocWitnessList)
+        return this.reportAsync(adhocWitnessList)
     }
 
-    suspend fun report(adhocWitnesses: List<XyoWitness<XyoPayload>> = emptyList()): XyoPanelReportResult {
+    fun report(adhocWitnesses: List<XyoWitness<XyoPayload>> = emptyList()) {
+        xyoScope.launch {
+            reportAsync(adhocWitnesses)
+        }
+    }
+
+    suspend fun reportAsync(adhocWitnesses: List<XyoWitness<XyoPayload>> = emptyList()): XyoPanelReportResult {
         val witnesses: List<XyoWitness<XyoPayload>> = (this.witnesses ?: emptyList()).plus(adhocWitnesses)
         val payloads = witnesses.map { witness ->
                 witness.observe(context)
