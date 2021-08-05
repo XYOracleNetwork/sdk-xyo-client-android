@@ -29,7 +29,8 @@ class XyoSystemInfoNetworkWifi (
             if (networkCaps?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true) {
                 val wifiManager = context.getSystemService(Context.WIFI_SERVICE) as WifiManager
                 val wifiInfo = wifiManager.connectionInfo
-                return XyoSystemInfoNetworkWifi(getIpAddress(), wifiInfo.macAddress, wifiInfo.rssi, wifiInfo.ssid)
+                //we remove the extra quotes because for some reason the system puts the SSID in quotes
+                return XyoSystemInfoNetworkWifi(getIpAddress(), wifiInfo.macAddress, wifiInfo.rssi, wifiInfo.ssid.replace("\"", ""))
             }
             return null
         }
