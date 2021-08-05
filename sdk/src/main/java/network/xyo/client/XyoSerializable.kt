@@ -10,11 +10,6 @@ import java.security.MessageDigest
 
 abstract class XyoSerializable: Serializable  {
 
-    fun <T>adapter(): JsonAdapter<T> {
-        val moshi = Moshi.Builder().build()
-        return moshi.adapter<T>(this.javaClass)
-    }
-
     companion object {
 
         fun sortJson(json: String): String {
@@ -62,7 +57,10 @@ abstract class XyoSerializable: Serializable  {
         }
 
         fun <T: XyoSerializable>fromJson(json: String, obj: T): T? {
-            val adapter = obj.adapter<T>()
+            val moshi = Moshi.Builder()
+                .addLast(KotlinJsonAdapterFactory())
+                .build()
+            val adapter = moshi.adapter(obj.javaClass)
             return adapter.fromJson(json)
         }
 
