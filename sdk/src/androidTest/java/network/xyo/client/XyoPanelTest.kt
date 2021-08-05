@@ -44,7 +44,7 @@ class XyoPanelTest {
                 return XyoPayload("network.xyo.basic", previousHash)
             })
             val panel = XyoPanel(appContext, archive, apiDomain, listOf(witness, XyoSystemInfoWitness()))
-            val result = panel.report()
+            val result = panel.reportAsync()
             result.apiResults.forEach {
                 assertEquals(it.errors, null)
             }
@@ -57,7 +57,7 @@ class XyoPanelTest {
             val panel = XyoPanel(appContext, fun(_context:Context, previousHash: String?): XyoEventPayload {
                 return XyoEventPayload("test_event", previousHash)
             })
-            val result = panel.report()
+            val result = panel.reportAsync()
             result.apiResults.forEach { assertEquals(it.errors, null) }
         }
     }
@@ -66,7 +66,7 @@ class XyoPanelTest {
     fun testReportEvent() {
         runBlocking {
             val panel = XyoPanel(appContext, null, null, listOf(XyoSystemInfoWitness()))
-            val result = panel.report()
+            val result = panel.reportAsync()
             result.apiResults.forEach { assertEquals(it.errors, null) }
         }
     }
