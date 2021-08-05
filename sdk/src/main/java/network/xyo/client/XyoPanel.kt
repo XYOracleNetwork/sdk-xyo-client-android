@@ -20,8 +20,8 @@ class XyoPanel(val context: Context, val archivists: List<XyoArchivistApiClient>
             listOf(
                 XyoArchivistApiClient.get(
                     XyoArchivistApiConfig(
-                        archive ?: XyoPanel.DefaultApiArchive,
-                        apiDomain ?: XyoPanel.DefaultApiDomain
+                        archive ?: DefaultApiArchive,
+                        apiDomain ?: DefaultApiDomain
                     )
                 )
             ),
@@ -38,7 +38,7 @@ class XyoPanel(val context: Context, val archivists: List<XyoArchivistApiClient>
 
     suspend fun event(event: String): XyoPanelReportResult {
         val adhocWitnessList = listOf(
-            XyoWitness<XyoEventPayload>({
+            XyoWitness({
                 context, previousHash -> XyoEventPayload(event, previousHash)
             })
         )
@@ -62,8 +62,8 @@ class XyoPanel(val context: Context, val archivists: List<XyoArchivistApiClient>
     }
 
     companion object {
-        val DefaultApiArchive = "default"
-        val DefaultApiDomain = "https://archivist.xyo.network"
+        const val DefaultApiArchive = "default"
+        const val DefaultApiDomain = "https://archivist.xyo.network"
         val defaultArchivist: XyoArchivistApiClient
             get() {
                 val apiConfig = XyoArchivistApiConfig(this.DefaultApiArchive, this.DefaultApiDomain)

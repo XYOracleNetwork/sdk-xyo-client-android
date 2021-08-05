@@ -31,18 +31,18 @@ class XyoBoundWitnessBuilder {
     }
 
     fun <T: XyoPayload>payload(schema: String, payload: T): XyoBoundWitnessBuilder {
-        _payloads.add(payload)
-        _payload_hashes.add(XyoSerializable.sha256String(payload))
-        _payload_schemas.add(schema)
+        if (payload.validate()) {
+            _payloads.add(payload)
+            _payload_hashes.add(XyoSerializable.sha256String(payload))
+            _payload_schemas.add(schema)
+        }
         return this
     }
 
     fun payloads(payloads: List<XyoPayload>): XyoBoundWitnessBuilder {
         payloads.forEach {
-            _payloads.add(it)
+            payload(it.schema, it)
         }
-        payloads.forEach {payload -> _payload_hashes.add(XyoSerializable.sha256String(payload))}
-        payloads.forEach {payload -> _payload_schemas.add(payload.schema)}
         return this
     }
 

@@ -2,13 +2,11 @@ package network.xyo.client.witness.system.info
 
 import android.Manifest
 import android.content.Context
-import android.content.pm.PackageManager
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.telephony.TelephonyManager
-import android.util.Log
-import androidx.core.app.ActivityCompat
 import com.squareup.moshi.JsonClass
+import network.xyo.client.hasPermission.hasPermission
 import java.net.NetworkInterface
 
 @JsonClass(generateAdapter = true)
@@ -16,6 +14,7 @@ data class XyoSystemInfoNetworkCellularProvider(
     val name: String?,
 )
 
+@JsonClass(generateAdapter = true)
 class XyoSystemInfoNetworkCellular(
     val provider: XyoSystemInfoNetworkCellularProvider?,
     val ip: String?
@@ -27,18 +26,17 @@ class XyoSystemInfoNetworkCellular(
             val networkCaps = connectivityManager.getNetworkCapabilities(network)
             if (networkCaps?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) == true) {
                 val telephonyManager = context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-                if (ActivityCompat.checkSelfPermission(
+                if (hasPermission (
                         context,
-                        Manifest.permission.READ_PHONE_STATE
-                    ) == PackageManager.PERMISSION_GRANTED
+                        Manifest.permission.READ_PHONE_STATE,
+                        "Manifest.permission.READ_PHONE_STATE required"
+                    )
                 ) {
                     val provider = XyoSystemInfoNetworkCellularProvider(
                         telephonyManager.networkOperatorName
                     )
 
                     return XyoSystemInfoNetworkCellular(provider, getIpAddress())
-                } else {
-                    Log.w(XyoSystemInfoNetworkCellular::class.java.name, "Manifest.permission.READ_PHONE_STATE required")
                 }
             }
             return null

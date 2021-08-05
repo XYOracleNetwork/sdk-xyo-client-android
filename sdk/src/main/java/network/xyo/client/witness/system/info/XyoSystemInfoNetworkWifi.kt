@@ -1,10 +1,14 @@
 package network.xyo.client.witness.system.info
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.pm.PackageManager
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.wifi.WifiManager
+import android.util.Log
+import androidx.core.app.ActivityCompat
 import com.squareup.moshi.JsonClass
 import java.net.NetworkInterface
 
@@ -16,6 +20,7 @@ class XyoSystemInfoNetworkWifi (
     val ssid: String?
 ) {
     companion object {
+
         @SuppressLint("HardwareIds")
         fun detect(context: Context): XyoSystemInfoNetworkWifi? {
             val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager

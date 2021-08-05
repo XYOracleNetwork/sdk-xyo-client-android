@@ -3,7 +3,7 @@ package network.xyo.client
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
-open class XyoBoundWitnessBodyJson(): XyoBoundWitnessBodyInterface {
+open class XyoBoundWitnessBodyJson(): XyoBoundWitnessBodyInterface, XyoSerializable() {
 
     final override var addresses = emptyList<String>()
     final override var previous_hashes = emptyList<String>()

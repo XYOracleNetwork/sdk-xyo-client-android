@@ -3,14 +3,6 @@ package network.xyo.client
 import java.math.BigInteger
 import java.security.spec.ECPoint
 
-
-/**
- * A point on an elliptical curve (x, y).
- *
- * @property x The x value of the point on the curve.
- * @property y The y value of the point on the curve.
- * @property curve The curve the point belongs to.
- */
 class EcPoint (x : BigInteger, y : BigInteger, val curve: EcCurve): ECPoint(x, y) {
 
     /**

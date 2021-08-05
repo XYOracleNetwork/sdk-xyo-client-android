@@ -1,32 +1,39 @@
 package network.xyo.client
 
-import android.util.Log
+import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import java.security.MessageDigest
 
-open class XyoSerializable {
+abstract class XyoSerializable  {
+
+    fun <T>adapter(): JsonAdapter<T> {
+        val moshi = Moshi.Builder().build()
+        return moshi.adapter<T>(this.javaClass)
+    }
+
     companion object {
 
-        fun toJson(obj: Any): String {
-            val moshi = Moshi.Builder()
-                .addLast(KotlinJsonAdapterFactory())
-                .build()
-            val jc = obj.javaClass.canonicalName
-            Log.d("XyoSerializable", jc)
-            val adapter = moshi.adapter(obj.javaClass)
-            val r = adapter.toJson(obj)
-            Log.d("XyoSerializable2", r)
-            return r
+        fun <T: XyoSerializable>toJson(obj: T): String {
+            val adapter = obj.adapter<T>()
+            return adapter.toJson(obj)
         }
 
-        fun sha256(obj: Any): ByteArray {
+        fun <T: XyoSerializable>fromJson(json: String, obj: T): T? {
+            val adapter = obj.adapter<T>()
+            return adapter.fromJson(json)
+        }
+
+        fun sha256(value: String): ByteArray {
             val md = MessageDigest.getInstance("SHA256")
-            md.update(toJson(obj).encodeToByteArray())
+            md.update(value.encodeToByteArray())
             return md.digest()
         }
 
-        fun sha256String(obj: Any): String {
+        fun <T: XyoSerializable>sha256(obj: T): ByteArray {
+            return sha256(toJson(obj))
+        }
+
+        fun <T: XyoSerializable>sha256String(obj: T): String {
             return bytesToHex(sha256(obj))
         }
 
