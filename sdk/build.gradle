@@ -3,6 +3,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'maven-publish'
 apply plugin: "de.mannodermaus.android-junit5"
+apply plugin: 'kotlin-kapt'
 
 group = 'network.xyo'
 
@@ -14,12 +15,17 @@ def verCode = majorVersion  * 10000000 + minorVersion * 10000 + patchVersion
 def verString = "" + majorVersion + "." + minorVersion + "(Build " + patchVersion + ")"
 
 android {
-    compileSdkVersion 31
+    compileSdkVersion 30
     buildToolsVersion "30.0.3"
+
+    //required for moshi codegen kotlin version conflict
+    packagingOptions {
+        exclude 'META-INF/*.kotlin_module'
+    }
 
     defaultConfig {
         minSdkVersion 24
-        targetSdkVersion 31
+        targetSdkVersion 30
         versionCode verCode
         versionName verString
 
@@ -44,9 +50,8 @@ android {
 }
 
 dependencies {
-
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1-native-mt'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.5.21"
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1'
     implementation 'com.squareup.moshi:moshi-kotlin:1.12.0'
     implementation 'androidx.core:core-ktx:1.6.0'
     implementation 'com.squareup.okhttp3:okhttp:4.9.1'
@@ -55,6 +60,8 @@ dependencies {
     androidTestImplementation "de.mannodermaus.junit5:android-test-core:1.2.2"
     androidTestRuntimeOnly "de.mannodermaus.junit5:android-test-runner:1.2.2"
     androidTestImplementation "org.junit.jupiter:junit-jupiter:5.7.2"
+    kapt 'com.squareup.moshi:moshi-kotlin-codegen:1.12.0'
+    kaptAndroidTest 'com.squareup.moshi:moshi-kotlin-codegen:1.12.0'
 }
 
 publishing {

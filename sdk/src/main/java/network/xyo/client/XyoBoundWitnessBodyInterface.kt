@@ -1,8 +1,5 @@
 package network.xyo.client
 
-import com.squareup.moshi.JsonClass
-
-@JsonClass(generateAdapter = true)
 interface XyoBoundWitnessBodyInterface {
     var addresses: List<String>
     var previous_hashes: List<String>
