@@ -23,7 +23,7 @@ android {
     }
 
     defaultConfig {
-        minSdkVersion 24
+        minSdkVersion 21
         targetSdkVersion 30
         versionCode verCode
         versionName verString
@@ -37,9 +37,9 @@ android {
         release {
             minifyEnabled false
             useProguard false
-            //proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8

@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.os.Build
 import android.telephony.TelephonyManager
 import com.squareup.moshi.JsonClass
 import network.xyo.client.hasPermission.hasPermission
@@ -21,22 +22,26 @@ class XyoSystemInfoNetworkCellular(
 ) {
     companion object {
         fun detect(context: Context): XyoSystemInfoNetworkCellular? {
-            val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-            val network = connectivityManager.activeNetwork
-            val networkCaps = connectivityManager.getNetworkCapabilities(network)
-            if (networkCaps?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) == true) {
-                val telephonyManager = context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-                if (hasPermission (
-                        context,
-                        Manifest.permission.READ_PHONE_STATE,
-                        "Manifest.permission.READ_PHONE_STATE required"
-                    )
-                ) {
-                    val provider = XyoSystemInfoNetworkCellularProvider(
-                        telephonyManager.networkOperatorName
-                    )
+            if (Build.VERSION.SDK_INT >= 23) {
+                val connectivityManager =
+                    context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+                val network = connectivityManager.activeNetwork
+                val networkCaps = connectivityManager.getNetworkCapabilities(network)
+                if (networkCaps?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) == true) {
+                    val telephonyManager =
+                        context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+                    if (hasPermission(
+                            context,
+                            Manifest.permission.READ_PHONE_STATE,
+                            "Manifest.permission.READ_PHONE_STATE required"
+                        )
+                    ) {
+                        val provider = XyoSystemInfoNetworkCellularProvider(
+                            telephonyManager.networkOperatorName
+                        )
 
-                    return XyoSystemInfoNetworkCellular(provider, getIpAddress())
+                        return XyoSystemInfoNetworkCellular(provider, getIpAddress())
+                    }
                 }
             }
             return null
