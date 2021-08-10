@@ -1,5 +1,6 @@
 package network.xyo.client.address
 
+import android.os.Build
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import network.xyo.client.EcCurve
@@ -41,19 +42,21 @@ open class XyoAddress(var _keyPair: KeyPair = generateKeyPair()) {
         }
 
         private fun generateKeyPair(): KeyPair {
-            val keyPairGenerator = KeyPairGenerator.getInstance(KeyProperties.KEY_ALGORITHM_EC, "AndroidKeyStore")
-            keyPairGenerator.initialize(
-                KeyGenParameterSpec.Builder(
-                    "xyo",
-                    KeyProperties.PURPOSE_SIGN
+            val keyPairGenerator = KeyPairGenerator.getInstance("EC", "AndroidKeyStore")
+            if (Build.VERSION.SDK_INT >= 24) {
+                keyPairGenerator.initialize(
+                    KeyGenParameterSpec.Builder(
+                        "xyo",
+                        KeyProperties.PURPOSE_SIGN
+                    )
+                        .setAlgorithmParameterSpec(ECGenParameterSpec("secp256r1"))
+                        .setDigests(
+                            KeyProperties.DIGEST_SHA256,
+                            KeyProperties.DIGEST_SHA384,
+                            KeyProperties.DIGEST_SHA512
+                        ).build()
                 )
-                    .setAlgorithmParameterSpec(ECGenParameterSpec("secp256r1"))
-                    .setDigests(
-                        KeyProperties.DIGEST_SHA256,
-                        KeyProperties.DIGEST_SHA384,
-                        KeyProperties.DIGEST_SHA512
-                    ).build()
-            )
+            }
             return keyPairGenerator.generateKeyPair()
         }
 
