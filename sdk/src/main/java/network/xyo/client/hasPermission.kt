@@ -1,4 +1,4 @@
-package network.xyo.client.hasPermission
+package network.xyo.client
 
 import android.content.Context
 import android.content.pm.PackageManager
