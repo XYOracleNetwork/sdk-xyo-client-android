@@ -59,15 +59,19 @@ class XyoPanel(val context: Context, val archivists: List<XyoArchivistApiClient>
         }
     }
 
-    suspend fun reportAsync(adhocWitnesses: List<XyoWitness<XyoPayload>> = emptyList()): XyoPanelReportResult {
+    fun generateBoundWitnessJson(adhocWitnesses: List<XyoWitness<XyoPayload>> = emptyList()): XyoBoundWitnessJson {
         val witnesses: List<XyoWitness<XyoPayload>> = (this.witnesses ?: emptyList()).plus(adhocWitnesses)
         val payloads = witnesses.map { witness ->
-                witness.observe(context)
+            witness.observe(context)
         }
-        val bw = XyoBoundWitnessBuilder()
+        return XyoBoundWitnessBuilder()
             .payloads(payloads.mapNotNull { payload -> payload })
             .witnesses(witnesses)
             .build()
+    }
+
+    suspend fun reportAsync(adhocWitnesses: List<XyoWitness<XyoPayload>> = emptyList()): XyoPanelReportResult {
+        val bw = generateBoundWitnessJson(adhocWitnesses)
         val results = mutableListOf<PostBoundWitnessesResult>()
         archivists.forEach { archivist ->
             results.add(archivist.postBoundWitnessAsync(bw))

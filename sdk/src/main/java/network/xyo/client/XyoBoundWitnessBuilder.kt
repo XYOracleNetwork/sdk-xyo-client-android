@@ -30,15 +30,16 @@ class XyoBoundWitnessBuilder {
         )
     }
 
+    @Throws(XyoValidationException::class)
     fun <T: XyoPayload>payload(schema: String, payload: T): XyoBoundWitnessBuilder {
-        if (payload.validate()) {
-            _payloads.add(payload)
-            _payload_hashes.add(XyoSerializable.sha256String(payload))
-            _payload_schemas.add(schema)
-        }
+        payload.validate()
+        _payloads.add(payload)
+        _payload_hashes.add(XyoSerializable.sha256String(payload))
+        _payload_schemas.add(schema)
         return this
     }
 
+    @Throws(XyoValidationException::class)
     fun payloads(payloads: List<XyoPayload>): XyoBoundWitnessBuilder {
         payloads.forEach {
             payload(it.schema, it)
