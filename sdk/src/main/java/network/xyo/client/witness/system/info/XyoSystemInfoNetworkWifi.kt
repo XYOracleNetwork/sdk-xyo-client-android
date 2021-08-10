@@ -1,15 +1,11 @@
 package network.xyo.client.witness.system.info
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.pm.PackageManager
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.wifi.WifiManager
 import android.os.Build
-import android.util.Log
-import androidx.core.app.ActivityCompat
 import com.squareup.moshi.JsonClass
 import java.net.NetworkInterface
 
@@ -29,7 +25,7 @@ class XyoSystemInfoNetworkWifi (
                 val network = connectivityManager.activeNetwork
                 val networkCaps = connectivityManager.getNetworkCapabilities(network)
                 if (networkCaps?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true) {
-                    val wifiManager = context.getSystemService(Context.WIFI_SERVICE) as WifiManager
+                    val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
                     val wifiInfo = wifiManager.connectionInfo
                     //we remove the extra quotes because for some reason the system puts the SSID in quotes
                     return XyoSystemInfoNetworkWifi(

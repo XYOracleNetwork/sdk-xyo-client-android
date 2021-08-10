@@ -3,15 +3,7 @@ package network.xyo.client
 import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
-import com.squareup.moshi.JsonClass
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import kotlinx.coroutines.runBlocking
-import network.xyo.client.address.XyoAddress
-import network.xyo.client.archivist.api.XyoArchivistApiClient
-import network.xyo.client.archivist.api.XyoArchivistApiConfig
 import network.xyo.client.witness.system.info.XyoSystemInfoWitness
-import org.json.JSONObject
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -76,7 +68,7 @@ class XyoPayloadTest {
     fun testRoundTripPayload() {
         val payload = TestPayload1()
         val payloadJsonString = XyoSerializable.toJson(payload)
-        val payloadMirrored = XyoSerializable.fromJson<TestPayload1>(payloadJsonString, TestPayload1())
+        val payloadMirrored = XyoSerializable.fromJson(payloadJsonString, TestPayload1())
         assertNotNull(payloadMirrored)
         if (payloadMirrored != null) {
             assertEquals(payload.schema, payloadMirrored.schema)
@@ -87,13 +79,13 @@ class XyoPayloadTest {
     fun testRoundTripPanel() {
         val apiDomain = "https://beta.archivist.xyo.network"
         val archive = "test"
-        val witness = XyoWitness(fun(context: Context, previousHash: String?): XyoPayload {
+        val witness = XyoWitness(fun(_context: Context, previousHash: String?): XyoPayload {
             return XyoPayload("network.xyo.basic", previousHash)
         })
         val panel = XyoPanel(appContext, archive, apiDomain, listOf(witness, XyoSystemInfoWitness()))
         val bwJson = panel.generateBoundWitnessJson()
         val bwJsonString = XyoSerializable.toJson(bwJson)
-        val bwMirrored = XyoSerializable.fromJson<XyoBoundWitnessJson>(bwJsonString, bwJson)
+        val bwMirrored = XyoSerializable.fromJson(bwJsonString, bwJson)
         assertNotNull(bwMirrored)
         if (bwMirrored != null) {
             assertEquals(bwJson._payloads?.size, bwMirrored._payloads?.size)

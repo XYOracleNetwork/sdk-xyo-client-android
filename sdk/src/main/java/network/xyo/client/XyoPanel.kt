@@ -1,7 +1,6 @@
 package network.xyo.client
 
 import android.content.Context
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import network.xyo.client.archivist.api.PostBoundWitnessesResult
 import network.xyo.client.archivist.api.XyoArchivistApiClient
