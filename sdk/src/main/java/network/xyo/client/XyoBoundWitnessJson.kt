@@ -7,5 +7,6 @@ class XyoBoundWitnessJson: XyoBoundWitnessBodyJson(), XyoBoundWitnessMetaInterfa
     override var _signatures: List<String>? = null
     override var _payloads: List<*>? = null
     override var _client: String? = null
+    override var _previous_hash: String? = null
     override var _hash: String? = null
 }

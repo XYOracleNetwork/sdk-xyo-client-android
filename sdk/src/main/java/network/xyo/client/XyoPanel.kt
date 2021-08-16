@@ -29,6 +29,8 @@ class XyoPanel(val context: Context, val archivists: List<XyoArchivistApiClient>
             witnesses
         )
 
+    var previousHash: String? = null
+
     constructor(
         context: Context,
         observe: ((context: Context, previousHash: String?) -> XyoEventPayload?)?
@@ -71,6 +73,8 @@ class XyoPanel(val context: Context, val archivists: List<XyoArchivistApiClient>
 
     suspend fun reportAsync(adhocWitnesses: List<XyoWitness<XyoPayload>> = emptyList()): XyoPanelReportResult {
         val bw = generateBoundWitnessJson(adhocWitnesses)
+        bw._previous_hash = previousHash
+        previousHash = bw._hash
         val results = mutableListOf<PostBoundWitnessesResult>()
         archivists.forEach { archivist ->
             results.add(archivist.postBoundWitnessAsync(bw))
