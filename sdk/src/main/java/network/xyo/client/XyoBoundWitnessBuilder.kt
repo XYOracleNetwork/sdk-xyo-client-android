@@ -53,10 +53,11 @@ class XyoBoundWitnessBuilder {
         }
     }
 
-    fun build(): XyoBoundWitnessJson {
+    fun build(previousHash: String? = null): XyoBoundWitnessJson {
         val bw = XyoBoundWitnessJson()
         val hashable = hashableFields()
         val hash = XyoSerializable.sha256String(hashable)
+        bw._previous_hash = previousHash
         bw._signatures = this.sign(hash)
         bw._hash = hash
         bw._client = "kotlin"
