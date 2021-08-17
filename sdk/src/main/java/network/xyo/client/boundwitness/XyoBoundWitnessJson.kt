@@ -1,4 +1,4 @@
-package network.xyo.client
+package network.xyo.client.boundwitness
 
 import com.squareup.moshi.JsonClass
 

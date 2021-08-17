@@ -5,8 +5,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
-import network.xyo.client.XyoBoundWitnessJson
-import network.xyo.client.XyoPayload
+import network.xyo.client.boundwitness.XyoBoundWitnessJson
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -14,6 +13,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import okio.IOException
 
 import network.xyo.client.XyoSerializable
+import network.xyo.client.payload.XyoPayload
 
 class XyoArchivistBoundWitnessBody (
     val boundWitnesses: List<XyoBoundWitnessJson>,

@@ -2,6 +2,7 @@ package network.xyo.client
 
 import android.content.Context
 import network.xyo.client.address.XyoAddress
+import network.xyo.client.payload.XyoPayload
 
 open class XyoWitness<out T: XyoPayload>(
     val address: XyoAddress,

@@ -1,6 +1,10 @@
-package network.xyo.client
+package network.xyo.client.boundwitness
 
+import network.xyo.client.XyoSerializable
+import network.xyo.client.XyoWitness
 import network.xyo.client.address.XyoAddress
+import network.xyo.client.payload.XyoPayload
+import network.xyo.client.payload.XyoValidationException
 
 class XyoBoundWitnessBuilder {
     private var _witnesses = mutableListOf<XyoAddress>()

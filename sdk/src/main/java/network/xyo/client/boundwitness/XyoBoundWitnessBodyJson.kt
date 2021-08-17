@@ -1,6 +1,7 @@
-package network.xyo.client
+package network.xyo.client.boundwitness
 
 import com.squareup.moshi.JsonClass
+import network.xyo.client.XyoSerializable
 
 @JsonClass(generateAdapter = true)
 open class XyoBoundWitnessBodyJson(): XyoBoundWitnessBodyInterface, XyoSerializable() {

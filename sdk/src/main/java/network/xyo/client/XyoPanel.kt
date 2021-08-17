@@ -2,9 +2,12 @@ package network.xyo.client
 
 import android.content.Context
 import kotlinx.coroutines.launch
+import network.xyo.client.boundwitness.XyoBoundWitnessBuilder
+import network.xyo.client.boundwitness.XyoBoundWitnessJson
 import network.xyo.client.archivist.api.PostBoundWitnessesResult
 import network.xyo.client.archivist.api.XyoArchivistApiClient
 import network.xyo.client.archivist.api.XyoArchivistApiConfig
+import network.xyo.client.payload.XyoPayload
 
 data class XyoPanelReportResult(val bw: XyoBoundWitnessJson, val apiResults: List<PostBoundWitnessesResult>)
 
@@ -68,12 +71,11 @@ class XyoPanel(val context: Context, val archivists: List<XyoArchivistApiClient>
         return XyoBoundWitnessBuilder()
             .payloads(payloads.mapNotNull { payload -> payload })
             .witnesses(witnesses)
-            .build()
+            .build(previousHash)
     }
 
     suspend fun reportAsync(adhocWitnesses: List<XyoWitness<XyoPayload>> = emptyList()): XyoPanelReportResult {
         val bw = generateBoundWitnessJson(adhocWitnesses)
-        bw._previous_hash = previousHash
         previousHash = bw._hash
         val results = mutableListOf<PostBoundWitnessesResult>()
         archivists.forEach { archivist ->
