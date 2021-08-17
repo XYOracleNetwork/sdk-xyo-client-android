@@ -1,6 +1,7 @@
-package network.xyo.client
+package network.xyo.client.payload
 
 import com.squareup.moshi.JsonClass
+import network.xyo.client.XyoSerializable
 
 open class XyoException(message: String): Throwable(message)
 open class XyoValidationException(message: String): XyoException(message)
@@ -8,7 +9,9 @@ open class XyoInvalidSchemaException(val schema: String): XyoValidationException
 open class XyoInvalidPreviousHashException(val previousHash: String?): XyoValidationException("'previous_hash' must be lowercase [${previousHash}]")
 
 @JsonClass(generateAdapter = true)
-open class XyoPayload(var schema: String, var previousHash: String? = null): XyoSerializable() {
+open class XyoPayload(schema: String, previousHash: String? = null): XyoSerializable() {
+    var schema = schema.lowercase()
+    var previousHash = previousHash?.lowercase()
     @Throws(XyoValidationException::class)
     open fun validate() {
         if (schema != schema.lowercase()) {

@@ -1,6 +1,7 @@
 package network.xyo.client
 
 import com.squareup.moshi.JsonClass
+import network.xyo.client.payload.XyoPayload
 import java.util.*
 
 @JsonClass(generateAdapter = true)

@@ -1,4 +1,4 @@
-package network.xyo.client
+package network.xyo.client.boundwitness
 
 interface XyoBoundWitnessMetaInterface {
     var _hash: String?
