@@ -3,6 +3,8 @@ package network.xyo.client.witness.system.info
 import android.content.Context
 import android.os.Build
 import com.squareup.moshi.JsonClass
+import java.io.UnsupportedEncodingException
+import java.net.URLEncoder
 
 @JsonClass(generateAdapter = true)
 class XyoSystemInfoDevice(
@@ -18,28 +20,28 @@ class XyoSystemInfoDevice(
     val model: String?,
     val product: String?,
     val tags: String?,
-    val type: String?,
     val time: Long?,
+    val type: String?,
     val user: String?,
 ) {
     companion object {
         fun detect(context: Context): XyoSystemInfoDevice {
             return XyoSystemInfoDevice(
-                Build.BOARD,
-                Build.BOOTLOADER,
-                Build.BRAND,
-                Build.DEVICE,
-                Build.FINGERPRINT,
-                Build.HARDWARE,
-                Build.HOST,
-                Build.ID,
-                Build.MANUFACTURER,
-                Build.MODEL,
-                Build.PRODUCT,
-                Build.TAGS,
-                Build.TYPE,
+                URLEncoder.encode(Build.BOARD, "UTF-8"),
+                URLEncoder.encode(Build.BOOTLOADER, "UTF-8"),
+                URLEncoder.encode(Build.BRAND, "UTF-8"),
+                URLEncoder.encode(Build.DEVICE, "UTF-8"),
+                URLEncoder.encode(Build.FINGERPRINT, "UTF-8"),
+                URLEncoder.encode(Build.HARDWARE, "UTF-8"),
+                URLEncoder.encode(Build.HOST, "UTF-8"),
+                URLEncoder.encode(Build.ID, "UTF-8"),
+                URLEncoder.encode(Build.MANUFACTURER, "UTF-8"),
+                URLEncoder.encode(Build.MODEL, "UTF-8"),
+                URLEncoder.encode(Build.PRODUCT, "UTF-8"),
+                URLEncoder.encode(Build.TAGS, "UTF-8"),
                 Build.TIME,
-                Build.USER
+                URLEncoder.encode(Build.TYPE, "UTF-8"),
+                URLEncoder.encode(Build.USER, "UTF-8")
             )
         }
     }
