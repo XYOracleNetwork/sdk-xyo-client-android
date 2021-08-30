@@ -3,6 +3,8 @@ package network.xyo.client
 import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
+import network.xyo.client.payload.XyoPayload
+import network.xyo.client.payload.XyoValidationException
 import network.xyo.client.witness.system.info.XyoSystemInfoWitness
 import org.junit.Before
 import org.junit.Rule

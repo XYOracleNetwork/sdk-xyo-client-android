@@ -17,8 +17,8 @@ data class XyoSystemInfoNetworkCellularProvider(
 
 @JsonClass(generateAdapter = true)
 class XyoSystemInfoNetworkCellular(
-    val provider: XyoSystemInfoNetworkCellularProvider?,
-    val ip: String?
+    val ip: String?,
+    val provider: XyoSystemInfoNetworkCellularProvider?
 ) {
     companion object {
         fun detect(context: Context): XyoSystemInfoNetworkCellular? {
@@ -40,7 +40,7 @@ class XyoSystemInfoNetworkCellular(
                             telephonyManager.networkOperatorName
                         )
 
-                        return XyoSystemInfoNetworkCellular(provider, getIpAddress())
+                        return XyoSystemInfoNetworkCellular(getIpAddress(), provider)
                     }
                 }
             }

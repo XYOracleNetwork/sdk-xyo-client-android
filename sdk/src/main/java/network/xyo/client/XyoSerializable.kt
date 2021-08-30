@@ -70,11 +70,13 @@ abstract class XyoSerializable: Serializable  {
         }
 
         fun <T: XyoSerializable>sha256(obj: T): ByteArray {
-            return sha256(toJson(obj))
+            val json = toJson(obj)
+            return sha256(json)
         }
 
         fun <T: XyoSerializable>sha256String(obj: T): String {
-            return bytesToHex(sha256(obj))
+            val shaBytes = sha256(obj)
+            return bytesToHex(shaBytes)
         }
 
         private val hexArray = "0123456789abcdef".toCharArray()
