@@ -29,7 +29,7 @@ Primary SDK for using the XYO Protocol 2.0 from Android.
 
 ### Configure XYO Panel
 ```kotlin
-var panel = XyoPanel(context, "test", "https://beta.archivist.xyo.network", listOf(XyoSystemInfoWitness()))
+var panel = XyoPanel(context, "test", "https://archivist.xyo.network", listOf(XyoSystemInfoWitness()))
 ```
 
 ### Generate BoundWitness report
