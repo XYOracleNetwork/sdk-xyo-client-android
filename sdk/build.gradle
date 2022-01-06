@@ -14,7 +14,7 @@ def verCode = majorVersion  * 10000000 + minorVersion * 10000 + patchVersion
 def verString = "" + majorVersion + "." + minorVersion + "(Build " + patchVersion + ")"
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 31
     buildToolsVersion "30.0.3"
 
     //required for moshi codegen kotlin version conflict
@@ -46,7 +46,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-reflect:1.6.10"
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2'
     implementation 'com.squareup.moshi:moshi-kotlin:1.12.0'
-    implementation 'androidx.core:core-ktx:1.6.0'
+    implementation 'androidx.core:core-ktx:1.7.0'
     implementation 'com.squareup.okhttp3:okhttp:4.9.1'
     androidTestImplementation "androidx.test:runner:1.4.0"
     androidTestImplementation 'androidx.test:rules:1.4.0'
