@@ -19,8 +19,8 @@ class XyoPanelTest {
 
     lateinit var appContext: Context
 
-    val apiDomainBeta = "https://beta.archivist.xyo.network"
-    val apiDomainLocal = "http://10.0.2.2:3030/dev"
+    val apiDomainBeta = "https://api.archivist.xyo.network"
+    val apiDomainLocal = "http://10.0.2.2:80"
     val archive = "test"
 
     @Before

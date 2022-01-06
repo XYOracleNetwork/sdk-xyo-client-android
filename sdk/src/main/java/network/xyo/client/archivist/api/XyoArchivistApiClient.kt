@@ -51,7 +51,7 @@ open class XyoArchivistApiClient(private val config: XyoArchivistApiConfig) {
         val archive = config.archive
 
         val request = Request.Builder()
-            .url("$apiDomain/archive/$archive/bw")
+            .url("$apiDomain/archive/$archive/block")
             .post(bodyString.toRequestBody(MEDIA_TYPE_JSON))
             .build()
 
@@ -83,7 +83,7 @@ open class XyoArchivistApiClient(private val config: XyoArchivistApiConfig) {
     }
 
     companion object {
-        val MEDIA_TYPE_JSON = "text/json; charset=utf-8".toMediaType()
+        val MEDIA_TYPE_JSON = "application/json; charset=utf-8".toMediaType()
         fun get(config: XyoArchivistApiConfig): XyoArchivistApiClient {
             return XyoArchivistApiClient(config)
         }

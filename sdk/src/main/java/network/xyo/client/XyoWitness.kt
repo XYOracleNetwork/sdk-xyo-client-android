@@ -5,7 +5,7 @@ import network.xyo.client.address.XyoAddress
 import network.xyo.client.payload.XyoPayload
 
 open class XyoWitness<out T: XyoPayload>(
-    val address: XyoAddress,
+    val address: XyoAddress = XyoAddress(),
     val observer: ((context: Context, previousHash: String) -> T?)? = null,
     var previousHash: String = ""
 ) {

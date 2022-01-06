@@ -2,46 +2,83 @@ package network.xyo.client.address
 
 import android.os.Build
 import android.security.keystore.KeyGenParameterSpec
+import android.security.keystore.KeyPermanentlyInvalidatedException
 import android.security.keystore.KeyProperties
 import network.xyo.client.EcCurve
 import network.xyo.client.XyoSerializable
+import java.lang.Exception
 import java.math.BigInteger
 import java.security.*
 import java.security.interfaces.ECPrivateKey
 import java.security.interfaces.ECPublicKey
 import java.security.spec.*
 
-open class XyoAddress(var _keyPair: KeyPair = generateKeyPair()) {
+open class XyoAddress(
+    var keyPair: KeyPair = generateKeyPair(),
+    val _allowRecreateKey: Boolean = true
+) {
+    val _encodedPrivateKey: ByteArray? = this.clonePrivateKey()
 
-    constructor(publicKey: ByteArray): this(decodeECKeyPair(publicKey))
+    //we add leading 0 to make sure it is positive
+    constructor(phrase: String): this(decodeECKeyPair(XyoSerializable.sha256(phrase).reversedArray().plus(0).reversedArray()))
 
-    constructor(phrase: String): this(decodeECKeyPair(XyoSerializable.sha256(phrase)))
+    //only clone if allowed
+    private fun clonePrivateKey(): ByteArray? {
+        if(this._allowRecreateKey) {
+            return keyPair.private.encoded
+        }
+        return null
+    }
 
-    open val privateKey: String?
+    open val privateKey: ByteArray
         get() {
-            return XyoSerializable.bytesToHex(_keyPair.private.encoded)
+            return keyPair.private.encoded
         }
 
-    open val publicKey: String
+    open val privateKeyHex: String?
         get() {
-            return XyoSerializable.bytesToHex(_keyPair.public.encoded)
+            return XyoSerializable.bytesToHex(this.privateKey)
         }
 
-    open fun sign(hash: String): ByteArray {
-        val signature: Signature = Signature.getInstance("SHA256withECDSA")
-        signature.initSign(_keyPair.private)
-        signature.update(hash.toByteArray())
-        return signature.sign()
+    open val publicKey: ByteArray
+        get() {
+            return keyPair.public.encoded
+        }
+
+    open val publicKeyHex: String
+        get() {
+            return XyoSerializable.bytesToHex(this.publicKey)
+        }
+
+    /* regenerateKeyIfNeeded is only used to prevent continual reties on regenerate in case
+    it fails */
+    open fun sign(hash: String, regenerateKeyIfNeeded: Boolean = true): ByteArray {
+        try {
+            val signature: Signature = Signature.getInstance("SHA256withECDSA")
+            signature.initSign(keyPair.private)
+            signature.update(hash.toByteArray())
+            return signature.sign()
+        } catch (ex: Exception) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (ex is KeyPermanentlyInvalidatedException) {
+                    if (regenerateKeyIfNeeded && _encodedPrivateKey != null) {
+                        keyPair = decodeECKeyPair(_encodedPrivateKey)
+                        return sign(hash, false)
+                    }
+                }
+            }
+            throw ex
+        }
     }
 
     companion object {
 
         private fun getECParamSpec(): ECParameterSpec {
-            val localKeyPair = generateKeyPair()
+            val localKeyPair = generateKeyPairForSpec()
             return (localKeyPair.public as ECPublicKey).params
         }
 
-        private fun generateKeyPair(): KeyPair {
+        private fun generateKeyPairForSpec(): KeyPair {
             val keyPairGenerator = KeyPairGenerator.getInstance("EC", "AndroidKeyStore")
             if (Build.VERSION.SDK_INT >= 24) {
                 keyPairGenerator.initialize(
@@ -58,6 +95,13 @@ open class XyoAddress(var _keyPair: KeyPair = generateKeyPair()) {
                 )
             }
             return keyPairGenerator.generateKeyPair()
+        }
+
+        private fun generateKeyPair(): KeyPair {
+            val random = SecureRandom()
+            val bytes = ByteArray(32)
+            random.nextBytes(bytes)
+            return decodeECKeyPair(bytes.reversedArray().plus(0).reversedArray())
         }
 
         private fun decodeECKeyPair(

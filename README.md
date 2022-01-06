@@ -2,6 +2,7 @@
 
 # sdk-xyo-client-android
 
+[![jitpack-badge][]][jitpack-link]
 [![bch-badge][]][bch-link]
 [![codacy-badge][]][codacy-link]
 [![codeclimate-badge][]][codeclimate-link]
@@ -28,7 +29,7 @@ Primary SDK for using the XYO Protocol 2.0 from Android.
 
 ### Configure XYO Panel
 ```kotlin
-var panel = XyoPanel(context, "test", "https://beta.archivist.xyo.network", listOf(XyoSystemInfoWitness()))
+var panel = XyoPanel(context, "test", "https://archivist.xyo.network", listOf(XyoSystemInfoWitness()))
 ```
 
 ### Generate BoundWitness report
@@ -50,7 +51,10 @@ Made with 🔥 and ❄️ by [XYO](https://xyo.network)
 
 [logo]: https://cdn.xy.company/img/brand/XYO_full_colored.png
 
-[bch-badge]: https://bettercodehub.com/edge/badge/XYOracleNetwork/sdk-xyo-client-android?branch=main
+[jitpack-badge]: https://jitpack.io/v/xyoraclenetwork/sdk-xyo-client-android.svg
+[jitpack-link]: https://jitpack.io/#xyoraclenetwork/sdk-xyo-client-android
+
+[bch-badge]: https://bettercodehub.com/edge/badge/XYOracleNetwork/sdk-xyo-client-android
 [bch-link]: https://bettercodehub.com/results/XYOracleNetwork/sdk-xyo-client-android
 
 [codacy-badge]: https://app.codacy.com/project/badge/Grade/e5647b5338044a958e18c0fe91b4ed4f
