@@ -1,0 +1,2 @@
+-keep class network.xyo.**,** { *; }
+-keepclassmembers class network.xyo.**,** { *; }
