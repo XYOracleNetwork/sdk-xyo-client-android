@@ -37,6 +37,11 @@ var panel = XyoPanel(context, "test", "https://archivist.xyo.network", listOf(Xy
 var bw = panel.reportAsync().bw
 ```
 
+### Proguard Issues
+
+> There seems to be issues using proguard with the SDK, or more specifically, Moshi, where it will remove generated classes
+> We strongly recommend that you use R8 over Proguard.
+
 ## Maintainers
 
 -   Arie Trouw
