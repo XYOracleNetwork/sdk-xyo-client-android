@@ -16,8 +16,7 @@ class XyoPanel(val context: Context, val archivists: List<XyoArchivistApiClient>
         context: Context,
         archive: String? = null,
         apiDomain: String? = null,
-        witnesses: List<XyoWitness<XyoPayload>>? = null,
-        token: String? = null
+        witnesses: List<XyoWitness<XyoPayload>>? = null
     ) :
         this(
             context,
@@ -42,21 +41,24 @@ class XyoPanel(val context: Context, val archivists: List<XyoArchivistApiClient>
         emptyList<XyoArchivistApiClient>(),
         listOf(XyoWitness(observe)))
 
+    @kotlinx.coroutines.ExperimentalCoroutinesApi
     fun event(event: String) {
         xyoScope.launch {
             this@XyoPanel.eventAsync(event)
         }
     }
 
+    @kotlinx.coroutines.ExperimentalCoroutinesApi
     suspend fun eventAsync(event: String): XyoPanelReportResult {
         val adhocWitnessList = listOf(
             XyoWitness({
-                context, previousHash -> XyoEventPayload(event, previousHash)
+                _, previousHash -> XyoEventPayload(event, previousHash)
             })
         )
         return this.reportAsync(adhocWitnessList)
     }
 
+    @kotlinx.coroutines.ExperimentalCoroutinesApi
     fun report(adhocWitnesses: List<XyoWitness<XyoPayload>> = emptyList()) {
         xyoScope.launch {
             reportAsync(adhocWitnesses)
@@ -74,6 +76,7 @@ class XyoPanel(val context: Context, val archivists: List<XyoArchivistApiClient>
             .build(previousHash)
     }
 
+    @kotlinx.coroutines.ExperimentalCoroutinesApi
     suspend fun reportAsync(adhocWitnesses: List<XyoWitness<XyoPayload>> = emptyList()): XyoPanelReportResult {
         val bw = generateBoundWitnessJson(adhocWitnesses)
         previousHash = bw._hash

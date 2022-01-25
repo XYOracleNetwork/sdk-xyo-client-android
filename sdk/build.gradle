@@ -17,14 +17,9 @@ android {
     compileSdkVersion 31
     buildToolsVersion "30.0.3"
 
-    //required for moshi codegen kotlin version conflict
-    packagingOptions {
-        exclude 'META-INF/*.kotlin_module'
-    }
-
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 30
+        targetSdkVersion 31
         versionCode verCode
         versionName verString
 
