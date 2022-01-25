@@ -76,6 +76,7 @@ open class XyoArchivistApiClient(private val config: XyoArchivistApiConfig) {
         }
     }
 
+    @kotlinx.coroutines.ExperimentalCoroutinesApi
     suspend fun postBoundWitnessAsync(
         entry: XyoBoundWitnessJson
     ): PostBoundWitnessesResult {
