@@ -2,120 +2,180 @@ package network.xyo.client.address
 
 import android.os.Build
 import android.security.keystore.KeyGenParameterSpec
-import android.security.keystore.KeyPermanentlyInvalidatedException
 import android.security.keystore.KeyProperties
-import network.xyo.client.EcCurve
+import androidx.annotation.RequiresApi
 import network.xyo.client.XyoSerializable
-import java.lang.Exception
+import org.spongycastle.jcajce.provider.asymmetric.ec.KeyPairGeneratorSpi
+import org.spongycastle.jcajce.provider.digest.Keccak
+import org.spongycastle.jce.ECNamedCurveTable
+import org.spongycastle.jce.interfaces.ECPrivateKey
+import org.spongycastle.jce.interfaces.ECPublicKey
+import org.spongycastle.jce.provider.BouncyCastleProvider
+import org.spongycastle.jce.spec.ECNamedCurveGenParameterSpec
+import org.spongycastle.jce.spec.ECParameterSpec
+import org.spongycastle.jce.spec.ECPrivateKeySpec
+import org.spongycastle.jce.spec.ECPublicKeySpec
+import org.spongycastle.math.ec.ECPoint
 import java.math.BigInteger
 import java.security.*
-import java.security.interfaces.ECPrivateKey
-import java.security.interfaces.ECPublicKey
-import java.security.spec.*
 
-open class XyoAddress(
-    var keyPair: KeyPair = generateKeyPair(),
-    val _allowRecreateKey: Boolean = true
-) {
-    val _encodedPrivateKey: ByteArray? = this.clonePrivateKey()
+@RequiresApi(Build.VERSION_CODES.M)
+open class XyoAddress {
 
-    //we add leading 0 to make sure it is positive
-    constructor(phrase: String): this(decodeECKeyPair(XyoSerializable.sha256(phrase).reversedArray().plus(0).reversedArray()))
-
-    //only clone if allowed
-    private fun clonePrivateKey(): ByteArray? {
-        if(this._allowRecreateKey) {
-            return keyPair.private.encoded
-        }
-        return null
+    constructor(alias: String = "xyo") {
+        this.keyPair = generateKeyPair(alias)
     }
 
-    open val privateKey: ByteArray
+    constructor(bytes: ByteArray) {
+        this.keyPair = getKeyPairFromPrivateKey(bytes)
+    }
+
+    constructor(keyPair: KeyPair) {
+        this.keyPair = keyPair
+    }
+
+    val keyPair: KeyPair
+
+    open val privateKey: ECPrivateKey
         get() {
-            return keyPair.private.encoded
+            return keyPair.private as ECPrivateKey
         }
 
-    open val privateKeyHex: String?
+    open val privateKeyBytes: ByteArray
         get() {
-            return XyoSerializable.bytesToHex(this.privateKey)
+            return privateKey.d.toByteArray()
         }
 
-    open val publicKey: ByteArray
+    open val privateKeyHex: String
         get() {
-            return keyPair.public.encoded
+            return privateKey.d.toString(16).padStart(32, '0')
+        }
+
+    open val publicKey: ECPublicKey
+        get() {
+            return keyPair.public as ECPublicKey
+        }
+
+    open val publicKeyBytes: ByteArray
+        get() {
+            val xBytes = publicKey.q.rawXCoord.toBigInteger().toByteArray()
+            val yBytes = publicKey.q.rawYCoord.toBigInteger().toByteArray()
+            val entireKey = xBytes.plus(yBytes)
+            return entireKey.copyOfRange(1, entireKey.size)
         }
 
     open val publicKeyHex: String
         get() {
-            return XyoSerializable.bytesToHex(this.publicKey)
+            return XyoSerializable.bytesToHex(publicKeyBytes).padStart(64, '0')
         }
 
-    /* regenerateKeyIfNeeded is only used to prevent continual reties on regenerate in case
-    it fails */
-    open fun sign(hash: String, regenerateKeyIfNeeded: Boolean = true): ByteArray {
-        try {
-            val signature: Signature = Signature.getInstance("SHA256withECDSA")
-            signature.initSign(keyPair.private)
-            signature.update(hash.toByteArray())
-            return signature.sign()
-        } catch (ex: Exception) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                if (ex is KeyPermanentlyInvalidatedException) {
-                    if (regenerateKeyIfNeeded && _encodedPrivateKey != null) {
-                        keyPair = decodeECKeyPair(_encodedPrivateKey)
-                        return sign(hash, false)
-                    }
-                }
-            }
-            throw ex
+    open val keccakHash: ByteArray
+        get() {
+            val kessac = Keccak.Digest256()
+            kessac.update(publicKeyBytes)
+            return kessac.digest()
         }
+
+    open val keccakHashHex: String
+        get() {
+            return XyoSerializable.bytesToHex(keccakHash).padStart(32, '0')
+        }
+
+    open val address: ByteArray
+        get() {
+            return keccakHash.copyOfRange(12, keccakHash.size)
+        }
+
+    open val addressHex: String
+        get() {
+            return XyoSerializable.bytesToHex(address).padStart(20, '0')
+        }
+
+    open fun sign(hash: String): ByteArray {
+        val signature: Signature = Signature.getInstance("SHA256withECDSA")
+        signature.initSign(keyPair.private)
+        signature.update(hash.toByteArray())
+        return signature.sign()
     }
 
     companion object {
+        val scInit = Security.insertProviderAt(BouncyCastleProvider(), 1)
 
-        private fun getECParamSpec(): ECParameterSpec {
-            val localKeyPair = generateKeyPairForSpec()
-            return (localKeyPair.public as ECPublicKey).params
-        }
+        private const val provider = "AndroidKeyStore"
 
-        private fun generateKeyPairForSpec(): KeyPair {
-            val keyPairGenerator = KeyPairGenerator.getInstance("EC", "AndroidKeyStore")
-            if (Build.VERSION.SDK_INT >= 24) {
-                keyPairGenerator.initialize(
-                    KeyGenParameterSpec.Builder(
-                        "xyo",
-                        KeyProperties.PURPOSE_SIGN
-                    )
-                        .setAlgorithmParameterSpec(ECGenParameterSpec("secp256r1"))
-                        .setDigests(
-                            KeyProperties.DIGEST_SHA256,
-                            KeyProperties.DIGEST_SHA384,
-                            KeyProperties.DIGEST_SHA512
-                        ).build()
-                )
-            }
+        private fun generateKeyPair(alias: String): KeyPair {
+            val keyPairGenerator = KeyPairGeneratorSpi.getInstance(
+                KeyProperties.KEY_ALGORITHM_EC, provider
+            );
+            keyPairGenerator.initialize(keyGenParameterSpec(alias))
             return keyPairGenerator.generateKeyPair()
         }
 
-        private fun generateKeyPair(): KeyPair {
-            val random = SecureRandom()
-            val bytes = ByteArray(32)
-            random.nextBytes(bytes)
-            return decodeECKeyPair(bytes.reversedArray().plus(0).reversedArray())
+        fun keyGenParameterSpec(alias: String): KeyGenParameterSpec {
+            return KeyGenParameterSpec.Builder(
+                alias,
+                KeyProperties.PURPOSE_SIGN
+            ).setAlgorithmParameterSpec(ECNamedCurveGenParameterSpec("secp256k1"))
+                .setDigests(
+                    KeyProperties.DIGEST_SHA256,
+                    KeyProperties.DIGEST_SHA512
+                )
+                .setUserAuthenticationRequired(false)
+                .build()
         }
 
-        private fun decodeECKeyPair(
-            key: ByteArray
-        ): KeyPair {
-            val params = getECParamSpec()
-            val privateKeySpec = ECPrivateKeySpec(BigInteger(key), params)
+        fun publicKeyFromPrivateKey(privateKey: ECPrivateKey): ECPublicKey {
+            val keyFactory = KeyFactory.getInstance("ECDSA")
+            val ecSpec: ECParameterSpec = ECNamedCurveTable.getParameterSpec("secp256k1")
+
+            val Q: ECPoint = ecSpec.g.multiply(privateKey.d)
+            val publicDerBytes: ByteArray = Q.getEncoded(false)
+
+            val point: ECPoint = ecSpec.curve.decodePoint(publicDerBytes)
+            val pubSpec = ECPublicKeySpec(point, ecSpec)
+            return keyFactory.generatePublic(pubSpec) as ECPublicKey
+        }
+
+        fun generatePrivateKey(): ECPrivateKey {
+            val ecGenSpec = ECNamedCurveGenParameterSpec("secp256k1")
+            val keyPairGenerator = KeyPairGeneratorSpi.getInstance("ECDSA", "BC")
+            keyPairGenerator.initialize(ecGenSpec, SecureRandom())
+            val pair = keyPairGenerator.generateKeyPair()
+            return pair.private as ECPrivateKey
+        }
+
+        fun getParametersForCurve(curveName: String): ECParameterSpec {
+            return ECNamedCurveTable.getParameterSpec(curveName)
+        }
+
+        fun loadPrivateKey(bytes: ByteArray): ECPrivateKey {
+            val ecParameterSpec = getParametersForCurve("secp256k1")
+            val privateKeySpec = ECPrivateKeySpec(BigInteger(bytes), ecParameterSpec)
             val keyFactory = KeyFactory.getInstance("EC")
-            val privateKey = keyFactory.generatePrivate(privateKeySpec) as ECPrivateKey
-            val curve = EcCurve(params)
-            val publicKeyPoint = curve.multiply(curve.g, params.cofactor.toBigInteger())
-            val publicKeySpec = ECPublicKeySpec(publicKeyPoint, params)
-            val publicKey = keyFactory.generatePublic(publicKeySpec)
+            return keyFactory.generatePrivate(privateKeySpec) as ECPrivateKey
+        }
+
+        fun getKeyPairFromPrivateKey(
+            bytes: ByteArray
+        ): KeyPair {
+            val privateKey = loadPrivateKey(bytes)
+            val publicKey = publicKeyFromPrivateKey(privateKey)
             return KeyPair(publicKey, privateKey)
+        }
+
+        fun getKeyPairFromAlias(
+            alias: String
+        ): KeyPair {
+            val keyStore = KeyStore.getInstance("AndroidKeyStore")
+            keyStore.load(null)
+            val entry = keyStore.getEntry(alias, null)
+            if (entry != null) {
+                val privateKey = (entry as KeyStore.PrivateKeyEntry).privateKey
+                val publicKey = keyStore.getCertificate(alias).publicKey
+                return KeyPair(publicKey, privateKey)
+            } else {
+                return generateKeyPair(alias)
+            }
         }
     }
 }
