@@ -50,7 +50,7 @@ class XyoBoundWitnessTest {
 
     fun testPayload1WithSend(apiDomain: String) {
         runBlocking {
-            val address = XyoAddress("test")
+            val address = XyoAddress()
             val config = XyoArchivistApiConfig(archive, apiDomain)
             val api = XyoArchivistApiClient.get(config)
             val bw =
@@ -74,7 +74,7 @@ class XyoBoundWitnessTest {
 
     fun testPayload2WithSend(apiDomain: String) {
         runBlocking {
-            val address = XyoAddress("test")
+            val address = XyoAddress()
             val config = XyoArchivistApiConfig(archive, apiDomain)
             val api = XyoArchivistApiClient.get(config)
             val bw =

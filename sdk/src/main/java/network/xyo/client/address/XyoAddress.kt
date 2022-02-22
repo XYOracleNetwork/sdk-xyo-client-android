@@ -3,126 +3,179 @@ package network.xyo.client.address
 import android.os.Build
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
-import android.util.Log
+import androidx.annotation.RequiresApi
 import network.xyo.client.XyoSerializable
-import org.bouncycastle.jce.ECNamedCurveTable
-import org.bouncycastle.jce.interfaces.ECPrivateKey
-import org.bouncycastle.jce.interfaces.ECPublicKey
-import org.bouncycastle.jce.spec.ECPublicKeySpec
+import org.spongycastle.jcajce.provider.asymmetric.ec.KeyPairGeneratorSpi
+import org.spongycastle.jcajce.provider.digest.Keccak
+import org.spongycastle.jce.ECNamedCurveTable
+import org.spongycastle.jce.interfaces.ECPrivateKey
+import org.spongycastle.jce.interfaces.ECPublicKey
+import org.spongycastle.jce.provider.BouncyCastleProvider
+import org.spongycastle.jce.spec.ECNamedCurveGenParameterSpec
+import org.spongycastle.jce.spec.ECParameterSpec
+import org.spongycastle.jce.spec.ECPrivateKeySpec
+import org.spongycastle.jce.spec.ECPublicKeySpec
+import org.spongycastle.math.ec.ECPoint
+import java.math.BigInteger
 import java.security.*
-import java.security.spec.ECGenParameterSpec
 
-open class XyoAddress(
-    var keyPair: KeyPair? = generateKeyPair(),
-    val _allowRecreateKey: Boolean = true
-) {
-    //we add leading 0 to make sure it is positive
-    constructor(privateKey: ECPrivateKey): this(decodeECKeyPair(privateKey))
+@RequiresApi(Build.VERSION_CODES.M)
+open class XyoAddress {
 
-    //only clone if allowed
-    private fun clonePrivateKey(): ByteArray? {
-        if(this._allowRecreateKey) {
-            return keyPair?.private?.encoded
-        }
-        return null
+    constructor(alias: String = "xyo") {
+        this.keyPair = generateKeyPair(alias)
     }
 
-    open val privateKey: ByteArray?
+    constructor(bytes: ByteArray) {
+        this.keyPair = getKeyPairFromPrivateKey(bytes)
+    }
+
+    constructor(keyPair: KeyPair) {
+        this.keyPair = keyPair
+    }
+
+    val keyPair: KeyPair
+
+    open val privateKey: ECPrivateKey
         get() {
-            return keyPair?.private?.encoded
+            return keyPair.private as ECPrivateKey
         }
 
-    open val privateKeyHex: String?
+    open val privateKeyBytes: ByteArray
         get() {
-            val privateKey = this.privateKey
-            return if (privateKey !== null) XyoSerializable.bytesToHex(privateKey) else null
+            return privateKey.d.toByteArray()
         }
 
-    open val publicKey: ByteArray?
+    open val privateKeyHex: String
         get() {
-            return keyPair?.public?.encoded
+            return privateKey.d.toString(16).padStart(32, '0')
         }
 
-    open val publicKeyHex: String?
+    open val publicKey: ECPublicKey
         get() {
-            val publicKey = this.publicKey
-            return if (publicKey !== null) XyoSerializable.bytesToHex(publicKey) else null
+            return keyPair.public as ECPublicKey
         }
 
-    open val address: ByteArray?
+    open val publicKeyBytes: ByteArray
         get() {
-            return keyPair?.public?.encoded
+            val xBytes = publicKey.q.rawXCoord.toBigInteger().toByteArray()
+            val yBytes = publicKey.q.rawYCoord.toBigInteger().toByteArray()
+            val entireKey = xBytes.plus(yBytes)
+            return entireKey.copyOfRange(1, entireKey.size)
         }
 
-    open val addressHex: String?
+    open val publicKeyHex: String
         get() {
-            val publicKey = this.publicKey
-            return if (publicKey != null) XyoSerializable.bytesToHex(publicKey) else null
+            return XyoSerializable.bytesToHex(publicKeyBytes).padStart(64, '0')
         }
 
-    /* regenerateKeyIfNeeded is only used to prevent continual reties on regenerate in case
-    it fails */
-    open fun sign(hash: String, regenerateKeyIfNeeded: Boolean = true): ByteArray? {
-        try {
-            val signature: Signature = Signature.getInstance("SHA256withECDSA")
-            signature.initSign(keyPair?.private)
-            signature.update(hash.toByteArray())
-            return signature.sign()
-        } catch (ex: Exception) {
-            Log.w("sign", "bad private key?")
-            return null
+    open val keccakHash: ByteArray
+        get() {
+            val kessac = Keccak.Digest256()
+            kessac.update(publicKeyBytes)
+            return kessac.digest()
         }
+
+    open val keccakHashHex: String
+        get() {
+            return XyoSerializable.bytesToHex(keccakHash).padStart(32, '0')
+        }
+
+    open val address: ByteArray
+        get() {
+            return keccakHash.copyOfRange(12, keccakHash.size)
+        }
+
+    open val addressHex: String
+        get() {
+            return XyoSerializable.bytesToHex(address).padStart(20, '0')
+        }
+
+    open fun sign(hash: String): ByteArray {
+        val signature: Signature = Signature.getInstance("SHA256withECDSA")
+        signature.initSign(keyPair.private)
+        signature.update(hash.toByteArray())
+        return signature.sign()
     }
 
     companion object {
+        val scInit = Security.insertProviderAt(BouncyCastleProvider(), 1)
 
-        private fun generateKeyPair(): KeyPair? {
-            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                val keyPairGenerator = KeyPairGenerator.getInstance(
-                    KeyProperties.KEY_ALGORITHM_EC, "AndroidKeyStore"
-                );
-                keyPairGenerator.initialize(keyGenParameterSpec())
-                keyPairGenerator.generateKeyPair()
-            } else {
-                null
-            }
+        private const val provider = "AndroidKeyStore"
+
+        private fun generateKeyPair(alias: String): KeyPair {
+            val keyPairGenerator = KeyPairGeneratorSpi.getInstance(
+                KeyProperties.KEY_ALGORITHM_EC, provider
+            );
+            keyPairGenerator.initialize(keyGenParameterSpec(alias))
+            return keyPairGenerator.generateKeyPair()
         }
 
-        fun keyGenParameterSpec(): KeyGenParameterSpec? {
-            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                KeyGenParameterSpec.Builder(
-                    "xyo",
-                    KeyProperties.PURPOSE_SIGN
-                ).setAlgorithmParameterSpec(ECGenParameterSpec("secp256r1"))
-                    .setDigests(
-                        KeyProperties.DIGEST_SHA256,
-                        KeyProperties.DIGEST_SHA384,
-                        KeyProperties.DIGEST_SHA512
-                    ) // Only permit the private key to be used if the user authenticated
-                    // within the last five minutes.
-                    .setUserAuthenticationRequired(true)
-                    .build()
-            } else {
-                null
-            }
+        fun keyGenParameterSpec(alias: String): KeyGenParameterSpec {
+            return KeyGenParameterSpec.Builder(
+                alias,
+                KeyProperties.PURPOSE_SIGN
+            ).setAlgorithmParameterSpec(ECNamedCurveGenParameterSpec("secp256k1"))
+                .setDigests(
+                    KeyProperties.DIGEST_SHA256,
+                    KeyProperties.DIGEST_SHA512
+                )
+                .setUserAuthenticationRequired(false)
+                .build()
         }
 
-        fun publicKeyFromPrivate(privateKey: ECPrivateKey): ECPublicKey {
-            val keyFactory = KeyFactory.getInstance("ECDSA", "BC")
-            val ecSpec = ECNamedCurveTable.getParameterSpec("secp256r1")
+        fun publicKeyFromPrivateKey(privateKey: ECPrivateKey): ECPublicKey {
+            val keyFactory = KeyFactory.getInstance("ECDSA")
+            val ecSpec: ECParameterSpec = ECNamedCurveTable.getParameterSpec("secp256k1")
 
-            val Q = ecSpec.g.multiply(privateKey.d)
+            val Q: ECPoint = ecSpec.g.multiply(privateKey.d)
             val publicDerBytes: ByteArray = Q.getEncoded(false)
 
-            val point = ecSpec.curve.decodePoint(publicDerBytes)
+            val point: ECPoint = ecSpec.curve.decodePoint(publicDerBytes)
             val pubSpec = ECPublicKeySpec(point, ecSpec)
             return keyFactory.generatePublic(pubSpec) as ECPublicKey
         }
 
-        fun decodeECKeyPair(
-            key: ECPrivateKey
+        fun generatePrivateKey(): ECPrivateKey {
+            val ecGenSpec = ECNamedCurveGenParameterSpec("secp256k1")
+            val keyPairGenerator = KeyPairGeneratorSpi.getInstance("ECDSA", "BC")
+            keyPairGenerator.initialize(ecGenSpec, SecureRandom())
+            val pair = keyPairGenerator.generateKeyPair()
+            return pair.private as ECPrivateKey
+        }
+
+        fun getParametersForCurve(curveName: String): ECParameterSpec {
+            return ECNamedCurveTable.getParameterSpec(curveName)
+        }
+
+        fun loadPrivateKey(bytes: ByteArray): ECPrivateKey {
+            val ecParameterSpec = getParametersForCurve("secp256k1")
+            val privateKeySpec = ECPrivateKeySpec(BigInteger(bytes), ecParameterSpec)
+            val keyFactory = KeyFactory.getInstance("EC")
+            return keyFactory.generatePrivate(privateKeySpec) as ECPrivateKey
+        }
+
+        fun getKeyPairFromPrivateKey(
+            bytes: ByteArray
         ): KeyPair {
-            return KeyPair(publicKeyFromPrivate(key), key)
+            val privateKey = loadPrivateKey(bytes)
+            val publicKey = publicKeyFromPrivateKey(privateKey)
+            return KeyPair(publicKey, privateKey)
+        }
+
+        fun getKeyPairFromAlias(
+            alias: String
+        ): KeyPair {
+            val keyStore = KeyStore.getInstance("AndroidKeyStore")
+            keyStore.load(null)
+            val entry = keyStore.getEntry(alias, null)
+            if (entry != null) {
+                val privateKey = (entry as KeyStore.PrivateKeyEntry).privateKey
+                val publicKey = keyStore.getCertificate(alias).publicKey
+                return KeyPair(publicKey, privateKey)
+            } else {
+                return generateKeyPair(alias)
+            }
         }
     }
 }
