@@ -117,7 +117,7 @@ abstract class XyoSerializable: Serializable  {
         }
 
         fun hexToBytes(hex: String): ByteArray {
-            val hexToConvert = hex.padStart(hex.length.mod(2), '0')
+            val hexToConvert = hex.padStart(hex.length.mod(2), '0').lowercase()
             val byteCount = hexToConvert.length / 2
             val result = ByteArray(byteCount)
             for (i in 0 until byteCount) {
