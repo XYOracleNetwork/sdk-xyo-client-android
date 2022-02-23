@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Assertions.*
 class XyoPanelTest {
     @Rule
     @JvmField
-    val grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(android.Manifest.permission.INTERNET, android.Manifest.permission.ACCESS_WIFI_STATE)
+    val grantPermissionRule = GrantPermissionRule.grant(android.Manifest.permission.INTERNET, android.Manifest.permission.ACCESS_WIFI_STATE)
 
     lateinit var appContext: Context
 

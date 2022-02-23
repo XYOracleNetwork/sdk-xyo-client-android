@@ -20,4 +20,10 @@ class XyoAddressTest {
         val privateHex = XyoSerializable.bytesToHex(privateBytes)
         assertEquals("7f71bc5644f8f521f7e9b73f7a391e82c05432f8a9d36c44d6b1edbf1d8db62f", privateHex)
     }
+
+    @Test
+    fun testInitWithGenerate() {
+        val address = XyoAddress()
+        assertNotNull(address)
+    }
 }

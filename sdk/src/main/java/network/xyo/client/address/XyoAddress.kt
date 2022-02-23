@@ -18,6 +18,7 @@ import org.spongycastle.jce.spec.ECPublicKeySpec
 import org.spongycastle.math.ec.ECPoint
 import java.math.BigInteger
 import java.security.*
+import java.security.spec.ECGenParameterSpec
 
 @RequiresApi(Build.VERSION_CODES.M)
 open class XyoAddress {
@@ -104,24 +105,8 @@ open class XyoAddress {
         private const val provider = "AndroidKeyStore"
 
         private fun generateKeyPair(alias: String): KeyPair {
-            val keyPairGenerator = KeyPairGeneratorSpi.getInstance(
-                KeyProperties.KEY_ALGORITHM_EC, provider
-            );
-            keyPairGenerator.initialize(keyGenParameterSpec(alias))
-            return keyPairGenerator.generateKeyPair()
-        }
-
-        fun keyGenParameterSpec(alias: String): KeyGenParameterSpec {
-            return KeyGenParameterSpec.Builder(
-                alias,
-                KeyProperties.PURPOSE_SIGN
-            ).setAlgorithmParameterSpec(ECNamedCurveGenParameterSpec("secp256k1"))
-                .setDigests(
-                    KeyProperties.DIGEST_SHA256,
-                    KeyProperties.DIGEST_SHA512
-                )
-                .setUserAuthenticationRequired(false)
-                .build()
+            val keyGenerator = KeyPairGenerator.getInstance("ECDSA")
+            return keyGenerator.generateKeyPair()
         }
 
         fun publicKeyFromPrivateKey(privateKey: ECPrivateKey): ECPublicKey {
