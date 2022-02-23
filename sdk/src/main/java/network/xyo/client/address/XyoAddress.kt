@@ -72,9 +72,9 @@ open class XyoAddress {
 
     open val keccakHash: ByteArray
         get() {
-            val kessac = Keccak.Digest256()
-            kessac.update(publicKeyBytes)
-            return kessac.digest()
+            val keccak = Keccak.Digest256()
+            keccak.update(publicKeyBytes)
+            return keccak.digest()
         }
 
     open val keccakHashHex: String
