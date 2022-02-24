@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Assertions.*
 
 class XyoBoundWitnessTest {
 
-    val apiDomainBeta = "https://api.archivist.xyo.network"
+    val apiDomainBeta = "https://beta.api.archivist.xyo.network"
     val apiDomainLocal = "http://10.0.2.2:80"
     val archive = "test"
 

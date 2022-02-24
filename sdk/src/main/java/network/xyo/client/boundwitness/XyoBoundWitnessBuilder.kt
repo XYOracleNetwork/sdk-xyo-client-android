@@ -1,11 +1,14 @@
 package network.xyo.client.boundwitness
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import network.xyo.client.XyoSerializable
 import network.xyo.client.XyoWitness
 import network.xyo.client.address.XyoAddress
 import network.xyo.client.payload.XyoPayload
 import network.xyo.client.payload.XyoValidationException
 
+@RequiresApi(Build.VERSION_CODES.M)
 class XyoBoundWitnessBuilder {
     private var _witnesses = mutableListOf<XyoAddress>()
     private var _previous_hashes = mutableListOf<String>()
@@ -64,7 +67,7 @@ class XyoBoundWitnessBuilder {
         bw._previous_hash = previousHash
         bw._signatures = this.sign(hash)
         bw._hash = hash
-        bw._client = "kotlin"
+        bw._client = "android"
         bw._payloads = _payloads
         bw.addresses = _witnesses.map { witness -> witness.publicKeyHex}
         bw.previous_hashes = _previous_hashes
