@@ -13,19 +13,24 @@ abstract class XyoSerializable: Serializable  {
 
     companion object {
 
-        fun sortJson(json: String): String {
-            return sortJson(JSONObject(json)).toString()
+        fun sortJson(json: String, removeMeta: Boolean = false): String {
+            return sortJson(JSONObject(json), removeMeta).toString()
         }
 
-        fun sortJson(jsonObject: JSONObject): JSONObject {
+        fun sortJson(jsonObject: JSONObject, removeMeta: Boolean = false): JSONObject {
             val keys = jsonObject.keys().asSequence().sorted()
             val newJsonObject = JSONObject()
             keys.forEach {
+                if (removeMeta) {
+                    if (it.startsWith("_")) {
+                        return@forEach
+                    }
+                }
                 val value = jsonObject.get(it)
                 if (value is JSONObject) {
-                    newJsonObject.put(it, sortJson(value))
+                    newJsonObject.put(it, sortJson(value, removeMeta))
                 } else if (value is JSONArray) {
-                    newJsonObject.put(it, sortJson(value))
+                    newJsonObject.put(it, sortJson(value, removeMeta))
                 } else {
                     newJsonObject.put(it, value)
                 }
@@ -33,15 +38,15 @@ abstract class XyoSerializable: Serializable  {
             return newJsonObject
         }
 
-        fun sortJson(jsonArray: JSONArray): JSONArray {
+        fun sortJson(jsonArray: JSONArray, removeMeta: Boolean = false): JSONArray {
             val newJsonArray = JSONArray()
             for (i in 0 until jsonArray.length()) {
                 val value = jsonArray[i]
                 if (value is JSONArray) {
-                    newJsonArray.put(sortJson(value))
+                    newJsonArray.put(sortJson(value, removeMeta))
                 }
                 else if (value is JSONObject) {
-                    newJsonArray.put(sortJson(value))
+                    newJsonArray.put(sortJson(value, removeMeta))
                 } else {
                     newJsonArray.put(value)
                 }
@@ -49,12 +54,12 @@ abstract class XyoSerializable: Serializable  {
             return newJsonArray
         }
 
-        fun toJson(obj: Any): String {
+        fun toJson(obj: Any, removeMeta: Boolean = false): String {
             val moshi = Moshi.Builder()
                 .addLast(KotlinJsonAdapterFactory())
                 .build()
             val adapter = moshi.adapter(obj.javaClass)
-            return sortJson(adapter.toJson(obj))
+            return sortJson(adapter.toJson(obj), removeMeta)
         }
 
         fun <T: XyoSerializable>fromJson(json: String, obj: T): T? {
@@ -72,7 +77,7 @@ abstract class XyoSerializable: Serializable  {
         }
 
         fun <T: XyoSerializable>sha256(obj: T): ByteArray {
-            val json = toJson(obj)
+            val json = toJson(obj, true)
             return sha256(json)
         }
 

@@ -12,6 +12,7 @@ open class XyoInvalidPreviousHashException(val previousHash: String?): XyoValida
 open class XyoPayload(schema: String, previousHash: String? = null): XyoSerializable() {
     var schema = schema.lowercase()
     var previousHash = previousHash?.lowercase()
+    var _client = "android"
     @Throws(XyoValidationException::class)
     open fun validate() {
         if (schema != schema.lowercase()) {

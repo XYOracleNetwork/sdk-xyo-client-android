@@ -79,7 +79,7 @@ class XyoPayloadTest {
 
     @Test
     fun testRoundTripPanel() {
-        val apiDomain = "https://api.archivist.xyo.network"
+        val apiDomain = "https://beta.api.archivist.xyo.network"
         val archive = "test"
         val witness = XyoWitness(fun(_context: Context, previousHash: String?): XyoPayload {
             return XyoPayload("network.xyo.basic", previousHash)
