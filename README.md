@@ -59,7 +59,7 @@ Made with 🔥 and ❄️ by [XYO](https://xyo.network)
 [jitpack-badge]: https://jitpack.io/v/xyoraclenetwork/sdk-xyo-client-android.svg
 [jitpack-link]: https://jitpack.io/#xyoraclenetwork/sdk-xyo-client-android
 
-[bch-badge]: https://bettercodehub.com/edge/badge/XYOracleNetwork/sdk-xyo-client-android
+[bch-badge]: https://bettercodehub.com/edge/badge/XYOracleNetwork/sdk-xyo-client-android?branch=main
 [bch-link]: https://bettercodehub.com/results/XYOracleNetwork/sdk-xyo-client-android
 
 [codacy-badge]: https://app.codacy.com/project/badge/Grade/e5647b5338044a958e18c0fe91b4ed4f
