@@ -1,30 +1,25 @@
 package network.xyo.client.address
 
 import android.os.Build
-import android.security.keystore.KeyGenParameterSpec
-import android.security.keystore.KeyProperties
 import androidx.annotation.RequiresApi
 import network.xyo.client.XyoSerializable
-import org.spongycastle.jcajce.provider.asymmetric.ec.KeyPairGeneratorSpi
 import org.spongycastle.jcajce.provider.digest.Keccak
 import org.spongycastle.jce.ECNamedCurveTable
 import org.spongycastle.jce.interfaces.ECPrivateKey
 import org.spongycastle.jce.interfaces.ECPublicKey
 import org.spongycastle.jce.provider.BouncyCastleProvider
-import org.spongycastle.jce.spec.ECNamedCurveGenParameterSpec
 import org.spongycastle.jce.spec.ECParameterSpec
 import org.spongycastle.jce.spec.ECPrivateKeySpec
 import org.spongycastle.jce.spec.ECPublicKeySpec
 import org.spongycastle.math.ec.ECPoint
 import java.math.BigInteger
 import java.security.*
-import java.security.spec.ECGenParameterSpec
 
 @RequiresApi(Build.VERSION_CODES.M)
 open class XyoAddress {
 
     constructor(alias: String = "xyo") {
-        this.keyPair = generateKeyPair(alias)
+        this.keyPair = generateKeyPair()
     }
 
     constructor(bytes: ByteArray) {
@@ -104,13 +99,13 @@ open class XyoAddress {
 
         private const val provider = "AndroidKeyStore"
 
-        private fun generateKeyPair(alias: String): KeyPair {
-            val keyGenerator = KeyPairGenerator.getInstance("ECDSA")
+        private fun generateKeyPair(): KeyPair {
+            val keyGenerator = KeyPairGenerator.getInstance("ECDSA", "SC")
             return keyGenerator.generateKeyPair()
         }
 
         fun publicKeyFromPrivateKey(privateKey: ECPrivateKey): ECPublicKey {
-            val keyFactory = KeyFactory.getInstance("ECDSA")
+            val keyFactory = KeyFactory.getInstance("ECDSA", "SC")
             val ecSpec: ECParameterSpec = ECNamedCurveTable.getParameterSpec("secp256k1")
 
             val Q: ECPoint = ecSpec.g.multiply(privateKey.d)
@@ -121,14 +116,6 @@ open class XyoAddress {
             return keyFactory.generatePublic(pubSpec) as ECPublicKey
         }
 
-        fun generatePrivateKey(): ECPrivateKey {
-            val ecGenSpec = ECNamedCurveGenParameterSpec("secp256k1")
-            val keyPairGenerator = KeyPairGeneratorSpi.getInstance("ECDSA", "BC")
-            keyPairGenerator.initialize(ecGenSpec, SecureRandom())
-            val pair = keyPairGenerator.generateKeyPair()
-            return pair.private as ECPrivateKey
-        }
-
         fun getParametersForCurve(curveName: String): ECParameterSpec {
             return ECNamedCurveTable.getParameterSpec(curveName)
         }
@@ -136,7 +123,7 @@ open class XyoAddress {
         fun loadPrivateKey(bytes: ByteArray): ECPrivateKey {
             val ecParameterSpec = getParametersForCurve("secp256k1")
             val privateKeySpec = ECPrivateKeySpec(BigInteger(bytes), ecParameterSpec)
-            val keyFactory = KeyFactory.getInstance("EC")
+            val keyFactory = KeyFactory.getInstance("ECDSA", "SC")
             return keyFactory.generatePrivate(privateKeySpec) as ECPrivateKey
         }
 
@@ -159,7 +146,7 @@ open class XyoAddress {
                 val publicKey = keyStore.getCertificate(alias).publicKey
                 return KeyPair(publicKey, privateKey)
             } else {
-                return generateKeyPair(alias)
+                return generateKeyPair()
             }
         }
     }
