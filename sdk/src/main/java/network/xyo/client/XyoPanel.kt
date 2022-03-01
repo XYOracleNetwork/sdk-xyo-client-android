@@ -1,6 +1,8 @@
 package network.xyo.client
 
 import android.content.Context
+import android.os.Build
+import androidx.annotation.RequiresApi
 import kotlinx.coroutines.launch
 import network.xyo.client.boundwitness.XyoBoundWitnessBuilder
 import network.xyo.client.boundwitness.XyoBoundWitnessJson
@@ -11,6 +13,7 @@ import network.xyo.client.payload.XyoPayload
 
 data class XyoPanelReportResult(val bw: XyoBoundWitnessJson, val apiResults: List<PostBoundWitnessesResult>)
 
+@RequiresApi(Build.VERSION_CODES.M)
 class XyoPanel(val context: Context, val archivists: List<XyoArchivistApiClient>, val witnesses: List<XyoWitness<XyoPayload>>?) {
     constructor(
         context: Context,
