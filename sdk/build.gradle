@@ -7,8 +7,8 @@ apply plugin: "de.mannodermaus.android-junit5"
 group = 'network.xyo'
 
 def majorVersion = 2
-def minorVersion = 0
-def patchVersion = 29
+def minorVersion = 1
+def patchVersion = 1
 
 def verCode = majorVersion  * 10000000 + minorVersion * 10000 + patchVersion
 def verString = "" + majorVersion + "." + minorVersion + "(Build " + patchVersion + ")"
