@@ -3,66 +3,62 @@ package network.xyo.client.address
 import android.os.Build
 import androidx.annotation.RequiresApi
 import network.xyo.client.XyoSerializable
+import org.spongycastle.asn1.sec.SECNamedCurves
+import org.spongycastle.asn1.x9.X9ECParameters
+import org.spongycastle.crypto.params.ECDomainParameters
+import org.spongycastle.jcajce.provider.asymmetric.ec.BCECPrivateKey
+import org.spongycastle.jcajce.provider.asymmetric.ec.BCECPublicKey
 import org.spongycastle.jcajce.provider.digest.Keccak
-import org.spongycastle.jce.ECNamedCurveTable
-import org.spongycastle.jce.interfaces.ECPrivateKey
-import org.spongycastle.jce.interfaces.ECPublicKey
 import org.spongycastle.jce.provider.BouncyCastleProvider
 import org.spongycastle.jce.spec.ECParameterSpec
 import org.spongycastle.jce.spec.ECPrivateKeySpec
-import org.spongycastle.jce.spec.ECPublicKeySpec
 import org.spongycastle.math.ec.ECPoint
 import java.math.BigInteger
 import java.security.*
+import kotlin.math.min
+
+
+class ECKeyPair(val private: BCECPrivateKey, val public: ECPoint)
 
 @RequiresApi(Build.VERSION_CODES.M)
 open class XyoAddress {
 
-    constructor(alias: String = "xyo") {
-        this.keyPair = generateKeyPair()
+    constructor() {
+        val secureRandom = SecureRandom()
+        val private = ByteArray(32)
+        secureRandom.nextBytes(private)
+        //this line is to make sure the key is below n
+        if (private[0] > 0x80) private[0] = (private[0] - 0x80).toByte()
+        val privateKey = privateKeyFromBigInteger(bytesToBigInteger(private))
+        this.keyPair = ECKeyPair(privateKey, publicKeyFromPrivateKey(bytesToBigInteger(private)))
     }
 
-    constructor(bytes: ByteArray) {
-        this.keyPair = getKeyPairFromPrivateKey(bytes)
+    constructor(private: ByteArray) {
+        val privateKey = privateKeyFromBigInteger(bytesToBigInteger(private))
+        this.keyPair = ECKeyPair(privateKey, publicKeyFromPrivateKey(bytesToBigInteger(private)))
     }
 
-    constructor(keyPair: KeyPair) {
-        this.keyPair = keyPair
-    }
-
-    val keyPair: KeyPair
-
-    open val privateKey: ECPrivateKey
-        get() {
-            return keyPair.private as ECPrivateKey
-        }
+    val keyPair: ECKeyPair
 
     open val privateKeyBytes: ByteArray
         get() {
-            return privateKey.d.toByteArray()
+            return keyPair.private.d.toByteArray()
         }
 
     open val privateKeyHex: String
         get() {
-            return privateKey.d.toString(16).padStart(32, '0')
-        }
-
-    open val publicKey: ECPublicKey
-        get() {
-            return keyPair.public as ECPublicKey
+            return XyoSerializable.bytesToHex(privateKeyBytes).padStart(64, '0')
         }
 
     open val publicKeyBytes: ByteArray
         get() {
-            val xBytes = publicKey.q.rawXCoord.toBigInteger().toByteArray()
-            val yBytes = publicKey.q.rawYCoord.toBigInteger().toByteArray()
-            val entireKey = xBytes.plus(yBytes)
-            return entireKey.copyOfRange(1, entireKey.size)
+            val bytes = keyPair.public.getEncoded(false)
+            return bytes.copyOfRange(1, bytes.size)
         }
 
     open val publicKeyHex: String
         get() {
-            return XyoSerializable.bytesToHex(publicKeyBytes).padStart(64, '0')
+            return XyoSerializable.bytesToHex(publicKeyBytes).padStart(128, '0')
         }
 
     open val keccakHash: ByteArray
@@ -95,59 +91,42 @@ open class XyoAddress {
     }
 
     companion object {
-        val scInit = Security.insertProviderAt(BouncyCastleProvider(), 1)
+        val scInit = Security.insertProviderAt(BouncyCastleProvider(), 0)
 
-        private const val provider = "AndroidKeyStore"
+        val params:X9ECParameters = SECNamedCurves.getByName("secp256k1");
+        val CURVE = ECDomainParameters(params.curve, params.g, params.n, params.h);
+        val CURVE_SPEC = ECParameterSpec(params.curve, params.g, params.n, params.h);
 
-        private fun generateKeyPair(): KeyPair {
-            val keyGenerator = KeyPairGenerator.getInstance("ECDSA", "SC")
-            return keyGenerator.generateKeyPair()
+        fun publicKeyFromPrivateKey(private: BigInteger, compressed: Boolean = false): ECPoint {
+            val point = CURVE.g.multiply(private)
+            return point
         }
 
-        fun publicKeyFromPrivateKey(privateKey: ECPrivateKey): ECPublicKey {
-            val keyFactory = KeyFactory.getInstance("ECDSA", "SC")
-            val ecSpec: ECParameterSpec = ECNamedCurveTable.getParameterSpec("secp256k1")
-
-            val Q: ECPoint = ecSpec.g.multiply(privateKey.d)
-            val publicDerBytes: ByteArray = Q.getEncoded(false)
-
-            val point: ECPoint = ecSpec.curve.decodePoint(publicDerBytes)
-            val pubSpec = ECPublicKeySpec(point, ecSpec)
-            return keyFactory.generatePublic(pubSpec) as ECPublicKey
+        fun bigIntegerToBytes(b: BigInteger?, numBytes: Int): ByteArray? {
+            if (b == null) return null
+            val bytes = ByteArray(numBytes)
+            val biBytes = b.toByteArray()
+            val start = if (biBytes.size == numBytes + 1) 1 else 0
+            val length = min(biBytes.size, numBytes)
+            System.arraycopy(biBytes, start, bytes, numBytes - length, length)
+            return bytes
         }
 
-        fun getParametersForCurve(curveName: String): ECParameterSpec {
-            return ECNamedCurveTable.getParameterSpec(curveName)
+        private fun privateKeyFromBigInteger(private: BigInteger): BCECPrivateKey {
+            return ECKeyFactory
+                .getInstance(SpongyCastleProvider.instance)
+                .generatePrivate(ECPrivateKeySpec(private, CURVE_SPEC)) as BCECPrivateKey
         }
 
-        fun loadPrivateKey(bytes: ByteArray): ECPrivateKey {
-            val ecParameterSpec = getParametersForCurve("secp256k1")
-            val privateKeySpec = ECPrivateKeySpec(BigInteger(bytes), ecParameterSpec)
-            val keyFactory = KeyFactory.getInstance("ECDSA", "SC")
-            return keyFactory.generatePrivate(privateKeySpec) as ECPrivateKey
+        fun bytesToBigInteger(bb: ByteArray): BigInteger {
+            return if (bb.isEmpty()) BigInteger.ZERO else BigInteger(1, bb)
         }
 
-        fun getKeyPairFromPrivateKey(
-            bytes: ByteArray
-        ): KeyPair {
-            val privateKey = loadPrivateKey(bytes)
-            val publicKey = publicKeyFromPrivateKey(privateKey)
-            return KeyPair(publicKey, privateKey)
-        }
-
-        fun getKeyPairFromAlias(
-            alias: String
-        ): KeyPair {
-            val keyStore = KeyStore.getInstance("AndroidKeyStore")
-            keyStore.load(null)
-            val entry = keyStore.getEntry(alias, null)
-            if (entry != null) {
-                val privateKey = (entry as KeyStore.PrivateKeyEntry).privateKey
-                val publicKey = keyStore.getCertificate(alias).publicKey
-                return KeyPair(publicKey, privateKey)
-            } else {
-                return generateKeyPair()
-            }
+        private fun extractPublicKey(ecPublicKey: BCECPublicKey): ECPoint? {
+            val publicPointW = ecPublicKey.w
+            val x = publicPointW.affineX
+            val y = publicPointW.affineY
+            return CURVE.curve.createPoint(x, y)
         }
     }
 }

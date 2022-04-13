@@ -15,11 +15,6 @@ import okio.IOException
 import network.xyo.client.XyoSerializable
 import network.xyo.client.payload.XyoPayload
 
-class XyoArchivistBoundWitnessBody (
-    val boundWitnesses: List<XyoBoundWitnessJson>,
-    val payloads: List<XyoPayload>? = null
-        ) : XyoSerializable()
-
 class PostBoundWitnessesResult (
     val count: Int,
     val errors: ArrayList<Error>? = null
@@ -46,7 +41,7 @@ open class XyoArchivistApiClient(private val config: XyoArchivistApiConfig) {
     private suspend fun postBoundWitnessesAsync (
         entries: List<XyoBoundWitnessJson>
     ): PostBoundWitnessesResult {
-        val bodyString = XyoSerializable.toJson(XyoArchivistBoundWitnessBody(entries))
+        val bodyString = XyoSerializable.toJson(entries)
         val apiDomain = config.apiDomain
         val archive = config.archive
 
