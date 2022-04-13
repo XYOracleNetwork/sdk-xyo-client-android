@@ -18,18 +18,24 @@ import java.security.*
 import kotlin.math.min
 
 
-class ECKeyPair(val private: BCECPrivateKey, val public: BCECPublicKey?, val publicPoint: ECPoint?)
+class ECKeyPair(val private: BCECPrivateKey, val public: ECPoint)
 
 @RequiresApi(Build.VERSION_CODES.M)
 open class XyoAddress {
 
     constructor() {
-        this.keyPair = generateKeyPair()
+        val secureRandom = SecureRandom()
+        val private = ByteArray(32)
+        secureRandom.nextBytes(private)
+        //this line is to make sure the key is below n
+        if (private[0] > 0x80) private[0] = (private[0] - 0x80).toByte()
+        val privateKey = privateKeyFromBigInteger(bytesToBigInteger(private))
+        this.keyPair = ECKeyPair(privateKey, publicKeyFromPrivateKey(bytesToBigInteger(private)))
     }
 
     constructor(private: ByteArray) {
         val privateKey = privateKeyFromBigInteger(bytesToBigInteger(private))
-        this.keyPair = ECKeyPair(privateKey, null, publicKeyFromPrivateKey(bytesToBigInteger(private)))
+        this.keyPair = ECKeyPair(privateKey, publicKeyFromPrivateKey(bytesToBigInteger(private)))
     }
 
     val keyPair: ECKeyPair
@@ -46,12 +52,7 @@ open class XyoAddress {
 
     open val publicKeyBytes: ByteArray
         get() {
-            val publicKey = keyPair.public
-            val bytes = if (publicKey != null) {
-                publicKey.q.getEncoded(false)
-            } else {
-                keyPair.publicPoint!!.getEncoded(false)
-            }
+            val bytes = keyPair.public.getEncoded(false)
             return bytes.copyOfRange(1, bytes.size)
         }
 
@@ -95,19 +96,10 @@ open class XyoAddress {
         val params:X9ECParameters = SECNamedCurves.getByName("secp256k1");
         val CURVE = ECDomainParameters(params.curve, params.g, params.n, params.h);
         val CURVE_SPEC = ECParameterSpec(params.curve, params.g, params.n, params.h);
-        val secureRandom = SecureRandom()
 
         fun publicKeyFromPrivateKey(private: BigInteger, compressed: Boolean = false): ECPoint {
             val point = CURVE.g.multiply(private)
             return point
-        }
-
-        fun generateKeyPair(provider: String = "EC", numBits: Int = 256): ECKeyPair {
-            val keyPairGen: KeyPairGenerator =
-                ECKeyPairGenerator.instance
-            val keyPair = keyPairGen.generateKeyPair()
-
-            return ECKeyPair(keyPair.private as BCECPrivateKey, keyPair.public as BCECPublicKey, null)
         }
 
         fun bigIntegerToBytes(b: BigInteger?, numBytes: Int): ByteArray? {
