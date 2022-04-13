@@ -62,6 +62,15 @@ abstract class XyoSerializable: Serializable  {
             return sortJson(adapter.toJson(obj), removeMeta)
         }
 
+        fun toJson(obj: List<Any>, removeMeta: Boolean = false): String {
+            val moshi = Moshi.Builder()
+                .addLast(KotlinJsonAdapterFactory())
+                .build()
+            val adapter = moshi.adapter(obj.first().javaClass)
+            val items = obj.map {item -> sortJson(adapter.toJson(item), removeMeta)}
+            return items.joinToString(",", "[", "]")
+        }
+
         fun <T: XyoSerializable>fromJson(json: String, obj: T): T? {
             val moshi = Moshi.Builder()
                 .addLast(KotlinJsonAdapterFactory())

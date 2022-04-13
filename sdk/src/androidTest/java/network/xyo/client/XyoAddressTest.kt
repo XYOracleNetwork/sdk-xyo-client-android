@@ -24,6 +24,9 @@ class XyoAddressTest {
     @Test
     fun testInitWithGenerate() {
         val address = XyoAddress()
+        val privateHex = address.privateKeyHex
+        val publicHex = address.publicKeyHex
+        val addressHex = address.addressHex
         assertNotNull(address)
     }
 }
