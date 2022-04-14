@@ -99,7 +99,7 @@ class XyoPanel(val context: Context, val archivists: List<XyoArchivistApiClient>
 
     companion object {
         const val DefaultApiArchive = "temp"
-        const val DefaultApiDomain = "http://10.0.2.2:8080"
+        const val DefaultApiDomain = "https://api.archivist.xyo.network"
         val defaultArchivist: XyoArchivistApiClient
             get() {
                 val apiConfig = XyoArchivistApiConfig(this.DefaultApiArchive, this.DefaultApiDomain)
