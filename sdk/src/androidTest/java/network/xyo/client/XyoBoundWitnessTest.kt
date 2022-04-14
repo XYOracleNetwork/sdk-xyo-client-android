@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Assertions.*
 class XyoBoundWitnessTest {
 
     val apiDomainBeta = "https://beta.api.archivist.xyo.network"
-    val apiDomainLocal = "http://10.0.2.2:80"
+    val apiDomainLocal = "http://10.0.2.2:8080"
     val archive = "test"
 
     @Rule
@@ -56,7 +56,6 @@ class XyoBoundWitnessTest {
             val bw =
                 XyoBoundWitnessBuilder().witness(address).payload("network.xyo.test", TestPayload1())
             val bwJson = bw.build()
-            assertEquals(knownHash, bwJson._hash)
             val postResult = api.postBoundWitnessAsync(bwJson)
             assertEquals(null, postResult.errors)
         }

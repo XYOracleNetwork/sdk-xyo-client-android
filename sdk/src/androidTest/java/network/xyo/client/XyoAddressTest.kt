@@ -5,20 +5,30 @@ import org.junit.Test
 import org.junit.jupiter.api.Assertions.*
 
 class XyoAddressTest {
+
+    val testVectorPrivate = "7f71bc5644f8f521f7e9b73f7a391e82c05432f8a9d36c44d6b1edbf1d8db62f"
+    val testVectorPublic = "ed6f3b86542f45aab88ec48ab1366b462bd993fec83e234054afd8f2311fba774800fdb40c04918463b463a6044b83413a604550bfba8f8911beb65475d6528e"
+    val testVectorSignature = "b61dad551e910e2793b4f9f880125b5799086510ce102fad0222c1b093c60a6bc755ca10a9068079ac8d9617416a7cd41077093061c1e9bcb2f81812086ae603"
+    val testVectorHash = "4b688df40bcedbe641ddb16ff0a1842d9c67ea1c3bf63f3e0471baa664531d1a"
+    val testVectorAddressKeccakHash = "0889fa0b3d5bb98e749c7bf75e7a847447e7fec41011ae7d32d768f86605ba03"
+    val testVectorAddress = "5e7a847447e7fec41011ae7d32d768f86605ba03"
+
     @Test
     fun testAddress() {
-        val address = XyoAddress(XyoSerializable.hexToBytes("5a95531488b4d0d3645aea49678297ae9e2034879ce0389b80eb788e8b533592"))
-        assertEquals("5a95531488b4d0d3645aea49678297ae9e2034879ce0389b80eb788e8b533592", address.privateKeyHex)
-        assertEquals("81346d7bcaae3281bad166b3fd7e50d94b0a0a62c79926ce803919acc730735a1f3272f0ca7bf5738d651903ad8347d9f617710fd21df6c5cda10cf44c789a33", address.publicKeyHex)
-        assertEquals("2a9c73875ce86f38d388a9d17b64f16c00aa5cc258a555e1424df46dd1766d33", address.keccakHashHex)
-        assertEquals("7b64f16c00aa5cc258a555e1424df46dd1766d33", address.addressHex)
+        val address = XyoAddress(XyoSerializable.hexToBytes(testVectorPrivate))
+        val signature = XyoSerializable.bytesToHex(address.sign(testVectorHash))
+        assertEquals(testVectorPrivate, address.privateKeyHex)
+        assertEquals(testVectorPublic, address.publicKeyHex)
+        assertEquals(testVectorAddressKeccakHash, address.keccakHashHex)
+        assertEquals(testVectorAddress, address.addressHex)
+        assertEquals(testVectorSignature, signature)
     }
 
     @Test
     fun testAddressHexRoundTrip() {
-        val privateBytes = XyoSerializable.hexToBytes("7f71bc5644f8f521f7e9b73f7a391e82c05432f8a9d36c44d6b1edbf1d8db62f")
+        val privateBytes = XyoSerializable.hexToBytes(testVectorPrivate)
         val privateHex = XyoSerializable.bytesToHex(privateBytes)
-        assertEquals("7f71bc5644f8f521f7e9b73f7a391e82c05432f8a9d36c44d6b1edbf1d8db62f", privateHex)
+        assertEquals(testVectorPrivate, privateHex)
     }
 
     @Test

@@ -11,8 +11,6 @@ class SpongyCastleProvider {
         init {
             val p = Security.getProvider("SC")
             instance = p ?: BouncyCastleProvider()
-            instance["MessageDigest.ETH-KECCAK-256"] = "org.ethereum.crypto.cryptohash.Keccak256"
-            instance["MessageDigest.ETH-KECCAK-512"] = "org.ethereum.crypto.cryptohash.Keccak512"
         }
     }
 }
