@@ -30,7 +30,7 @@ class XyoBoundWitnessBuilder {
 
     private fun hashableFields(): XyoBoundWitnessBodyJson {
         return XyoBoundWitnessBodyJson(
-            _witnesses.map { witness -> witness.keccakHashHex},
+            _witnesses.map { witness -> witness.addressHex},
             _previous_hashes,
             _payload_hashes,
             _payload_schemas
@@ -70,10 +70,10 @@ class XyoBoundWitnessBuilder {
         bw._hash = hash
         bw._client = "android"
         bw._payloads = _payloads
-        bw.addresses = _witnesses.map { witness -> witness.keccakHashHex}
-        bw.previous_hashes = _previous_hashes
+        bw.addresses = _witnesses.map { witness -> witness.addressHex}
         bw.payload_hashes = _payload_hashes
         bw.payload_schemas = _payload_schemas
+        bw.previous_hashes = _previous_hashes
         return bw
     }
 }
