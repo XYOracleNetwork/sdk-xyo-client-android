@@ -1,10 +1,13 @@
 package network.xyo.client
 
 import android.content.Context
+import android.os.Build
+import androidx.annotation.RequiresApi
 import network.xyo.client.address.XyoAddress
 import network.xyo.client.payload.XyoPayload
 
-open class XyoWitness<out T: XyoPayload>(
+@RequiresApi(Build.VERSION_CODES.M)
+open class XyoWitness<out T: XyoPayload> constructor(
     val address: XyoAddress = XyoAddress(),
     val observer: ((context: Context, previousHash: String) -> T?)? = null,
     var previousHash: String = ""

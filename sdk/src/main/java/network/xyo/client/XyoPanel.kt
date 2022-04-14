@@ -41,7 +41,14 @@ class XyoPanel(val context: Context, val archivists: List<XyoArchivistApiClient>
         observe: ((context: Context, previousHash: String?) -> XyoEventPayload?)?
     ):this(
         context,
-        emptyList<XyoArchivistApiClient>(),
+        listOf(
+            XyoArchivistApiClient.get(
+                XyoArchivistApiConfig(
+                    DefaultApiArchive,
+                    DefaultApiDomain
+                )
+            )
+        ),
         listOf(XyoWitness(observe)))
 
     @kotlinx.coroutines.ExperimentalCoroutinesApi

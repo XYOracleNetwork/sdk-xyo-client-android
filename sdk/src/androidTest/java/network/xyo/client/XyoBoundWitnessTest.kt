@@ -56,7 +56,6 @@ class XyoBoundWitnessTest {
             val bw =
                 XyoBoundWitnessBuilder().witness(address).payload("network.xyo.test", TestPayload1())
             val bwJson = bw.build()
-            assertEquals(knownHash, bwJson._hash)
             val postResult = api.postBoundWitnessAsync(bwJson)
             assertEquals(null, postResult.errors)
         }

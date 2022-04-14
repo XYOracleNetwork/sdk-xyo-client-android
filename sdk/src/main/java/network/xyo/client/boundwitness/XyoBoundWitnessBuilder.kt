@@ -56,7 +56,8 @@ class XyoBoundWitnessBuilder {
 
     fun sign(hash: String): List<String> {
         return _witnesses.map {
-            XyoSerializable.bytesToHex(it.sign(hash))
+            val sig = XyoSerializable.bytesToHex(it.sign(hash))
+            sig
         }
     }
 

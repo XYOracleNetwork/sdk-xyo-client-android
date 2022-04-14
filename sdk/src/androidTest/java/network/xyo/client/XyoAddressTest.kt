@@ -7,11 +7,14 @@ import org.junit.jupiter.api.Assertions.*
 class XyoAddressTest {
     @Test
     fun testAddress() {
-        val address = XyoAddress(XyoSerializable.hexToBytes("5a95531488b4d0d3645aea49678297ae9e2034879ce0389b80eb788e8b533592"))
-        assertEquals("5a95531488b4d0d3645aea49678297ae9e2034879ce0389b80eb788e8b533592", address.privateKeyHex)
-        assertEquals("81346d7bcaae3281bad166b3fd7e50d94b0a0a62c79926ce803919acc730735a1f3272f0ca7bf5738d651903ad8347d9f617710fd21df6c5cda10cf44c789a33", address.publicKeyHex)
-        assertEquals("2a9c73875ce86f38d388a9d17b64f16c00aa5cc258a555e1424df46dd1766d33", address.keccakHashHex)
-        assertEquals("7b64f16c00aa5cc258a555e1424df46dd1766d33", address.addressHex)
+        val testVectorSignature = "e63caff060241cba8e7f0347ed4629ffdfb1bf3c3484e88a212e4bc2ecf402f209826e2ad75a934e5a74bdc536c83d368826edda201e7def2cc78afd1cc8432000"
+        val testVectorHash = "4b688df40bcedbe641ddb16ff0a1842d9c67ea1c3bf63f3e0471baa664531d1a"
+        val address = XyoAddress(XyoSerializable.hexToBytes("7f71bc5644f8f521f7e9b73f7a391e82c05432f8a9d36c44d6b1edbf1d8db62f"))
+        val signature = XyoSerializable.bytesToHex(address.sign(testVectorHash))
+        assertEquals(testVectorSignature, signature)
+        assertEquals("7f71bc5644f8f521f7e9b73f7a391e82c05432f8a9d36c44d6b1edbf1d8db62f", address.privateKeyHex)
+        assertEquals("ed6f3b86542f45aab88ec48ab1366b462bd993fec83e234054afd8f2311fba774800fdb40c04918463b463a6044b83413a604550bfba8f8911beb65475d6528e", address.publicKeyHex)
+        assertEquals("5e7a847447e7fec41011ae7d32d768f86605ba03", address.addressHex)
     }
 
     @Test

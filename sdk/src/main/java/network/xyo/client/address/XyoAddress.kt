@@ -5,7 +5,11 @@ import androidx.annotation.RequiresApi
 import network.xyo.client.XyoSerializable
 import org.spongycastle.asn1.sec.SECNamedCurves
 import org.spongycastle.asn1.x9.X9ECParameters
+import org.spongycastle.crypto.digests.SHA256Digest
 import org.spongycastle.crypto.params.ECDomainParameters
+import org.spongycastle.crypto.params.ECPrivateKeyParameters
+import org.spongycastle.crypto.signers.ECDSASigner
+import org.spongycastle.crypto.signers.HMacDSAKCalculator
 import org.spongycastle.jcajce.provider.asymmetric.ec.BCECPrivateKey
 import org.spongycastle.jcajce.provider.asymmetric.ec.BCECPublicKey
 import org.spongycastle.jcajce.provider.digest.Keccak
@@ -84,10 +88,16 @@ open class XyoAddress {
         }
 
     open fun sign(hash: String): ByteArray {
-        val signature: Signature = Signature.getInstance("SHA256withECDSA")
-        signature.initSign(keyPair.private)
-        signature.update(hash.toByteArray())
-        return signature.sign()
+        val input = XyoSerializable.hexToBytes(hash)
+        val privateKey = this.keyPair.private
+
+        val signer = ECDSASigner()
+        val privKeyParams = ECPrivateKeyParameters(privateKey.d, CURVE)
+        signer.init(true, privKeyParams)
+        val components = signer.generateSignature(input)
+        val r = XyoSerializable.bytesToHex(components[0].toByteArray())
+        val s = XyoSerializable.bytesToHex(components[1].toByteArray())
+        return signatureToByteArray(components[0], components[1])
     }
 
     companion object {
@@ -102,8 +112,32 @@ open class XyoAddress {
             return point
         }
 
-        fun bigIntegerToBytes(b: BigInteger?, numBytes: Int): ByteArray? {
-            if (b == null) return null
+        fun signatureToByteArray(r: BigInteger, s: BigInteger, v: Byte = 0.toByte()): ByteArray {
+            val result = mergeByteArrays(
+                bigIntegerToBytes(r, 32),
+                bigIntegerToBytes(s, 32),
+                arrayOf(v).toByteArray()
+            )
+            return result
+        }
+
+        fun mergeByteArrays(vararg arrays: ByteArray): ByteArray {
+            var count = 0
+            for (array in arrays) {
+                count += array.size
+            }
+
+            // Create new array and copy all array contents
+            val mergedArray = ByteArray(count)
+            var start = 0
+            for (array in arrays) {
+                System.arraycopy(array, 0, mergedArray, start, array.size)
+                start += array.size
+            }
+            return mergedArray
+        }
+
+        fun bigIntegerToBytes(b: BigInteger, numBytes: Int): ByteArray {
             val bytes = ByteArray(numBytes)
             val biBytes = b.toByteArray()
             val start = if (biBytes.size == numBytes + 1) 1 else 0

@@ -20,7 +20,7 @@ class XyoPanelTest {
     lateinit var appContext: Context
 
     val apiDomainBeta = "https://beta.api.archivist.xyo.network"
-    val apiDomainLocal = "http://10.0.2.2:80"
+    val apiDomainLocal = "http://10.0.2.2:8080"
     val archive = "temp"
 
     @Before
@@ -51,10 +51,12 @@ class XyoPanelTest {
         runBlocking {
             val apiDomain = apiDomain
             val archive = archive
-            val witness = XyoWitness(fun(context: Context, previousHash: String?): XyoPayload {
+            val address = XyoAddress(XyoSerializable.hexToBytes("9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"))
+            val address2 = XyoAddress(XyoSerializable.hexToBytes("5a95531488b4d0d3645aea49678297ae9e2034879ce0389b80eb788e8b533592"))
+            val witness = XyoWitness(address, fun(context: Context, previousHash: String?): XyoPayload {
                 return XyoPayload("network.xyo.basic", previousHash)
             })
-            val panel = XyoPanel(appContext, archive, apiDomain, listOf(witness, XyoSystemInfoWitness()))
+            val panel = XyoPanel(appContext, archive, apiDomain, listOf(witness, XyoSystemInfoWitness(address2)))
             val result = panel.reportAsync()
             result.apiResults.forEach {
                 assertEquals(it.errors, null)
