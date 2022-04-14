@@ -24,6 +24,8 @@ import kotlin.math.min
 
 class ECKeyPair(val private: BCECPrivateKey, val public: ECPoint)
 
+val SECP256K1N = BigInteger("fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141", 16)
+
 @RequiresApi(Build.VERSION_CODES.M)
 open class XyoAddress {
 
@@ -32,7 +34,9 @@ open class XyoAddress {
         val private = ByteArray(32)
         secureRandom.nextBytes(private)
         //this line is to make sure the key is below n
-        if (private[0] > 0x80) private[0] = (private[0] - 0x80).toByte()
+        while(BigInteger(private) > SECP256K1N) {
+            secureRandom.nextBytes(private)
+        }
         val privateKey = privateKeyFromBigInteger(bytesToBigInteger(private))
         this.keyPair = ECKeyPair(privateKey, publicKeyFromPrivateKey(bytesToBigInteger(private)))
     }
@@ -89,15 +93,18 @@ open class XyoAddress {
 
     open fun sign(hash: String): ByteArray {
         val input = XyoSerializable.hexToBytes(hash)
+
         val privateKey = this.keyPair.private
 
-        val signer = ECDSASigner()
+        val signer = ECDSASigner(HMacDSAKCalculator(SHA256Digest()))
         val privKeyParams = ECPrivateKeyParameters(privateKey.d, CURVE)
         signer.init(true, privKeyParams)
         val components = signer.generateSignature(input)
-        val r = XyoSerializable.bytesToHex(components[0].toByteArray())
-        val s = XyoSerializable.bytesToHex(components[1].toByteArray())
-        return signatureToByteArray(components[0], components[1])
+        val rArray = components[0].toByteArray()
+        val r = rArray.copyOfRange(rArray.size - 32, rArray.size)
+        val sArray = components[1].toByteArray()
+        val s = sArray.copyOfRange(sArray.size - 32, sArray.size)
+        return r + s
     }
 
     companion object {
@@ -147,9 +154,8 @@ open class XyoAddress {
         }
 
         private fun privateKeyFromBigInteger(private: BigInteger): BCECPrivateKey {
-            return ECKeyFactory
-                .getInstance(SpongyCastleProvider.instance)
-                .generatePrivate(ECPrivateKeySpec(private, CURVE_SPEC)) as BCECPrivateKey
+            val keyFactory = KeyFactory.getInstance("EC", SpongyCastleProvider.instance)
+            return keyFactory.generatePrivate(ECPrivateKeySpec(private, CURVE_SPEC)) as BCECPrivateKey
         }
 
         fun bytesToBigInteger(bb: ByteArray): BigInteger {
