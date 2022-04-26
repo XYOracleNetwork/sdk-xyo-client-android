@@ -42,7 +42,8 @@ class TestInvalidSchemaPayload: XyoPayload("network.xyo.Test") {
     var string_field = "there"
 }
 
-const val knownHash = "472e426f32cce7c693e09703ac57c49de6463cf250acd73df95ba8cfc9448511"
+val knownAddress = XyoAddress(ByteArray(32) {index -> index.toByte()})
+const val knownHash = "6e173bbfc0577ebde66b44b090316eca5ecad8ecdb5c51886211d805c769d2ea"
 
 class XyoPayloadTest {
 

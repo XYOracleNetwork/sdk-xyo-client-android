@@ -101,9 +101,9 @@ open class XyoAddress {
         signer.init(true, privKeyParams)
         val components = signer.generateSignature(input)
         val rArray = components[0].toByteArray()
-        val r = rArray.copyOfRange(rArray.size - 32, rArray.size)
+        val r = copyByteArrayWithLeadingPaddingOrTrim(rArray, 32)
         val sArray = components[1].toByteArray()
-        val s = sArray.copyOfRange(sArray.size - 32, sArray.size)
+        val s = copyByteArrayWithLeadingPaddingOrTrim(sArray, 32)
         return r + s
     }
 
@@ -113,6 +113,23 @@ open class XyoAddress {
         val params:X9ECParameters = SECNamedCurves.getByName("secp256k1");
         val CURVE = ECDomainParameters(params.curve, params.g, params.n, params.h);
         val CURVE_SPEC = ECParameterSpec(params.curve, params.g, params.n, params.h);
+
+        fun copyByteArrayWithLeadingPaddingOrTrim(src: ByteArray, size: Int): ByteArray {
+            val dest = ByteArray(size)
+
+            var srcStartIndex = 0
+            if (src.size > dest.size){
+                srcStartIndex = src.size - dest.size
+            }
+
+            var destOffest = 0
+            if (src.size < dest.size){
+                destOffest = dest.size - src.size
+            }
+            src.copyInto(dest, destOffest, srcStartIndex )
+
+            return dest
+        }
 
         fun publicKeyFromPrivateKey(private: BigInteger, compressed: Boolean = false): ECPoint {
             val point = CURVE.g.multiply(private)
