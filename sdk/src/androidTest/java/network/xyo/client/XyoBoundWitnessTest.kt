@@ -73,11 +73,10 @@ class XyoBoundWitnessTest {
 
     fun testPayload2WithSend(apiDomain: String) {
         runBlocking {
-            val address = XyoAddress()
             val config = XyoArchivistApiConfig(archive, apiDomain)
             val api = XyoArchivistApiClient.get(config)
             val bw =
-                XyoBoundWitnessBuilder().witness(address).payload("network.xyo.test", TestPayload2())
+                XyoBoundWitnessBuilder().witness(knownAddress).payload("network.xyo.test", TestPayload2())
             val bwJson = bw.build()
             assertEquals(knownHash, bwJson._hash)
             val postResult = api.postBoundWitnessAsync(bwJson)
