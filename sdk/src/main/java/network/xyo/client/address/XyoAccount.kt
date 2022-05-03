@@ -46,7 +46,17 @@ open class XyoAccount {
         this.keyPair = ECKeyPair(privateKey, publicKeyFromPrivateKey(bytesToBigInteger(privateKeyBytes)))
     }
 
-    val keyPair: ECKeyPair
+    private val keyPair: ECKeyPair
+
+    val private: BCECPrivateKey
+        get() {
+            return this.keyPair.private
+        }
+
+    val public: ECPoint
+        get() {
+            return this.keyPair.public
+        }
 
     open val privateKeyBytes: ByteArray
         get() {
