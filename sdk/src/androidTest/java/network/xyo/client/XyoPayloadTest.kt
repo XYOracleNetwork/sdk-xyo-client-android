@@ -3,7 +3,7 @@ package network.xyo.client
 import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
-import network.xyo.client.address.XyoAddress
+import network.xyo.client.address.XyoAccount
 import network.xyo.client.payload.XyoPayload
 import network.xyo.client.witness.system.info.XyoSystemInfoWitness
 import org.junit.Before
@@ -42,7 +42,7 @@ class TestInvalidSchemaPayload: XyoPayload("network.xyo.Test") {
     var string_field = "there"
 }
 
-val knownAddress = XyoAddress(ByteArray(32) {index -> index.toByte()})
+val knownAddress = XyoAccount(ByteArray(32) {index -> index.toByte()})
 const val knownHash = "6e173bbfc0577ebde66b44b090316eca5ecad8ecdb5c51886211d805c769d2ea"
 
 class XyoPayloadTest {
@@ -82,7 +82,7 @@ class XyoPayloadTest {
     fun testRoundTripPanel() {
         val apiDomain = "https://beta.api.archivist.xyo.network"
         val archive = "test"
-        val address = XyoAddress(XyoSerializable.hexToBytes("5a95531488b4d0d3645aea49678297ae9e2034879ce0389b80eb788e8b533592"))
+        val address = XyoAccount(XyoSerializable.hexToBytes("5a95531488b4d0d3645aea49678297ae9e2034879ce0389b80eb788e8b533592"))
         val witness = XyoWitness(address, fun(_context: Context, previousHash: String?): XyoPayload {
             return XyoPayload("network.xyo.basic", previousHash)
         })

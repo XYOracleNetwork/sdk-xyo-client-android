@@ -27,7 +27,7 @@ class ECKeyPair(val private: BCECPrivateKey, val public: ECPoint)
 val SECP256K1N = BigInteger("fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141", 16)
 
 @RequiresApi(Build.VERSION_CODES.M)
-open class XyoAddress {
+open class XyoAccount {
 
     constructor() {
         val secureRandom = SecureRandom()
@@ -41,9 +41,9 @@ open class XyoAddress {
         this.keyPair = ECKeyPair(privateKey, publicKeyFromPrivateKey(bytesToBigInteger(private)))
     }
 
-    constructor(private: ByteArray) {
-        val privateKey = privateKeyFromBigInteger(bytesToBigInteger(private))
-        this.keyPair = ECKeyPair(privateKey, publicKeyFromPrivateKey(bytesToBigInteger(private)))
+    constructor(privateKeyBytes: ByteArray) {
+        val privateKey = privateKeyFromBigInteger(bytesToBigInteger(privateKeyBytes))
+        this.keyPair = ECKeyPair(privateKey, publicKeyFromPrivateKey(bytesToBigInteger(privateKeyBytes)))
     }
 
     val keyPair: ECKeyPair
@@ -131,9 +131,8 @@ open class XyoAddress {
             return dest
         }
 
-        fun publicKeyFromPrivateKey(private: BigInteger, compressed: Boolean = false): ECPoint {
-            val point = CURVE.g.multiply(private)
-            return point
+        fun publicKeyFromPrivateKey(private: BigInteger): ECPoint {
+            return CURVE.g.multiply(private)
         }
 
         fun signatureToByteArray(r: BigInteger, s: BigInteger, v: Byte = 0.toByte()): ByteArray {

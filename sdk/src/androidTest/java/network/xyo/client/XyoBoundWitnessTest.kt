@@ -5,7 +5,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import kotlinx.coroutines.runBlocking
 import network.xyo.client.boundwitness.XyoBoundWitnessBuilder
-import network.xyo.client.address.XyoAddress
+import network.xyo.client.address.XyoAccount
 import network.xyo.client.archivist.api.XyoArchivistApiClient
 import network.xyo.client.archivist.api.XyoArchivistApiConfig
 import org.junit.Before
@@ -50,7 +50,7 @@ class XyoBoundWitnessTest {
 
     fun testPayload1WithSend(apiDomain: String) {
         runBlocking {
-            val address = XyoAddress()
+            val address = XyoAccount()
             val config = XyoArchivistApiConfig(archive, apiDomain)
             val api = XyoArchivistApiClient.get(config)
             val bw =
