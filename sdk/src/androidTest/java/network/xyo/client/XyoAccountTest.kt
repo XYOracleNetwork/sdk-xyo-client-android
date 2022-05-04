@@ -1,10 +1,10 @@
 package network.xyo.client
 
-import network.xyo.client.address.XyoAddress
+import network.xyo.client.address.XyoAccount
 import org.junit.Test
 import org.junit.jupiter.api.Assertions.*
 
-class XyoAddressTest {
+class XyoAccountTest {
 
     val testVectorPrivate = "7f71bc5644f8f521f7e9b73f7a391e82c05432f8a9d36c44d6b1edbf1d8db62f"
     val testVectorPublic = "ed6f3b86542f45aab88ec48ab1366b462bd993fec83e234054afd8f2311fba774800fdb40c04918463b463a6044b83413a604550bfba8f8911beb65475d6528e"
@@ -15,12 +15,12 @@ class XyoAddressTest {
 
     @Test
     fun testAddress() {
-        val address = XyoAddress(XyoSerializable.hexToBytes(testVectorPrivate))
-        val signature = XyoSerializable.bytesToHex(address.sign(testVectorHash))
-        assertEquals(testVectorPrivate, address.privateKeyHex)
-        assertEquals(testVectorPublic, address.publicKeyHex)
-        assertEquals(testVectorAddressKeccakHash, address.keccakHashHex)
-        assertEquals(testVectorAddress, address.addressHex)
+        val account = XyoAccount(XyoSerializable.hexToBytes(testVectorPrivate))
+        val signature = XyoSerializable.bytesToHex(account.private.sign(testVectorHash))
+        assertEquals(testVectorPrivate, account.private.hex)
+        assertEquals(testVectorPublic, account.public.hex)
+        assertEquals(testVectorAddressKeccakHash, account.public.keccak256.hex)
+        assertEquals(testVectorAddress, account.address.hex)
         assertEquals(testVectorSignature, signature)
     }
 
@@ -33,10 +33,13 @@ class XyoAddressTest {
 
     @Test
     fun testInitWithGenerate() {
-        val address = XyoAddress()
-        val privateHex = address.privateKeyHex
-        val publicHex = address.publicKeyHex
-        val addressHex = address.addressHex
-        assertNotNull(address)
+        val account = XyoAccount()
+        val privateHex = account.private.hex
+        val publicHex = account.public.hex
+        val addressHex = account.address.hex
+        assertNotNull(privateHex)
+        assertNotNull(publicHex)
+        assertNotNull(addressHex)
+        assertNotNull(account)
     }
 }
