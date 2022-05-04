@@ -15,12 +15,12 @@ class XyoAccountTest {
 
     @Test
     fun testAddress() {
-        val address = XyoAccount(XyoSerializable.hexToBytes(testVectorPrivate))
-        val signature = XyoSerializable.bytesToHex(address.sign(testVectorHash))
-        assertEquals(testVectorPrivate, address.privateKeyHex)
-        assertEquals(testVectorPublic, address.publicKeyHex)
-        assertEquals(testVectorAddressKeccakHash, address.keccakHashHex)
-        assertEquals(testVectorAddress, address.addressHex)
+        val account = XyoAccount(XyoSerializable.hexToBytes(testVectorPrivate))
+        val signature = XyoSerializable.bytesToHex(account.private.sign(testVectorHash))
+        assertEquals(testVectorPrivate, account.private.hex)
+        assertEquals(testVectorPublic, account.public.hex)
+        assertEquals(testVectorAddressKeccakHash, account.public.keccak256.hex)
+        assertEquals(testVectorAddress, account.address.hex)
         assertEquals(testVectorSignature, signature)
     }
 
@@ -33,10 +33,13 @@ class XyoAccountTest {
 
     @Test
     fun testInitWithGenerate() {
-        val address = XyoAccount()
-        val privateHex = address.privateKeyHex
-        val publicHex = address.publicKeyHex
-        val addressHex = address.addressHex
-        assertNotNull(address)
+        val account = XyoAccount()
+        val privateHex = account.private.hex
+        val publicHex = account.public.hex
+        val addressHex = account.address.hex
+        assertNotNull(privateHex)
+        assertNotNull(publicHex)
+        assertNotNull(addressHex)
+        assertNotNull(account)
     }
 }
