@@ -16,8 +16,8 @@ class XyoBoundWitnessBuilder {
     private var _payload_schemas = mutableListOf<String>()
     private var _payloads = mutableListOf<XyoPayload>()
 
-    fun witness(address: XyoAccount, previousHash: String = ""): XyoBoundWitnessBuilder {
-        _witnesses.add(address)
+    fun witness(account: XyoAccount, previousHash: String = ""): XyoBoundWitnessBuilder {
+        _witnesses.add(account)
         _previous_hashes.add(previousHash)
         return this
     }
@@ -30,7 +30,7 @@ class XyoBoundWitnessBuilder {
 
     private fun hashableFields(): XyoBoundWitnessBodyJson {
         return XyoBoundWitnessBodyJson(
-            _witnesses.map { witness -> witness.addressHex},
+            _witnesses.map { witness -> witness.address.hex},
             _previous_hashes,
             _payload_hashes,
             _payload_schemas
@@ -56,7 +56,7 @@ class XyoBoundWitnessBuilder {
 
     fun sign(hash: String): List<String> {
         return _witnesses.map {
-            val sig = XyoSerializable.bytesToHex(it.sign(hash))
+            val sig = XyoSerializable.bytesToHex(it.private.sign(hash))
             sig
         }
     }
@@ -70,7 +70,7 @@ class XyoBoundWitnessBuilder {
         bw._hash = hash
         bw._client = "android"
         bw._payloads = _payloads
-        bw.addresses = _witnesses.map { witness -> witness.addressHex}
+        bw.addresses = _witnesses.map { witness -> witness.address.hex}
         bw.payload_hashes = _payload_hashes
         bw.payload_schemas = _payload_schemas
         bw.previous_hashes = _previous_hashes

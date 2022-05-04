@@ -5,38 +5,49 @@ import org.spongycastle.jcajce.provider.digest.Keccak
 
 class XyoInvalidSizeException : Exception()
 
-open class XyoData(private val _size: Int, sourceBytes: ByteArray?) {
+abstract class XyoData(protected val _size: Int) {
 
-    private val _bytes = sourceBytes?.copyInto(ByteArray(_size), sourceBytes?.size - _size) ?: ByteArray(_size)
-
-    private fun checkSize() {
-        if (_bytes.size != _size) {
+    protected fun checkSize() {
+        if (bytes.size != _size) {
             throw XyoInvalidSizeException()
         }
     }
 
-    val size: Int
+    open val size: Int
         get() {
-            checkSize()
             return _size
         }
 
-    val hex: String
+    open val hex: String
         get() {
             return XyoSerializable.bytesToHex(bytes)
         }
 
-    val bytes: ByteArray
-        get() {
-            checkSize()
-            return _bytes
-        }
+    abstract val bytes: ByteArray
 
-    val keccak256: ByteArray
+    open val keccak256: XyoData
         get () {
-            checkSize()
             val keccak = Keccak.Digest256()
             keccak.update(bytes)
-            return keccak.digest()
+            return XyoMemoryData(32, keccak.digest())
         }
+
+    companion object {
+        fun copyByteArrayWithLeadingPaddingOrTrim(src: ByteArray, size: Int): ByteArray {
+            val dest = ByteArray(size)
+
+            var srcStartIndex = 0
+            if (src.size > dest.size){
+                srcStartIndex = src.size - dest.size
+            }
+
+            var destOffset = 0
+            if (src.size < dest.size){
+                destOffset = dest.size - src.size
+            }
+            src.copyInto(dest, destOffset, srcStartIndex )
+
+            return dest
+        }
+    }
 }
