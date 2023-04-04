@@ -1,6 +1,7 @@
 package network.xyo.client
 
 import kotlinx.coroutines.runBlocking
+import network.xyo.client.address.XyoAccount
 import network.xyo.client.node.client.NodeClient
 import network.xyo.client.payload.XyoPayload
 import org.junit.Test
@@ -16,7 +17,8 @@ class NodeClientTest {
         val payload = XyoPayload("network.xyo.query.module.discover")
 
         runBlocking {
-            val postResult = client.callAsync(payload)
+            val address = XyoAccount()
+            val postResult = client.query(payload, address, null)
             assertEquals(null, postResult.errors)
         }
     }

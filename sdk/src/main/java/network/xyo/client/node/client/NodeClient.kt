@@ -34,20 +34,11 @@ class NodeClient(private val url: String) {
 
     @ExperimentalCoroutinesApi
     @RequiresApi(Build.VERSION_CODES.M)
-    suspend fun callAsync(query: XyoPayload): PostQueryResult {
-        val address = XyoAccount()
-        val bw = QueryBoundWitnessBuilder()
-            .query(query)
-            .witness(address)
-            .build(null)
-        val bwJson = XyoSerializable.toJson((bw))
-        val queryJson = XyoSerializable.toJson(arrayListOf(query))
-        val items = arrayListOf<String>(bwJson, queryJson)
-        val bodyString = items.joinToString(",", "[", "]")
-        println(bodyString)
+    suspend fun query(query: XyoPayload, address: XyoAccount, previousHash: String?): PostQueryResult {
+        val bodyString = buildQuery(query, address, previousHash)
         val postBody = bodyString.toRequestBody(XyoArchivistApiClient.MEDIA_TYPE_JSON)
         val request = Request.Builder()
-            .url("http://10.0.2.2:8080/node")
+            .url(url)
             .post(postBody)
             .build()
 
@@ -70,5 +61,17 @@ class NodeClient(private val url: String) {
                 }
             }
         }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    private fun buildQuery(query: XyoPayload, address: XyoAccount, previousHash: String?): String {
+        val bw = QueryBoundWitnessBuilder()
+            .query(query)
+            .witness(address)
+            .build(previousHash)
+        val bwJson = XyoSerializable.toJson((bw))
+        val queryJson = XyoSerializable.toJson(arrayListOf(query))
+        val builtQuery = arrayListOf<String>(bwJson, queryJson)
+        return builtQuery.joinToString(",", "[", "]")
     }
 }
