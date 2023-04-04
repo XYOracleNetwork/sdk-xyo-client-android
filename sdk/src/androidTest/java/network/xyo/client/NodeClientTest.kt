@@ -8,15 +8,16 @@ import org.junit.jupiter.api.Assertions.*
 
 class NodeClientTest {
 
+    val apiDomainLocal = "http://10.0.2.2:8080"
+
     @Test
     fun testUrl() {
-        val url = "http://localhost:8080/RootStorageArchivist"
-        val client = NodeClient(url)
-        assertEquals(client.url, url)
-        val payload = XyoPayload("network.xyo.discover.query")
+        val client = NodeClient(apiDomainLocal)
+        val payload = XyoPayload("network.xyo.query.module.discover")
 
         runBlocking {
-            client.callAsync(payload)
+            val postResult = client.callAsync(payload)
+            assertEquals(null, postResult.errors)
         }
     }
 }
