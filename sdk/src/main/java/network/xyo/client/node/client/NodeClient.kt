@@ -25,7 +25,7 @@ import java.util.logging.Logger
 import kotlin.coroutines.Continuation
 
 class PostQueryResult (
-    val count: Int,
+    val response: String? = null,
     val errors: ArrayList<Error>? = null
 ): XyoSerializable()
 
@@ -48,16 +48,16 @@ class NodeClient(private val url: String) {
                     okHttp.newCall(request).execute().use { response ->
                         if (!response.isSuccessful) {
                             continuation.resume(PostQueryResult(
-                                0,
+                                null,
                                 arrayListOf(Error(response.message))
                             ), null)
                         } else {
-                            continuation.resume(PostQueryResult(1), null)
+                            continuation.resume(PostQueryResult(response.body!!.string(), null), null)
                         }
                     }
                 } catch (ex: IOException) {
                     Log.e("xyoClient", ex.message ?: ex.toString())
-                    continuation.resume(PostQueryResult(0, arrayListOf(Error(ex.message))), null)
+                    continuation.resume(PostQueryResult(null, arrayListOf(Error(ex.message))), null)
                 }
             }
         }

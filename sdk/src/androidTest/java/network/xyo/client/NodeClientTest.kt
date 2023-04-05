@@ -12,7 +12,7 @@ class NodeClientTest {
     val apiDomainLocal = "http://10.0.2.2:8080"
 
     @Test
-    fun testUrl() {
+    fun DiscoverTest() {
         val client = NodeClient(apiDomainLocal)
         val payload = XyoPayload("network.xyo.query.module.discover")
 
@@ -20,6 +20,18 @@ class NodeClientTest {
             val address = XyoAccount()
             val postResult = client.query(payload, address, null)
             assertEquals(null, postResult.errors)
+        }
+    }
+
+    @Test
+    fun AddressTest() {
+        val client = NodeClient(apiDomainLocal)
+        val payload = XyoPayload("network.xyo.query.module.discover")
+
+        runBlocking {
+            val address = XyoAccount()
+            val postResult = client.query(payload, address, null)
+            assertNotEquals(postResult.response, null)
         }
     }
 }
