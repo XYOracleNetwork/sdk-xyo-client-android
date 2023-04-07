@@ -13,24 +13,25 @@ class NodeClientTest {
 
     @Test
     fun DiscoverTest() {
-        val client = NodeClient(apiDomainLocal)
+        val account = XyoAccount()
+        val client = NodeClient(apiDomainLocal, account)
         val payload = XyoPayload("network.xyo.query.module.discover")
 
         runBlocking {
-            val address = XyoAccount()
-            val postResult = client.query(payload, address, null)
+            val postResult = client.query(payload, null)
             assertEquals(null, postResult.errors)
         }
     }
 
     @Test
     fun AddressTest() {
-        val client = NodeClient(apiDomainLocal)
+        val account = XyoAccount()
+        val client = NodeClient("$apiDomainLocal/Archivist", account)
         val payload = XyoPayload("network.xyo.query.module.discover")
 
         runBlocking {
             val address = XyoAccount()
-            val postResult = client.query(payload, address, null)
+            val postResult = client.query(payload, null)
             assertNotEquals(postResult.response, null)
         }
     }

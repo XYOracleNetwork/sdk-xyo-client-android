@@ -29,13 +29,26 @@ class PostQueryResult (
     val errors: ArrayList<Error>? = null
 ): XyoSerializable()
 
-class NodeClient(private val url: String) {
+@RequiresApi(Build.VERSION_CODES.M)
+class NodeClient(private val url: String, private val accountToUse: XyoAccount?) {
+
+    private val _internalAccount = XyoAccount()
     private val okHttp = OkHttpClient()
+
+    private var account: XyoAccount = this._internalAccount
+        get() {
+            if (this.accountToUse === null) {
+                println("WARNING: Anonymous Queries not allowed, but running anyway.")
+                return this._internalAccount
+            }
+            return this.accountToUse
+        }
+
 
     @ExperimentalCoroutinesApi
     @RequiresApi(Build.VERSION_CODES.M)
-    suspend fun query(query: XyoPayload, address: XyoAccount, previousHash: String?): PostQueryResult {
-        val bodyString = buildQuery(query, address, previousHash)
+    suspend fun query(query: XyoPayload, previousHash: String?): PostQueryResult {
+        val bodyString = buildQuery(query, previousHash)
         val postBody = bodyString.toRequestBody(XyoArchivistApiClient.MEDIA_TYPE_JSON)
         val request = Request.Builder()
             .url(url)
@@ -64,10 +77,10 @@ class NodeClient(private val url: String) {
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
-    private fun buildQuery(query: XyoPayload, address: XyoAccount, previousHash: String?): String {
+    private fun buildQuery(query: XyoPayload, previousHash: String?): String {
         val bw = QueryBoundWitnessBuilder()
             .query(query)
-            .witness(address)
+            .witness(this.account)
             .build(previousHash)
         val bwJson = XyoSerializable.toJson((bw))
         val queryJson = XyoSerializable.toJson(arrayListOf(query))
