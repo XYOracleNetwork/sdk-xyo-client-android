@@ -81,7 +81,6 @@ class NodeClient(private val url: String, private val accountToUse: XyoAccount?)
         val bw = QueryBoundWitnessBuilder()
             .query(query)
             .witness(this.account)
-//            .build(previousHash)
         payloads?.let {
             bw.payloads(it)
         }
