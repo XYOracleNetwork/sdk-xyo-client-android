@@ -4,7 +4,7 @@ import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
 import kotlinx.coroutines.launch
-import network.xyo.client.boundwitness.XyoBoundWitnessJson
+import network.xyo.client.address.XyoAccount
 import network.xyo.client.node.client.NodeClient
 import network.xyo.client.node.client.PostQueryResult
 import network.xyo.client.payload.XyoPayload
@@ -14,6 +14,22 @@ data class XyoPanelReportResult(val apiResults: List<PostQueryResult>)
 @RequiresApi(Build.VERSION_CODES.M)
 class XyoPanel(val context: Context, val nodes: List<NodeClient>, private val witnesses: List<XyoWitness<XyoPayload>>?) {
     var previousHash: String? = null
+
+    constructor(
+        context: Context,
+        nodeUrl: String,
+        accountToUse: XyoAccount,
+        witnesses: List<XyoWitness<XyoPayload>>? = null
+    ) :
+            this(
+                context,
+                listOf(
+                    NodeClient(nodeUrl, accountToUse)
+                ),
+                witnesses
+            )
+
+
 
     constructor(
         context: Context,
