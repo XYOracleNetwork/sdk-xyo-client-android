@@ -20,6 +20,7 @@ class PostBoundWitnessesResult (
     val errors: ArrayList<Error>? = null
     ): XyoSerializable()
 
+@Deprecated("Use NodeClient instead")
 open class XyoArchivistApiClient(private val config: XyoArchivistApiConfig) {
 
     private val okHttp = OkHttpClient()
