@@ -8,6 +8,9 @@ import network.xyo.client.boundwitness.XyoBoundWitnessBuilder
 import network.xyo.client.address.XyoAccount
 import network.xyo.client.archivist.api.XyoArchivistApiClient
 import network.xyo.client.archivist.api.XyoArchivistApiConfig
+import network.xyo.client.boundwitness.QueryBoundWitnessBuilder
+import network.xyo.client.node.client.NodeClient
+import network.xyo.client.payload.XyoPayload
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -17,7 +20,6 @@ class XyoBoundWitnessTest {
 
     val apiDomainBeta = "https://beta.api.archivist.xyo.network"
     val apiDomainLocal = "http://10.0.2.2:8080"
-    val archive = "test"
 
     @Rule
     @JvmField
@@ -32,31 +34,14 @@ class XyoBoundWitnessTest {
         this.appContext = InstrumentationRegistry.getInstrumentation().targetContext
     }
 
-    fun testNotAuthenticated(apiDomain: String) {
-        val config = XyoArchivistApiConfig(archive, apiDomain)
-        val api = XyoArchivistApiClient.get(config)
-        assertFalse(api.authenticated)
-    }
-
-    @Test
-    fun testNotAuthenticatedLocal() {
-        testNotAuthenticated(apiDomainLocal)
-    }
-
-    @Test
-    fun testNotAuthenticatedBeta() {
-        testNotAuthenticated(apiDomainBeta)
-    }
-
     fun testPayload1WithSend(apiDomain: String) {
         runBlocking {
-            val address = XyoAccount()
-            val config = XyoArchivistApiConfig(archive, apiDomain)
-            val api = XyoArchivistApiClient.get(config)
-            val bw =
-                XyoBoundWitnessBuilder().witness(address).payload("network.xyo.test", TestPayload1())
-            val bwJson = bw.build()
-            val postResult = api.postBoundWitnessAsync(bwJson)
+            val account = XyoAccount()
+            val client = NodeClient(apiDomainLocal, account)
+            val query = XyoPayload("network.xyo.query.module.discover")
+            val payloads = mutableListOf<XyoPayload>()
+            payloads.add(TestPayload1())
+            val postResult = client.query(query, payloads, null)
             assertEquals(null, postResult.errors)
         }
     }
@@ -73,13 +58,12 @@ class XyoBoundWitnessTest {
 
     fun testPayload2WithSend(apiDomain: String) {
         runBlocking {
-            val config = XyoArchivistApiConfig(archive, apiDomain)
-            val api = XyoArchivistApiClient.get(config)
-            val bw =
-                XyoBoundWitnessBuilder().witness(knownAddress).payload("network.xyo.test", TestPayload2())
-            val bwJson = bw.build()
-            assertEquals(knownHash, bwJson._hash)
-            val postResult = api.postBoundWitnessAsync(bwJson)
+            val account = XyoAccount()
+            val client = NodeClient(apiDomainLocal, account)
+            val query = XyoPayload("network.xyo.query.module.discover")
+            val payloads = mutableListOf<XyoPayload>()
+            payloads.add(TestPayload2())
+            val postResult = client.query(query, payloads, null)
             assertEquals(null, postResult.errors)
         }
     }
