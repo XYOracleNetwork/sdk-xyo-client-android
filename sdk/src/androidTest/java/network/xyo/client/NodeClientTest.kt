@@ -1,5 +1,6 @@
 package network.xyo.client
 
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import network.xyo.client.address.XyoAccount
 import network.xyo.client.archivist.wrapper.ArchivistWrapper
@@ -10,12 +11,11 @@ import org.junit.jupiter.api.Assertions.*
 
 class NodeClientTest {
 
-    private val apiDomainLocal = "http://10.0.2.2:8080"
-
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun discoverTest() {
         val account = XyoAccount()
-        val client = NodeClient(apiDomainLocal, account)
+        val client = NodeClient(TestConstants.nodeUrlLocal, account)
         val query = XyoPayload("network.xyo.query.module.discover")
 
         runBlocking {
@@ -27,19 +27,17 @@ class NodeClientTest {
     @Test
     fun archivistInsertTest() {
         val hash2 = "2967d5719b610e1dfa38651e8ff1a67d47b7bb4cea4ccfc8735b05d1660ef36f"
-        val archivist = ArchivistWrapper(NodeClient("$apiDomainLocal/Archivist", PayloadTestConstants.TestAccount))
+        val archivist = ArchivistWrapper(NodeClient("${TestConstants.nodeUrlLocal}/Archivist", TestConstants.TestAccount))
 
-        val payloads = mutableListOf<XyoPayload>()
-        payloads.add(PayloadTestConstants.debugPayload)
+        val payloads = arrayListOf(TestConstants.debugPayload)
 
         runBlocking {
-            val insertResult = archivist.insert(payloads, null)
-            val (response, errors) = insertResult
+            val (response, errors) = archivist.insert(payloads, null)
             assertNotEquals(response, null)
             assertEquals(errors, null)
 
             if (response != null) {
-                assertTrue(response.contains(PayloadTestConstants.debugPayloadHash))
+                assertTrue(response.contains(TestConstants.debugPayloadHash))
                 assertTrue(response.contains(hash2))
             } else {
                 throw(Error("Response should not be null"))
@@ -47,7 +45,7 @@ class NodeClientTest {
         }
 
         runBlocking {
-            val getResult = archivist.get(arrayListOf(PayloadTestConstants.debugPayloadHash), null)
+            val getResult = archivist.get(arrayListOf(TestConstants.debugPayloadHash), null)
             assertNotEquals(getResult.response, null)
 
             val response = getResult.response
