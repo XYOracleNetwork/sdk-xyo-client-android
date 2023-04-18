@@ -8,6 +8,8 @@ import org.junit.Test
 import org.junit.jupiter.api.Assertions.*
 
 class GetPayload(val hashes: MutableList<String>): XyoPayload("network.xyo.query.archivist.get") {}
+class DebugPayload(schema: String, val nonce: Int) : XyoPayload(schema) {}
+data class ArchivistInsertPayload(val payloads: List<String>): XyoPayload("network.xyo.query.archivist.insert")
 
 class NodeClientTest {
 
@@ -27,15 +29,17 @@ class NodeClientTest {
 
     @Test
     fun ArchivistInsertTest() {
-        val hash1 = "7ad2100faa86dd870898e61707786bfac3181bd1ce36ac31e227371060f8456c"
-        val hash2 = "3da33603417622f4cdad2becbca8c7889623d9045d0e8923e1702a99d2f3e47c"
+        val hash1 = "15b8d0e30ca5aa96ca6cc9e1528c075aec88cd3f2c3eb0394fde647eb4bf4547"
+        val hash2 = "2967d5719b610e1dfa38651e8ff1a67d47b7bb4cea4ccfc8735b05d1660ef36f"
 
-        val account = XyoAccount()
+        val account = XyoAccount(XyoSerializable.hexToBytes("69f0b123c094c34191f22c25426036d6e46d5e1fab0a04a164b3c1c2621152ab"))
         val client = NodeClient("$apiDomainLocal/Archivist", account)
 
-        val query = XyoPayload("network.xyo.query.archivist.insert")
+        val debugPayload = DebugPayload("network.xyo.debug",1)
+        val query = ArchivistInsertPayload(arrayListOf(XyoSerializable.sha256String(debugPayload)))
+
         val payloads = mutableListOf<XyoPayload>()
-        payloads.add(XyoPayload("network.xyo.payload"))
+        payloads.add(debugPayload)
 
         runBlocking {
             val postResult = client.query(query, payloads, null)
@@ -51,7 +55,7 @@ class NodeClientTest {
         }
 
         val hashes = mutableListOf<String>()
-        hashes.add(hash2)
+        hashes.add(hash1)
         val getQueryPayload = GetPayload(hashes)
 
 
@@ -61,7 +65,7 @@ class NodeClientTest {
 
             val response = postResult.response
             if (response != null) {
-                assertTrue(response.contains("network.xyo.payload"))
+                assertTrue(response.contains("network.xyo.debug"))
             } else {
                 throw(Error("Response should not be null"))
             }
