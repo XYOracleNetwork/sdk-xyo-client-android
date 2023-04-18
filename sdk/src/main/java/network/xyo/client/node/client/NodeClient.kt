@@ -81,12 +81,12 @@ class NodeClient(private val url: String, private val accountToUse: XyoAccount?)
 
     @RequiresApi(Build.VERSION_CODES.M)
     private fun buildQuery(query: XyoPayload, payloads: List<XyoPayload>?, previousHash: String?): String {
-        val bw = QueryBoundWitnessBuilder().witness(this.account)
+        val queryBw = QueryBoundWitnessBuilder().witness(this.account, previousHash)
         payloads?.let {
-            bw.payloads(it)
+            queryBw.payloads(it)
         }
-        bw.query(query)
-        val builtQuery = bw.build(previousHash)
+        queryBw.query(query)
+        val builtQuery = queryBw.build(previousHash)
 
         val bwJson = XyoSerializable.toJson((builtQuery))
 
