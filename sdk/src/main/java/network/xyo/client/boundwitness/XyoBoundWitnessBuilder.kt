@@ -11,12 +11,12 @@ import network.xyo.client.payload.XyoValidationException
 @RequiresApi(Build.VERSION_CODES.M)
 open class XyoBoundWitnessBuilder {
     protected var _witnesses = mutableListOf<XyoAccount>()
-    protected var _previous_hashes = mutableListOf<String>()
+    protected var _previous_hashes = mutableListOf<String?>()
     protected var _payload_hashes = mutableListOf<String>()
     protected var _payload_schemas = mutableListOf<String>()
     protected var _payloads = mutableListOf<XyoPayload>()
 
-    open fun witness(account: XyoAccount, previousHash: String = ""): XyoBoundWitnessBuilder {
+    open fun witness(account: XyoAccount, previousHash: String?): XyoBoundWitnessBuilder {
         _witnesses.add(account)
         _previous_hashes.add(previousHash)
         return this

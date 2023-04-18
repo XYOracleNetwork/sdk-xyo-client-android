@@ -28,7 +28,7 @@ class QueryBoundWitnessBuilder() : XyoBoundWitnessBuilder() {
         return this
     }
 
-    override fun witness(account: XyoAccount, previousHash: String): QueryBoundWitnessBuilder {
+    override fun witness(account: XyoAccount, previousHash: String?): QueryBoundWitnessBuilder {
         _witnesses.add(account)
         _previous_hashes.add(previousHash)
         return this
