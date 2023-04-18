@@ -8,13 +8,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import network.xyo.client.XyoSerializable
-import network.xyo.client.XyoWitness
 import network.xyo.client.address.XyoAccount
-import network.xyo.client.archivist.api.PostBoundWitnessesResult
-import network.xyo.client.archivist.api.XyoArchivistApiClient
 import network.xyo.client.boundwitness.QueryBoundWitnessBuilder
-import network.xyo.client.boundwitness.QueryBoundWitnessJson
-import network.xyo.client.boundwitness.XyoBoundWitnessBuilder
 import network.xyo.client.payload.XyoPayload
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -23,9 +18,6 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.IOException
-
-import java.util.logging.Logger
-import kotlin.coroutines.Continuation
 
 class PostQueryResult (
     val response: String? = null,
@@ -38,7 +30,7 @@ class NodeClient(private val url: String, private val accountToUse: XyoAccount?)
     private val _internalAccount = XyoAccount()
     private val okHttp = OkHttpClient()
 
-    private var account: XyoAccount = this._internalAccount
+    private val account: XyoAccount
         get() {
             if (this.accountToUse === null) {
                 println("WARNING: Anonymous Queries not allowed, but running anyway.")
@@ -52,7 +44,7 @@ class NodeClient(private val url: String, private val accountToUse: XyoAccount?)
     @RequiresApi(Build.VERSION_CODES.M)
     suspend fun query(query: XyoPayload, payloads: List<XyoPayload>?, previousHash: String?): PostQueryResult {
         val bodyString = buildQuery(query, payloads, previousHash)
-        val postBody = bodyString.toRequestBody(NodeClient.MEDIA_TYPE_JSON)
+        val postBody = bodyString.toRequestBody(MEDIA_TYPE_JSON)
         val request = Request.Builder()
             .url(url)
             .post(postBody)
@@ -85,10 +77,7 @@ class NodeClient(private val url: String, private val accountToUse: XyoAccount?)
         payloads?.let {
             queryBw.payloads(it)
         }
-        queryBw.query(query)
-        val builtQuery = queryBw.build(previousHash)
-
-        val bwJson = XyoSerializable.toJson((builtQuery))
+        val builtQuery = queryBw.query(query).build(previousHash)
 
         // combine payloads and query
         val queryPayloads = ArrayList<XyoPayload>()
@@ -107,7 +96,7 @@ class NodeClient(private val url: String, private val accountToUse: XyoAccount?)
                 this.put(obj)
             }
         }
-        val builtQueryTuple = arrayListOf<String>(bwJson, queryPayloadsJsonArray.toString())
+        val builtQueryTuple = arrayListOf(XyoSerializable.toJson((builtQuery)), queryPayloadsJsonArray.toString())
         return builtQueryTuple.joinToString(",", "[", "]")
     }
 
