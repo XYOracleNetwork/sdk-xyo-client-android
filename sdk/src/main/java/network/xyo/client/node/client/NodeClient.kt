@@ -16,9 +16,12 @@ import network.xyo.client.boundwitness.QueryBoundWitnessBuilder
 import network.xyo.client.boundwitness.QueryBoundWitnessJson
 import network.xyo.client.boundwitness.XyoBoundWitnessBuilder
 import network.xyo.client.payload.XyoPayload
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONArray
+import org.json.JSONObject
 import java.io.IOException
 
 import java.util.logging.Logger
@@ -49,7 +52,7 @@ class NodeClient(private val url: String, private val accountToUse: XyoAccount?)
     @RequiresApi(Build.VERSION_CODES.M)
     suspend fun query(query: XyoPayload, payloads: List<XyoPayload>?, previousHash: String?): PostQueryResult {
         val bodyString = buildQuery(query, payloads, previousHash)
-        val postBody = bodyString.toRequestBody(XyoArchivistApiClient.MEDIA_TYPE_JSON)
+        val postBody = bodyString.toRequestBody(NodeClient.MEDIA_TYPE_JSON)
         val request = Request.Builder()
             .url(url)
             .post(postBody)
@@ -78,26 +81,37 @@ class NodeClient(private val url: String, private val accountToUse: XyoAccount?)
 
     @RequiresApi(Build.VERSION_CODES.M)
     private fun buildQuery(query: XyoPayload, payloads: List<XyoPayload>?, previousHash: String?): String {
-        val bw = QueryBoundWitnessBuilder()
-            .query(query)
-            .witness(this.account)
+        val bw = QueryBoundWitnessBuilder().witness(this.account)
         payloads?.let {
             bw.payloads(it)
         }
+        bw.query(query)
         val builtQuery = bw.build(previousHash)
 
         val bwJson = XyoSerializable.toJson((builtQuery))
 
+        // combine payloads and query
         val queryPayloads = ArrayList<XyoPayload>()
-        queryPayloads.add(query)
         payloads?.let {
             payloads.forEach {
                 queryPayloads.add(it)
             }
         }
+        queryPayloads.add(query)
 
-        val queryJson = XyoSerializable.toJson(queryPayloads)
-        val builtQueryTuple = arrayListOf<String>(bwJson, queryJson)
+        // stringify combined payloads
+        val queryPayloadsJsonArray = JSONArray().apply {
+            queryPayloads.forEach {
+                val serializedPayload = XyoSerializable.toJson(it)
+                val obj = JSONObject(serializedPayload)
+                this.put(obj)
+            }
+        }
+        val builtQueryTuple = arrayListOf<String>(bwJson, queryPayloadsJsonArray.toString())
         return builtQueryTuple.joinToString(",", "[", "]")
+    }
+
+    companion object {
+        val MEDIA_TYPE_JSON = "application/json; charset=utf-8".toMediaType()
     }
 }
