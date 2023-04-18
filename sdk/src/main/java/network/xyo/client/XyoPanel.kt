@@ -78,7 +78,7 @@ class XyoPanel(val context: Context, val nodes: List<NodeClient>, private val wi
         val payloads = generatePayloads(adhocWitnesses)
         val results = mutableListOf<PostQueryResult>()
         nodes.forEach { node ->
-            val query = XyoPayload("network.xyo.archivist.insert")
+            val query = XyoPayload("network.xyo.query.archivist.insert")
             val queryResult = node.query(query, payloads, previousHash)
             results.add(queryResult)
         }
