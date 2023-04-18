@@ -13,7 +13,6 @@ class QueryBoundWitnessBuilder() : XyoBoundWitnessBuilder() {
     private lateinit var queryHash: String
 
     override fun hashableFields(): QueryBoundWitnessBodyJson {
-
         return QueryBoundWitnessBodyJson(
             this._witnesses.map { witness -> witness.address.hex},
             this._previous_hashes,
@@ -25,7 +24,7 @@ class QueryBoundWitnessBuilder() : XyoBoundWitnessBuilder() {
 
     fun query(query: XyoPayload): QueryBoundWitnessBuilder {
         this.queryHash = XyoSerializable.sha256String(query)
-        this.payload("network.xyo.boundwitness", query)
+        this.payload(query.schema, query)
         return this
     }
 
