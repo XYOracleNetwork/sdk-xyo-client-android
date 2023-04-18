@@ -5,6 +5,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import kotlinx.coroutines.launch
 import network.xyo.client.address.XyoAccount
+import network.xyo.client.archivist.wrapper.ArchivistWrapper
 import network.xyo.client.node.client.NodeClient
 import network.xyo.client.node.client.PostQueryResult
 import network.xyo.client.payload.XyoPayload
@@ -78,8 +79,8 @@ class XyoPanel(val context: Context, val nodes: List<NodeClient>, private val wi
         val payloads = generatePayloads(adhocWitnesses)
         val results = mutableListOf<PostQueryResult>()
         nodes.forEach { node ->
-            val query = XyoPayload("network.xyo.query.archivist.insert")
-            val queryResult = node.query(query, payloads, previousHash)
+            val archivist = ArchivistWrapper(node)
+            val queryResult = archivist.insert(payloads, previousHash)
             results.add(queryResult)
         }
         return XyoPanelReportResult(results)
