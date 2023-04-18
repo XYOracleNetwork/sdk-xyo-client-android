@@ -10,6 +10,7 @@ import kotlinx.coroutines.withContext
 import network.xyo.client.XyoSerializable
 import network.xyo.client.address.XyoAccount
 import network.xyo.client.boundwitness.QueryBoundWitnessBuilder
+import network.xyo.client.boundwitness.QueryBoundWitnessJson
 import network.xyo.client.payload.XyoPayload
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -76,31 +77,45 @@ class NodeClient(private val url: String, private val accountToUse: XyoAccount?)
 
     @RequiresApi(Build.VERSION_CODES.M)
     private fun buildQuery(query: XyoPayload, payloads: List<XyoPayload>?, previousHash: String?): String {
-        val queryBw = QueryBoundWitnessBuilder().witness(this.account, previousHash)
-        payloads?.let {
-            queryBw.payloads(it)
-        }
-        val builtQuery = queryBw.query(query).build(previousHash)
+        val builtQuery = queryBuilder(query, payloads, previousHash)
+        val queryPayloads = buildQueryPayloads(query, payloads)
+        val queryPayloadsJsonArray = queryPayloadsJsonArray(queryPayloads)
+        val builtQueryTuple = arrayListOf(XyoSerializable.toJson((builtQuery)), queryPayloadsJsonArray.toString())
+        return builtQueryTuple.joinToString(",", "[", "]")
+    }
 
-        // combine payloads and query
-        val queryPayloads = ArrayList<XyoPayload>()
-        payloads?.let {
-            payloads.forEach {
-                queryPayloads.add(it)
+    private fun queryBuilder(query: XyoPayload, payloads: List<XyoPayload>?, previousHash: String?): QueryBoundWitnessJson {
+        return QueryBoundWitnessBuilder().let {
+            payloads?.let { payload ->
+                it.payloads(payload)
             }
-        }
-        queryPayloads.add(query)
+            it.witness(this.account, previousHash).query(query).build(previousHash)
 
-        // stringify combined payloads
-        val queryPayloadsJsonArray = JSONArray().apply {
-            queryPayloads.forEach {
-                val serializedPayload = XyoSerializable.toJson(it)
+        }
+    }
+
+    // combine payloads and query
+    private fun buildQueryPayloads(query: XyoPayload, payloads: List<XyoPayload>?): List<XyoPayload>{
+        return arrayListOf<XyoPayload>().let { queryPayloads ->
+            payloads?.let { payloads ->
+                payloads.forEach { payload ->
+                    queryPayloads.add(payload)
+                }
+            }
+            queryPayloads.add(query)
+            queryPayloads
+        }
+    }
+
+    // stringify combined payloads
+    private fun queryPayloadsJsonArray(payloads: List<XyoPayload>): JSONArray {
+        return JSONArray().apply {
+            payloads.forEach { payload ->
+                val serializedPayload = XyoSerializable.toJson(payload)
                 val obj = JSONObject(serializedPayload)
                 this.put(obj)
             }
         }
-        val builtQueryTuple = arrayListOf(XyoSerializable.toJson((builtQuery)), queryPayloadsJsonArray.toString())
-        return builtQueryTuple.joinToString(",", "[", "]")
     }
 
     companion object {
