@@ -2,6 +2,7 @@ package network.xyo.client.witness.system.info
 
 import android.content.Context
 import android.os.Build
+import androidx.annotation.RequiresApi
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
@@ -15,6 +16,7 @@ class XyoSystemInfoOs (
     val security_patch: String?
 ) {
     companion object {
+        @RequiresApi(Build.VERSION_CODES.M)
         fun detect(context: Context): XyoSystemInfoOs {
             return XyoSystemInfoOs(
                 Build.VERSION.BASE_OS,
