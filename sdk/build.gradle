@@ -65,7 +65,9 @@ dependencies {
 publishing {
     publications {
         Production(MavenPublication) {
-            artifact("$buildDir/outputs/aar/sdk-release.aar")
+            artifact("$buildDir/outputs/aar/sdk-release.aar") {
+                builtBy 'releaseSourcesJar'
+            }
             groupId 'network.xyo'
             artifactId 'sdk-xyo-client-android'
             version verString
