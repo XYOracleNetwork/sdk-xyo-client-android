@@ -10,7 +10,7 @@ def minorVersion = 1
 def patchVersion = 5
 
 def verCode = majorVersion  * 10000000 + minorVersion * 10000 + patchVersion
-def verString = "" + majorVersion + "." + minorVersion + "(Build " + patchVersion + ")"
+def verString = "" + majorVersion + "." + minorVersion + "(Build-" + patchVersion + ")"
 
 android {
     compileSdk 33
