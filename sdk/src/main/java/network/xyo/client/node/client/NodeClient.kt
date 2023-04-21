@@ -21,7 +21,7 @@ import org.json.JSONObject
 import java.io.IOException
 
 class PostQueryResult (
-    val response: String? = null,
+    val response: QueryResponseWrapper? = null,
     val errors: ArrayList<Error>? = null
 ): XyoSerializable() {
     operator fun component1() = response
@@ -64,7 +64,7 @@ class NodeClient(private val url: String, private val accountToUse: XyoAccount?)
                                 arrayListOf(Error(response.message))
                             ), null)
                         } else {
-                            continuation.resume(PostQueryResult(response.body!!.string(), null), null)
+                            continuation.resume(PostQueryResult(QueryResponseWrapper.parse(response.body!!.string()), null), null)
                         }
                     }
                 } catch (ex: IOException) {

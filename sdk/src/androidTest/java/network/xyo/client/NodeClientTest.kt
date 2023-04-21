@@ -37,8 +37,7 @@ class NodeClientTest {
             assertEquals(errors, null)
 
             if (response != null) {
-                assertTrue(response.contains(TestConstants.debugPayloadHash))
-                assertTrue(response.contains(hash2))
+                assertEquals(response?.payloads?.get(0)?.schema, "network.xyo.boundwitness")
             } else {
                 throw(Error("Response should not be null"))
             }
@@ -50,7 +49,7 @@ class NodeClientTest {
 
             val response = getResult.response
             if (response != null) {
-                assertTrue(response.contains("network.xyo.debug"))
+                assertEquals(response?.payloads?.get(0)?.schema, TestConstants.debugPayload.schema)
             } else {
                 throw(Error("Response should not be null"))
             }
