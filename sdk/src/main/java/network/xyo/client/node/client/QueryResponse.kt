@@ -1,6 +1,7 @@
 package network.xyo.client.node.client
 
 import com.squareup.moshi.Moshi
+import com.squareup.moshi.Types
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import network.xyo.client.XyoSerializable
 import network.xyo.client.boundwitness.XyoBoundWitnessBodyJson
@@ -16,17 +17,18 @@ open class QueryResponseWrapper(private val rawResponse: String) {
     var bw: XyoBoundWitnessBodyJson? = null
     var payloads: List<XyoPayload>? = null
 
+    private fun unwrap() {
+        println(rawResponse)
+        val response = JSONObject(rawResponse)
+        val data = response.get("data") as JSONArray
+        return splitTuple(data)
+    }
+
     protected fun splitTuple(tuple: JSONArray) {
         val bwString = tuple[0].toString()
         val payloadsString = tuple[1].toString()
         bw = parseBW(bwString)
-        payloads = parsePayloads((payloadsString))
-    }
-
-    private fun unwrap() {
-        val response = JSONObject(rawResponse)
-        val data = response.get("data") as JSONArray
-        return splitTuple(data)
+        payloads = parsePayloads(payloadsString)
     }
 
     protected open fun parseBW(bwString: String): XyoBoundWitnessBodyJson? {
@@ -48,7 +50,8 @@ open class QueryResponseWrapper(private val rawResponse: String) {
      * @return
      */
     open fun parsePayloads(payloadsString: String): List<XyoPayload>? {
-        val payloadAdapter = moshi.adapter<List<XyoPayload>>(List::class.java)
+        val type = Types.newParameterizedType(List::class.java, XyoPayload::class.java)
+        val payloadAdapter = moshi.adapter<List<XyoPayload>>(type)
         return payloadAdapter.fromJson(payloadsString)
     }
 
