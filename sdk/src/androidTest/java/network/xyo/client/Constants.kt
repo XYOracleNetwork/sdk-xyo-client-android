@@ -3,7 +3,8 @@ package network.xyo.client
 import network.xyo.client.address.XyoAccount
 import network.xyo.client.payload.XyoPayload
 
-class DebugPayload(schema: String, val nonce: Int) : XyoPayload(schema) {}
+class DebugPayload(schema: String, val nonce: Int) : XyoPayload(schema)
+
 
 class TestConstants {
     companion object {
