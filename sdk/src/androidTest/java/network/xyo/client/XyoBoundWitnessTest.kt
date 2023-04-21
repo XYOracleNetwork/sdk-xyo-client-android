@@ -36,48 +36,30 @@ class XyoBoundWitnessTest {
         this.appContext = InstrumentationRegistry.getInstrumentation().targetContext
     }
 
-    fun generateQuery(): RequestDependencies {
+    fun generateQuery(nodeUrl: String): RequestDependencies {
         val account = XyoAccount()
-        val client = NodeClient(apiDomainLocal, account)
+        val client = NodeClient(nodeUrl, account)
         val query = XyoPayload("network.xyo.query.module.discover")
         val payloads = mutableListOf<XyoPayload>()
         payloads.add(TestPayload1())
         return RequestDependencies(client, query, payloads)
     }
 
-    fun testPayload1WithSend(apiDomain: String) {
+    fun testSendQueryBW(nodeUrl: String) {
         runBlocking {
-            val(client, query, payloads) = generateQuery()
+            val(client, query, payloads) = generateQuery(nodeUrl)
             val postResult = client.query(query, payloads, null)
             assertEquals(null, postResult.errors)
         }
     }
 
     @Test
-    fun testPayload1WithSendLocal() {
-        testPayload1WithSend(apiDomainLocal)
+    fun testSendQueryBWSendLocal() {
+        testSendQueryBW(apiDomainLocal)
     }
 
     @Test
-    fun testPayload1WithSendBeta() {
-        testPayload1WithSend(apiDomainBeta)
-    }
-
-    fun testPayload2WithSend(apiDomain: String) {
-        runBlocking {
-            val(client, query, payloads) = generateQuery()
-            val postResult = client.query(query, payloads, null)
-            assertEquals(null, postResult.errors)
-        }
-    }
-
-    @Test
-    fun testPayload2WithSendLocal() {
-        testPayload2WithSend(apiDomainLocal)
-    }
-
-    @Test
-    fun testPayload2WithSendBeta() {
-        testPayload2WithSend(apiDomainBeta)
+    fun testSendQueryBWSendBeta() {
+        testSendQueryBW(apiDomainBeta)
     }
 }

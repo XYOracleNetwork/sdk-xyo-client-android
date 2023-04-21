@@ -6,7 +6,6 @@ import androidx.test.rule.GrantPermissionRule
 import network.xyo.client.address.XyoAccount
 import network.xyo.client.boundwitness.XyoBoundWitnessBuilder
 import network.xyo.client.payload.XyoPayload
-import network.xyo.client.witness.system.info.XyoSystemInfoWitness
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
