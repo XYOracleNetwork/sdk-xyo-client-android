@@ -12,19 +12,18 @@ import org.json.JSONObject
 data class QueryResponse(val data: String) {}
 
 open class QueryResponseWrapper(private val rawResponse: String) {
-    val moshi = Moshi.Builder().addLast(KotlinJsonAdapterFactory()).build()
+    val moshi: Moshi = Moshi.Builder().addLast(KotlinJsonAdapterFactory()).build()
     var bwHash: String? = null
     var bw: XyoBoundWitnessBodyJson? = null
     var payloads: List<XyoPayload>? = null
 
     private fun unwrap() {
-        println(rawResponse)
         val response = JSONObject(rawResponse)
         val data = response.get("data") as JSONArray
         return splitTuple(data)
     }
 
-    protected fun splitTuple(tuple: JSONArray) {
+    private fun splitTuple(tuple: JSONArray) {
         val bwString = tuple[0].toString()
         val payloadsString = tuple[1].toString()
         bw = parseBW(bwString)
