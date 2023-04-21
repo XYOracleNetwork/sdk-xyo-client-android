@@ -16,6 +16,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.jupiter.api.Assertions.*
 
+data class RequestDependencies(val client: NodeClient, val query: XyoPayload, val payloads: List<XyoPayload>)
+
 class XyoBoundWitnessTest {
 
     val apiDomainBeta = "https://beta.api.archivist.xyo.network"
@@ -34,13 +36,18 @@ class XyoBoundWitnessTest {
         this.appContext = InstrumentationRegistry.getInstrumentation().targetContext
     }
 
+    fun generateQuery(): RequestDependencies {
+        val account = XyoAccount()
+        val client = NodeClient(apiDomainLocal, account)
+        val query = XyoPayload("network.xyo.query.module.discover")
+        val payloads = mutableListOf<XyoPayload>()
+        payloads.add(TestPayload1())
+        return RequestDependencies(client, query, payloads)
+    }
+
     fun testPayload1WithSend(apiDomain: String) {
         runBlocking {
-            val account = XyoAccount()
-            val client = NodeClient(apiDomainLocal, account)
-            val query = XyoPayload("network.xyo.query.module.discover")
-            val payloads = mutableListOf<XyoPayload>()
-            payloads.add(TestPayload1())
+            val(client, query, payloads) = generateQuery()
             val postResult = client.query(query, payloads, null)
             assertEquals(null, postResult.errors)
         }
@@ -58,11 +65,7 @@ class XyoBoundWitnessTest {
 
     fun testPayload2WithSend(apiDomain: String) {
         runBlocking {
-            val account = XyoAccount()
-            val client = NodeClient(apiDomainLocal, account)
-            val query = XyoPayload("network.xyo.query.module.discover")
-            val payloads = mutableListOf<XyoPayload>()
-            payloads.add(TestPayload2())
+            val(client, query, payloads) = generateQuery()
             val postResult = client.query(query, payloads, null)
             assertEquals(null, postResult.errors)
         }
