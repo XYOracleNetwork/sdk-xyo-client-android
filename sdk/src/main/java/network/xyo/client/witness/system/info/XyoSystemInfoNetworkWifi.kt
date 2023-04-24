@@ -26,6 +26,8 @@ class XyoSystemInfoNetworkWifi (
                 val networkCaps = connectivityManager.getNetworkCapabilities(network)
                 if (networkCaps?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true) {
                     val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+                    // WifiInfo has moved to the ConnectivityManager and requires API level 29
+                    // see - https://developer.android.com/reference/kotlin/android/net/wifi/WifiManager#getConnectionInfo()
                     val wifiInfo = wifiManager.connectionInfo
                     //we remove the extra quotes because for some reason the system puts the SSID in quotes
                     return XyoSystemInfoNetworkWifi(
