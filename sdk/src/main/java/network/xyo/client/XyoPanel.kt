@@ -5,6 +5,8 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import kotlinx.coroutines.launch
 import network.xyo.client.address.XyoAccount
+import network.xyo.client.archivist.api.XyoArchivistApiClient
+import network.xyo.client.archivist.api.XyoArchivistApiConfig
 import network.xyo.client.archivist.wrapper.ArchivistWrapper
 import network.xyo.client.node.client.NodeClient
 import network.xyo.client.node.client.PostQueryResult
@@ -16,7 +18,20 @@ data class XyoPanelReportResult(val apiResults: List<PostQueryResult>)
 class XyoPanel(val context: Context, val nodes: List<NodeClient>, private val witnesses: List<XyoWitness<XyoPayload>>?) {
     var previousHash: String? = null
 
+    @Deprecated("use constructors without deprecated archive field")
     constructor(
+        context: Context,
+        archive: String? = null,
+        apiDomain: String? = null,
+        witnesses: List<XyoWitness<XyoPayload>>? = null
+    ) :
+            this(
+                context,
+                arrayListOf(NodeClient(apiDomain ?: DefaultApiDomain , XyoAccount())),
+                witnesses
+            )
+
+        constructor(
         context: Context,
         nodeUrl: String,
         accountToUse: XyoAccount,
@@ -84,5 +99,9 @@ class XyoPanel(val context: Context, val nodes: List<NodeClient>, private val wi
             results.add(queryResult)
         }
         return XyoPanelReportResult(results)
+    }
+
+    companion object {
+        const val DefaultApiDomain = "https://api.archivist.xyo.network/Archivist"
     }
 }
