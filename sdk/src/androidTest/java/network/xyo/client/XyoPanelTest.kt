@@ -3,9 +3,9 @@ package network.xyo.client
 import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import network.xyo.client.address.XyoAccount
-import network.xyo.client.node.client.NodeClient
 import network.xyo.client.payload.XyoPayload
 import network.xyo.client.witness.system.info.XyoSystemInfoWitness
 import org.junit.Before
@@ -31,7 +31,7 @@ class XyoPanelTest {
 
     fun testCreatePanel(nodeUrl: String) {
         val witness = XyoWitness<XyoPayload>(XyoAccount())
-        val panel = XyoPanel(appContext, arrayListOf(nodeUrl), arrayListOf(XyoAccount()), listOf(witness))
+        val panel = XyoPanel(appContext, arrayListOf(Pair(nodeUrl, XyoAccount())), listOf(witness))
         assertNotNull(panel)
     }
 
@@ -45,6 +45,7 @@ class XyoPanelTest {
         testCreatePanel(apiDomainLocal)
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     fun testPanelReport(nodeUrl: String) {
         runBlocking {
             val witnessAccount = XyoAccount(XyoSerializable.hexToBytes("9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"))
@@ -52,9 +53,9 @@ class XyoPanelTest {
             val witness = XyoWitness(witnessAccount, fun(context: Context, previousHash: String?): XyoPayload {
                 return XyoPayload("network.xyo.basic", previousHash)
             })
-            val panel = XyoPanel(appContext, arrayListOf(nodeUrl), arrayListOf(XyoAccount()), listOf(witness, XyoSystemInfoWitness(witness2Account)))
+            val panel = XyoPanel(appContext, arrayListOf(Pair(nodeUrl, XyoAccount())), listOf(witness, XyoSystemInfoWitness(witness2Account)))
             val result = panel.reportAsyncQuery()
-            result.apiResults?.forEach {
+            result.apiResults.forEach {
                 assertEquals(it.errors, null)
             }
         }
@@ -70,6 +71,7 @@ class XyoPanelTest {
         testPanelReport(apiDomainLocal)
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun testSimplePanelReport() {
         runBlocking {
@@ -77,16 +79,17 @@ class XyoPanelTest {
                 return XyoEventPayload("test_event", previousHash)
             })
             val result = panel.reportAsyncQuery()
-            result.apiResults?.forEach { assertEquals(it.errors, null) }
+            result.apiResults.forEach { assertEquals(it.errors, null) }
         }
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun testReportEvent() {
         runBlocking {
-            val panel = XyoPanel(appContext, listOf(apiDomainBeta), listOf(XyoAccount()), listOf(XyoSystemInfoWitness()))
+            val panel = XyoPanel(appContext, arrayListOf(Pair(apiDomainBeta, XyoAccount())), listOf(XyoSystemInfoWitness()))
             val result = panel.reportAsyncQuery()
-            result.apiResults?.forEach { assertEquals(it.errors, null) }
+            result.apiResults.forEach { assertEquals(it.errors, null) }
         }
     }
 }

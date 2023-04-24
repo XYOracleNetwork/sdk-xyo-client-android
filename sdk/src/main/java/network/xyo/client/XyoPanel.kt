@@ -46,8 +46,8 @@ class XyoPanel(val context: Context, private val archivists: List<XyoArchivistAp
 
     constructor(
         context: Context,
-        nodeUrls: List<String> = arrayListOf(),
-        accountsToUse: List<XyoAccount?> = arrayListOf(),
+        // ArrayList to not cause compiler confusion with other class constructor signatures
+        nodeUrlsAndAccounts: ArrayList<Pair<String, XyoAccount?>>,
         witnesses: List<XyoWitness<XyoPayload>>? = null
     ): this(
             context,
@@ -60,11 +60,14 @@ class XyoPanel(val context: Context, private val archivists: List<XyoArchivistAp
                 )
             ),
             witnesses
-        ) {
-        if (nodeUrls.isNotEmpty()) {
+        )
+    {
+        if (nodeUrlsAndAccounts.isNotEmpty()) {
             nodes = mutableListOf<NodeClient>().let {
-                nodeUrls.forEachIndexed{ index, nodeUrl ->
-                    it?.add(NodeClient(nodeUrl, accountsToUse[index] ?: XyoAccount()))
+                nodeUrlsAndAccounts.forEach(){ pair ->
+                    val nodeUrl = pair.first
+                    val account = pair.second
+                    it.add(NodeClient(nodeUrl, account ?: XyoAccount()))
                 }
                 it
             }
@@ -76,8 +79,7 @@ class XyoPanel(val context: Context, private val archivists: List<XyoArchivistAp
         observe: ((context: Context, previousHash: String?) -> XyoEventPayload?)?
     ): this(
         context,
-        listOf("$DefaultApiDomain/Archivist"),
-        listOf(XyoAccount()),
+        arrayListOf(Pair("$DefaultApiDomain/Archivist", XyoAccount())),
         listOf(XyoWitness(observe))
     )
 
