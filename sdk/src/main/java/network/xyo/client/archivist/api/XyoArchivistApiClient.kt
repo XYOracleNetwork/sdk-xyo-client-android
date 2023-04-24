@@ -15,8 +15,8 @@ import okio.IOException
 import network.xyo.client.XyoSerializable
 import network.xyo.client.payload.XyoPayload
 
-@Deprecated("Use NodeClient instead")
-class PostBoundWitnessesResult (
+@Deprecated("Use PostQueryResult instead")
+open class PostBoundWitnessesResult (
     val count: Int,
     val errors: ArrayList<Error>? = null
     ): XyoSerializable()

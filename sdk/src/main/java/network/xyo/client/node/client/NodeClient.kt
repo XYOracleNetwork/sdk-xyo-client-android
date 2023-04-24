@@ -20,13 +20,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.io.IOException
 
-class PostQueryResult (
-    val response: QueryResponseWrapper? = null,
-    val errors: ArrayList<Error>? = null
-): XyoSerializable() {
-    operator fun component1() = response
-    operator fun component2() = errors
-}
+
 
 @RequiresApi(Build.VERSION_CODES.M)
 class NodeClient(private val url: String, private val accountToUse: XyoAccount?) {
