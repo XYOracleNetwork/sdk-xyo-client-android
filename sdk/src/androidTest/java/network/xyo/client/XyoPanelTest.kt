@@ -20,9 +20,8 @@ class XyoPanelTest {
 
     lateinit var appContext: Context
 
-    val apiDomainBeta = "${TestConstants.nodeUrlBeta}/Archivist"
-    val apiDomainLocal = "${TestConstants.nodeUrlLocal}/Archivist"
-    val archive = "temp"
+    private val apiDomainBeta = "${TestConstants.nodeUrlBeta}/Archivist"
+    private val apiDomainLocal = "${TestConstants.nodeUrlLocal}/Archivist"
 
     @Before
     fun useAppContext() {
@@ -32,9 +31,7 @@ class XyoPanelTest {
 
     fun testCreatePanel(nodeUrl: String) {
         val witness = XyoWitness<XyoPayload>(XyoAccount())
-        val clients = arrayListOf(NodeClient(nodeUrl, XyoAccount()))
-        val panel = XyoPanel(appContext, clients, listOf(witness))
-        assertNotNull(clients)
+        val panel = XyoPanel(appContext, arrayListOf(nodeUrl), arrayListOf(XyoAccount()), listOf(witness))
         assertNotNull(panel)
     }
 
@@ -50,15 +47,14 @@ class XyoPanelTest {
 
     fun testPanelReport(nodeUrl: String) {
         runBlocking {
-            val clients = arrayListOf(NodeClient(nodeUrl, XyoAccount()))
             val witnessAccount = XyoAccount(XyoSerializable.hexToBytes("9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"))
             val witness2Account = XyoAccount(XyoSerializable.hexToBytes("5a95531488b4d0d3645aea49678297ae9e2034879ce0389b80eb788e8b533592"))
             val witness = XyoWitness(witnessAccount, fun(context: Context, previousHash: String?): XyoPayload {
                 return XyoPayload("network.xyo.basic", previousHash)
             })
-            val panel = XyoPanel(appContext, clients, listOf(witness, XyoSystemInfoWitness(witness2Account)))
-            val result = panel.reportAsync()
-            result.apiResults.forEach {
+            val panel = XyoPanel(appContext, arrayListOf(nodeUrl), arrayListOf(XyoAccount()), listOf(witness, XyoSystemInfoWitness(witness2Account)))
+            val result = panel.reportAsyncQuery()
+            result.apiResults?.forEach {
                 assertEquals(it.errors, null)
             }
         }
@@ -77,21 +73,20 @@ class XyoPanelTest {
     @Test
     fun testSimplePanelReport() {
         runBlocking {
-            val clients = arrayListOf(NodeClient(apiDomainBeta, XyoAccount()))
-            val panel = XyoPanel(appContext, clients, fun(_context:Context, previousHash: String?): XyoEventPayload {
-                return XyoEventPayload("test_event", null)
+            val panel = XyoPanel(appContext, fun(_context:Context, previousHash: String?): XyoEventPayload {
+                return XyoEventPayload("test_event", previousHash)
             })
-            val result = panel.reportAsync()
-            result.apiResults.forEach { assertEquals(it.errors, null) }
+            val result = panel.reportAsyncQuery()
+            result.apiResults?.forEach { assertEquals(it.errors, null) }
         }
     }
 
     @Test
     fun testReportEvent() {
         runBlocking {
-            val panel = XyoPanel(appContext, apiDomainBeta, XyoAccount(), listOf(XyoSystemInfoWitness()))
-            val result = panel.reportAsync()
-            result.apiResults.forEach { assertEquals(it.errors, null) }
+            val panel = XyoPanel(appContext, listOf(apiDomainBeta), listOf(XyoAccount()), listOf(XyoSystemInfoWitness()))
+            val result = panel.reportAsyncQuery()
+            result.apiResults?.forEach { assertEquals(it.errors, null) }
         }
     }
 }
