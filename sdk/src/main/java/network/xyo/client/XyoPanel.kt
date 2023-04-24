@@ -101,9 +101,26 @@ class XyoPanel(val context: Context, private val archivists: List<XyoArchivistAp
     }
 
     @kotlinx.coroutines.ExperimentalCoroutinesApi
+    suspend fun eventAsyncQuery(event: String): XyoPanelReportQueryResult {
+        val adhocWitnessList = listOf(
+            XyoWitness({
+                    _, previousHash -> XyoEventPayload(event, previousHash)
+            })
+        )
+        return reportAsyncQuery(adhocWitnessList)
+    }
+
+    @kotlinx.coroutines.ExperimentalCoroutinesApi
     fun report(adhocWitnesses: List<XyoWitness<XyoPayload>> = emptyList()) {
         xyoScope.launch {
             reportAsync(adhocWitnesses)
+        }
+    }
+
+    @kotlinx.coroutines.ExperimentalCoroutinesApi
+    fun reportQuery(adhocWitnesses: List<XyoWitness<XyoPayload>> = emptyList()) {
+        xyoScope.launch {
+            reportAsyncQuery(adhocWitnesses)
         }
     }
 
