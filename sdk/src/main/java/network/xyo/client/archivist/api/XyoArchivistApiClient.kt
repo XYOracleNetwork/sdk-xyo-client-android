@@ -15,11 +15,13 @@ import okio.IOException
 import network.xyo.client.XyoSerializable
 import network.xyo.client.payload.XyoPayload
 
-class PostBoundWitnessesResult (
+@Deprecated("Use PostQueryResult instead")
+open class PostBoundWitnessesResult (
     val count: Int,
     val errors: ArrayList<Error>? = null
     ): XyoSerializable()
 
+@Deprecated("Use NodeClient instead")
 open class XyoArchivistApiClient(private val config: XyoArchivistApiConfig) {
 
     private val okHttp = OkHttpClient()

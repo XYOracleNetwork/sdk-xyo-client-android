@@ -4,8 +4,8 @@ import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import network.xyo.client.address.XyoAccount
+import network.xyo.client.boundwitness.XyoBoundWitnessBuilder
 import network.xyo.client.payload.XyoPayload
-import network.xyo.client.witness.system.info.XyoSystemInfoWitness
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -80,17 +80,15 @@ class XyoPayloadTest {
 
     @Test
     fun testRoundTripPanel() {
-        val apiDomain = "https://beta.api.archivist.xyo.network"
-        val archive = "test"
         val address = XyoAccount(XyoSerializable.hexToBytes("5a95531488b4d0d3645aea49678297ae9e2034879ce0389b80eb788e8b533592"))
         val witness = XyoWitness(address, fun(_context: Context, previousHash: String?): XyoPayload {
             return XyoPayload("network.xyo.basic", previousHash)
         })
-        val panel = XyoPanel(appContext, archive, apiDomain, listOf(witness, XyoSystemInfoWitness(
-            address
-        )
-        ))
-        val bwJson = panel.generateBoundWitnessJson()
+        val payloads = arrayListOf(witness.observe(appContext))
+        val bwJson = XyoBoundWitnessBuilder()
+            .payloads(payloads.mapNotNull { payload -> payload })
+            .witnesses(arrayListOf(witness))
+            .build()
         val bwJsonString = XyoSerializable.toJson(bwJson)
         val bwMirrored = XyoSerializable.fromJson(bwJsonString, bwJson)
         assertNotNull(bwMirrored)

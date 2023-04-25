@@ -42,13 +42,16 @@ abstract class XyoSerializable: Serializable  {
             val newJsonArray = JSONArray()
             for (i in 0 until jsonArray.length()) {
                 val value = jsonArray[i]
-                if (value is JSONArray) {
-                    newJsonArray.put(sortJson(value, removeMeta))
-                }
-                else if (value is JSONObject) {
-                    newJsonArray.put(sortJson(value, removeMeta))
-                } else {
-                    newJsonArray.put(value)
+                when (value) {
+                    is JSONArray -> {
+                        newJsonArray.put(sortJson(value, removeMeta))
+                    }
+                    is JSONObject -> {
+                        newJsonArray.put(sortJson(value, removeMeta))
+                    }
+                    else -> {
+                        newJsonArray.put(value)
+                    }
                 }
             }
             return newJsonArray

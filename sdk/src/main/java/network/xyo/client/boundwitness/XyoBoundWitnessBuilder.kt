@@ -9,26 +9,26 @@ import network.xyo.client.payload.XyoPayload
 import network.xyo.client.payload.XyoValidationException
 
 @RequiresApi(Build.VERSION_CODES.M)
-class XyoBoundWitnessBuilder {
-    private var _witnesses = mutableListOf<XyoAccount>()
-    private var _previous_hashes = mutableListOf<String>()
-    private var _payload_hashes = mutableListOf<String>()
-    private var _payload_schemas = mutableListOf<String>()
-    private var _payloads = mutableListOf<XyoPayload>()
+open class XyoBoundWitnessBuilder {
+    protected var _witnesses = mutableListOf<XyoAccount>()
+    protected var _previous_hashes = mutableListOf<String?>()
+    protected var _payload_hashes = mutableListOf<String>()
+    protected var _payload_schemas = mutableListOf<String>()
+    protected var _payloads = mutableListOf<XyoPayload>()
 
-    fun witness(account: XyoAccount, previousHash: String = ""): XyoBoundWitnessBuilder {
+    open fun witness(account: XyoAccount, previousHash: String?): XyoBoundWitnessBuilder {
         _witnesses.add(account)
         _previous_hashes.add(previousHash)
         return this
     }
 
-    fun witnesses(witnesses: List<XyoWitness<XyoPayload>>): XyoBoundWitnessBuilder {
+    open fun witnesses(witnesses: List<XyoWitness<XyoPayload>>): XyoBoundWitnessBuilder {
         witnesses.forEach { witness -> _witnesses.add(witness.address) }
         witnesses.forEach { witness -> _previous_hashes.add(witness.previousHash) }
         return this
     }
 
-    private fun hashableFields(): XyoBoundWitnessBodyJson {
+    open fun hashableFields(): XyoBoundWitnessBodyJson {
         return XyoBoundWitnessBodyJson(
             _witnesses.map { witness -> witness.address.hex},
             _previous_hashes,
@@ -61,8 +61,7 @@ class XyoBoundWitnessBuilder {
         }
     }
 
-    fun build(previousHash: String? = null): XyoBoundWitnessJson {
-        val bw = XyoBoundWitnessJson()
+    protected fun  constructFields(bw: XyoBoundWitnessJson, previousHash: String?) {
         val hashable = hashableFields()
         val hash = XyoSerializable.sha256String(hashable)
         bw._previous_hash = previousHash
@@ -74,6 +73,13 @@ class XyoBoundWitnessBuilder {
         bw.payload_hashes = _payload_hashes
         bw.payload_schemas = _payload_schemas
         bw.previous_hashes = _previous_hashes
+    }
+
+    open fun build(previousHash: String? = null): XyoBoundWitnessJson {
+        val bw = XyoBoundWitnessJson().let{
+            constructFields(it, previousHash)
+            it
+        }
         return bw
     }
 }
