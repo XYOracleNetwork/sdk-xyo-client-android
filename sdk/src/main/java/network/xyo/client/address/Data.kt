@@ -29,7 +29,7 @@ abstract class XyoData(protected val _size: Int) {
         get () {
             val keccak = Keccak.Digest256()
             keccak.update(bytes)
-            return XyoMemoryData(32, keccak.digest())
+            return MemoryData(32, keccak.digest())
         }
 
     companion object {

@@ -13,6 +13,7 @@ open class XyoInvalidSchemaException(val schema: String): XyoValidationException
 open class XyoInvalidPreviousHashException(val previousHash: String?): XyoValidationException("'previous_hash' must be lowercase [${previousHash}]")
 
 @JsonClass(generateAdapter = true)
+@Deprecated("Use Payload instead")
 open class XyoPayload(schema: String, previousHash: String? = null): XyoSerializable() {
     var schema = schema.lowercase()
     var previousHash = previousHash?.lowercase()

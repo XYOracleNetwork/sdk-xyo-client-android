@@ -7,7 +7,7 @@ import org.spongycastle.jce.provider.BouncyCastleProvider
 import org.spongycastle.jce.spec.ECParameterSpec
 import java.security.Security
 
-abstract class XyoEllipticKey(_size: Int): XyoData(_size) {
+abstract class EllipticKey(_size: Int): XyoData(_size) {
     companion object {
         val scInit = Security.insertProviderAt(BouncyCastleProvider(), 0)
 

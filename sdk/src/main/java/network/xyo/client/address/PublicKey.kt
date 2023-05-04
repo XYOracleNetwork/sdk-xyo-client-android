@@ -2,7 +2,7 @@ package network.xyo.client.address
 
 import org.spongycastle.math.ec.ECPoint
 
-class XyoPublicKey(sourceBytes: ByteArray): XyoEllipticKey(64) {
+class PublicKey(sourceBytes: ByteArray): EllipticKey(64) {
 
     private val _bytes = sourceBytes.copyOfRange(sourceBytes.size - _size, sourceBytes.size)
 
@@ -17,9 +17,9 @@ class XyoPublicKey(sourceBytes: ByteArray): XyoEllipticKey(64) {
             return _bytes
         }
 
-    val address: XyoAddressValue
+    val address: AddressValue
         get() {
-            return XyoAddressValue.addressFromAddressOrPublicKey(bytes)
+            return AddressValue.addressFromAddressOrPublicKey(bytes)
         }
 
     val point: ECPoint

@@ -12,7 +12,7 @@ import java.math.BigInteger
 import java.security.KeyFactory
 import java.security.SecureRandom
 
-class XyoPrivateKey(privateBytes: ByteArray?): XyoEllipticKey(32) {
+class PrivateKey(privateBytes: ByteArray?): EllipticKey(32) {
     private val keyPair: ECKeyPair
 
     init {
@@ -22,9 +22,9 @@ class XyoPrivateKey(privateBytes: ByteArray?): XyoEllipticKey(32) {
         checkSize()
     }
 
-    val public: XyoPublicKey
+    val public: PublicKey
         get() {
-            return XyoPublicKey(this.keyPair.public)
+            return PublicKey(this.keyPair.public)
         }
 
     override val bytes: ByteArray
