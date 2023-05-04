@@ -13,7 +13,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.jupiter.api.Assertions.*
 
-class XyoPanelTest {
+class SentinelTest {
     @Rule
     @JvmField
     val grantPermissionRule = GrantPermissionRule.grant(android.Manifest.permission.INTERNET, android.Manifest.permission.ACCESS_WIFI_STATE)
@@ -31,7 +31,7 @@ class XyoPanelTest {
 
     fun testCreatePanel(nodeUrl: String) {
         val witness = XyoWitness<XyoPayload>(XyoAccount())
-        val panel = XyoPanel(appContext, arrayListOf(Pair(nodeUrl, XyoAccount())), listOf(witness))
+        val panel = Sentinel(appContext, arrayListOf(Pair(nodeUrl, XyoAccount())), listOf(witness))
         assertNotNull(panel)
     }
 
@@ -53,7 +53,7 @@ class XyoPanelTest {
             val witness = XyoWitness(witnessAccount, fun(context: Context, previousHash: String?): XyoPayload {
                 return XyoPayload("network.xyo.basic", previousHash)
             })
-            val panel = XyoPanel(appContext, arrayListOf(Pair(nodeUrl, XyoAccount())), listOf(witness, XyoSystemInfoWitness(witness2Account)))
+            val panel = Sentinel(appContext, arrayListOf(Pair(nodeUrl, XyoAccount())), listOf(witness, XyoSystemInfoWitness(witness2Account)))
             val result = panel.reportAsyncQuery()
             result.apiResults.forEach {
                 assertEquals(it.errors, null)
@@ -75,7 +75,7 @@ class XyoPanelTest {
     @Test
     fun testSimplePanelReport() {
         runBlocking {
-            val panel = XyoPanel(appContext, fun(_context:Context, previousHash: String?): XyoEventPayload {
+            val panel = Sentinel(appContext, fun(_context:Context, previousHash: String?): XyoEventPayload {
                 return XyoEventPayload("test_event", previousHash)
             })
             val result = panel.reportAsyncQuery()
@@ -87,7 +87,7 @@ class XyoPanelTest {
     @Test
     fun testReportEvent() {
         runBlocking {
-            val panel = XyoPanel(appContext, arrayListOf(Pair(apiDomainBeta, XyoAccount())), listOf(XyoSystemInfoWitness()))
+            val panel = Sentinel(appContext, arrayListOf(Pair(apiDomainBeta, XyoAccount())), listOf(XyoSystemInfoWitness()))
             val result = panel.reportAsyncQuery()
             result.apiResults.forEach { assertEquals(it.errors, null) }
         }

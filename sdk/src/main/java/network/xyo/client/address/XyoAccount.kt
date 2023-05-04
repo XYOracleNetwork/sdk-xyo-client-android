@@ -31,6 +31,8 @@ open class XyoAccount(privateKeyBytes: ByteArray? = null) {
 
     private val keyPair: XyoKeyPair = XyoKeyPair(privateKeyBytes)
 
+    public var previousHash: String? = null
+
     val private: XyoPrivateKey
         get() {
             return this.keyPair.private
@@ -45,4 +47,10 @@ open class XyoAccount(privateKeyBytes: ByteArray? = null) {
         get() {
             return public.address
         }
+
+    fun sign(hash: String): String {
+        val signature = this.private.sign(hash)
+        this.previousHash = hash
+        return XyoSerializable.bytesToHex(signature)
+    }
 }
