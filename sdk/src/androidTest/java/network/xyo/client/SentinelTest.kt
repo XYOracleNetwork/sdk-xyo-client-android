@@ -5,7 +5,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
-import network.xyo.client.address.XyoAccount
+import network.xyo.client.address.Account
 import network.xyo.client.payload.XyoPayload
 import network.xyo.client.witness.system.info.XyoSystemInfoWitness
 import org.junit.Before
@@ -30,8 +30,8 @@ class SentinelTest {
     }
 
     fun testCreatePanel(nodeUrl: String) {
-        val witness = XyoWitness<XyoPayload>(XyoAccount())
-        val panel = Sentinel(appContext, arrayListOf(Pair(nodeUrl, XyoAccount())), listOf(witness))
+        val witness = XyoWitness<XyoPayload>(Account())
+        val panel = Sentinel(appContext, arrayListOf(Pair(nodeUrl, Account())), listOf(witness))
         assertNotNull(panel)
     }
 
@@ -48,12 +48,12 @@ class SentinelTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     fun testPanelReport(nodeUrl: String) {
         runBlocking {
-            val witnessAccount = XyoAccount(XyoSerializable.hexToBytes("9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"))
-            val witness2Account = XyoAccount(XyoSerializable.hexToBytes("5a95531488b4d0d3645aea49678297ae9e2034879ce0389b80eb788e8b533592"))
+            val witnessAccount = Account(XyoSerializable.hexToBytes("9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"))
+            val witness2Account = Account(XyoSerializable.hexToBytes("5a95531488b4d0d3645aea49678297ae9e2034879ce0389b80eb788e8b533592"))
             val witness = XyoWitness(witnessAccount, fun(context: Context, previousHash: String?): XyoPayload {
                 return XyoPayload("network.xyo.basic", previousHash)
             })
-            val panel = Sentinel(appContext, arrayListOf(Pair(nodeUrl, XyoAccount())), listOf(witness, XyoSystemInfoWitness(witness2Account)))
+            val panel = Sentinel(appContext, arrayListOf(Pair(nodeUrl, Account())), listOf(witness, XyoSystemInfoWitness(witness2Account)))
             val result = panel.reportAsyncQuery()
             result.apiResults.forEach {
                 assertEquals(it.errors, null)
@@ -87,7 +87,7 @@ class SentinelTest {
     @Test
     fun testReportEvent() {
         runBlocking {
-            val panel = Sentinel(appContext, arrayListOf(Pair(apiDomainBeta, XyoAccount())), listOf(XyoSystemInfoWitness()))
+            val panel = Sentinel(appContext, arrayListOf(Pair(apiDomainBeta, Account())), listOf(XyoSystemInfoWitness()))
             val result = panel.reportAsyncQuery()
             result.apiResults.forEach { assertEquals(it.errors, null) }
         }

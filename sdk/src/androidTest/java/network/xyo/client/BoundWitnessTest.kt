@@ -4,11 +4,7 @@ import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import kotlinx.coroutines.runBlocking
-import network.xyo.client.boundwitness.XyoBoundWitnessBuilder
-import network.xyo.client.address.XyoAccount
-import network.xyo.client.archivist.api.XyoArchivistApiClient
-import network.xyo.client.archivist.api.XyoArchivistApiConfig
-import network.xyo.client.boundwitness.QueryBoundWitnessBuilder
+import network.xyo.client.address.Account
 import network.xyo.client.node.client.NodeClient
 import network.xyo.client.payload.XyoPayload
 import org.junit.Before
@@ -18,7 +14,7 @@ import org.junit.jupiter.api.Assertions.*
 
 data class RequestDependencies(val client: NodeClient, val query: XyoPayload, val payloads: List<XyoPayload>)
 
-class XyoBoundWitnessTest {
+class BoundWitnessTest {
 
     val apiDomainBeta = "https://beta.api.archivist.xyo.network"
     val apiDomainLocal = "http://10.0.2.2:8080"
@@ -37,11 +33,11 @@ class XyoBoundWitnessTest {
     }
 
     fun generateQuery(nodeUrl: String): RequestDependencies {
-        val account = XyoAccount()
+        val account = Account()
         val client = NodeClient(nodeUrl, account)
         val query = XyoPayload("network.xyo.query.module.discover")
         val payloads = mutableListOf<XyoPayload>()
-        payloads.add(TestPayload1())
+        payloads.add(XyoTestPayload1())
         return RequestDependencies(client, query, payloads)
     }
 

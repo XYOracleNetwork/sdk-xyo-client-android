@@ -1,10 +1,10 @@
 package network.xyo.client
 
-import network.xyo.client.address.XyoAccount
+import network.xyo.client.address.Account
 import org.junit.Test
 import org.junit.jupiter.api.Assertions.*
 
-class XyoAccountTest {
+class AccountTest {
 
     val testVectorPrivate = "7f71bc5644f8f521f7e9b73f7a391e82c05432f8a9d36c44d6b1edbf1d8db62f"
     val testVectorPublic = "ed6f3b86542f45aab88ec48ab1366b462bd993fec83e234054afd8f2311fba774800fdb40c04918463b463a6044b83413a604550bfba8f8911beb65475d6528e"
@@ -15,7 +15,7 @@ class XyoAccountTest {
 
     @Test
     fun testAddress() {
-        val account = XyoAccount(XyoSerializable.hexToBytes(testVectorPrivate))
+        val account = Account(XyoSerializable.hexToBytes(testVectorPrivate))
         val signature = XyoSerializable.bytesToHex(account.private.sign(testVectorHash))
         assertEquals(testVectorPrivate, account.private.hex)
         assertEquals(testVectorPublic, account.public.hex)
@@ -33,7 +33,7 @@ class XyoAccountTest {
 
     @Test
     fun testInitWithGenerate() {
-        val account = XyoAccount()
+        val account = Account()
         val privateHex = account.private.hex
         val publicHex = account.public.hex
         val addressHex = account.address.hex

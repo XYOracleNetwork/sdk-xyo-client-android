@@ -4,19 +4,19 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import network.xyo.client.XyoSerializable
 import network.xyo.client.XyoWitness
-import network.xyo.client.address.XyoAccount
+import network.xyo.client.address.Account
 import network.xyo.client.payload.XyoPayload
 import network.xyo.client.payload.XyoValidationException
 
-@RequiresApi(Build.VERSION_CODES.M)
+
 open class XyoBoundWitnessBuilder {
-    protected var _witnesses = mutableListOf<XyoAccount>()
+    protected var _witnesses = mutableListOf<Account>()
     protected var _previous_hashes = mutableListOf<String?>()
     protected var _payload_hashes = mutableListOf<String>()
     protected var _payload_schemas = mutableListOf<String>()
     protected var _payloads = mutableListOf<XyoPayload>()
 
-    open fun witness(account: XyoAccount, previousHash: String?): XyoBoundWitnessBuilder {
+    open fun witness(account: Account, previousHash: String?): XyoBoundWitnessBuilder {
         _witnesses.add(account)
         _previous_hashes.add(previousHash)
         return this

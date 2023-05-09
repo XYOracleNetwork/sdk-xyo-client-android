@@ -1,20 +1,16 @@
 package network.xyo.client.address
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import network.xyo.client.XyoSerializable
 import org.spongycastle.jcajce.provider.asymmetric.ec.BCECPrivateKey
 import org.spongycastle.math.ec.ECPoint
 import java.math.BigInteger
-import java.security.*
 
 
 class ECKeyPair(val private: BCECPrivateKey, val public: ECPoint)
 
 val SECP256K1N = BigInteger("fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141", 16)
 
-@RequiresApi(Build.VERSION_CODES.M)
-open class XyoAccount(privateKeyBytes: ByteArray? = null) {
+open class Account(privateKeyBytes: ByteArray? = null) {
 
     private val keyPair: KeyPair = KeyPair(privateKeyBytes)
 

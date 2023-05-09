@@ -4,7 +4,7 @@ import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
 import kotlinx.coroutines.launch
-import network.xyo.client.address.XyoAccount
+import network.xyo.client.address.Account
 import network.xyo.client.archivist.api.PostBoundWitnessesResult
 import network.xyo.client.archivist.api.XyoArchivistApiClient
 import network.xyo.client.archivist.api.XyoArchivistApiConfig
@@ -12,7 +12,6 @@ import network.xyo.client.archivist.wrapper.ArchivistWrapper
 import network.xyo.client.boundwitness.XyoBoundWitnessBuilder
 import network.xyo.client.boundwitness.XyoBoundWitnessJson
 import network.xyo.client.module.AbstractModule
-import network.xyo.client.module.Module
 import network.xyo.client.module.ModuleConfig
 import network.xyo.client.module.ModuleParams
 import network.xyo.client.module.ModuleResolver
@@ -23,7 +22,7 @@ import network.xyo.client.payload.XyoPayload
 data class SentinelReportResult(val bw: XyoBoundWitnessJson, val apiResults: List<PostBoundWitnessesResult>)
 data class SentinelReportQueryResult(val bw: XyoBoundWitnessJson, val apiResults: List<PostQueryResult>)
 
-@RequiresApi(Build.VERSION_CODES.M)
+
 class Sentinel(val context: Context, params: ModuleParams<ModuleConfig>, private val archivists: List<XyoArchivistApiClient>, private val witnesses: List<XyoWitness<XyoPayload>>?): AbstractModule<ModuleConfig, ModuleParams<ModuleConfig>>(params) {
     var previousHash: String? = null
     private var nodes: MutableList<NodeClient>? = null
@@ -71,7 +70,7 @@ class Sentinel(val context: Context, params: ModuleParams<ModuleConfig>, private
         context: Context,
         params: ModuleParams<ModuleConfig>,
         // ArrayList to not cause compiler confusion with other class constructor signatures
-        nodeUrlsAndAccounts: ArrayList<Pair<String, XyoAccount?>>,
+        nodeUrlsAndAccounts: ArrayList<Pair<String, Account?>>,
         witnesses: List<XyoWitness<XyoPayload>>? = null
     ): this(
             context,
@@ -92,7 +91,7 @@ class Sentinel(val context: Context, params: ModuleParams<ModuleConfig>, private
                 nodeUrlsAndAccounts.forEach(){ pair ->
                     val nodeUrl = pair.first
                     val account = pair.second
-                    it.add(NodeClient(nodeUrl, account ?: XyoAccount()))
+                    it.add(NodeClient(nodeUrl, account ?: Account()))
                 }
                 it
             }
@@ -106,7 +105,7 @@ class Sentinel(val context: Context, params: ModuleParams<ModuleConfig>, private
     ): this(
         context,
         params,
-        arrayListOf(Pair("$DefaultApiDomain/Archivist", XyoAccount())),
+        arrayListOf(Pair("$DefaultApiDomain/Archivist", Account())),
         listOf(XyoWitness(observe))
     )
 

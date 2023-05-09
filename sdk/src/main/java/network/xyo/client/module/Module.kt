@@ -5,12 +5,11 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import network.xyo.client.CompositeModuleResolver
-import network.xyo.client.XyoSerializable
-import network.xyo.client.address.XyoAccount
+import network.xyo.client.address.Account
 import network.xyo.client.boundwitness.XyoBoundWitnessBodyInterface
 import network.xyo.client.boundwitness.XyoBoundWitnessBuilder
 import network.xyo.client.boundwitness.XyoBoundWitnessJson
-import network.xyo.client.payload.XyoPayload
+import network.xyo.client.payload.Payload
 import java.security.InvalidParameterException
 
 interface ModuleConfig {
@@ -20,7 +19,7 @@ interface ModuleConfig {
 
 interface ModuleParams<TConfig : ModuleConfig> {
     var config: TConfig
-    var account: XyoAccount
+    var account: Account
 }
 
 interface ModuleFilter {
@@ -40,23 +39,24 @@ interface QueryBoundWitness: XyoBoundWitnessBodyInterface {
     var resultSet: String
 }
 
+typealias ModuleQueryResult = Pair<XyoBoundWitnessJson, List<Payload>>
+
 interface Module<TConfig: ModuleConfig, TParams : ModuleParams<TConfig>> {
-    var address: String
-    var config: TConfig
+    val address: String
+    val config: TConfig
     var downResolver: ModuleResolver
-    var params: TParams
+    val params: TParams
     var queries: List<String>
-    fun query(query: QueryBoundWitness, payloads: List<XyoPayload>?): Pair<XyoBoundWitnessBodyInterface, List<XyoPayload>>
-    fun queryable(query: QueryBoundWitness, payloads: List<XyoPayload>?): Boolean
+    fun query(query: QueryBoundWitness, payloads: List<Payload>?): ModuleQueryResult
+    fun queryable(query: QueryBoundWitness, payloads: List<Payload>?): Boolean
     fun start()
     var upResolver: ModuleResolver
 }
 
-interface AnyModule : Module<ModuleConfig, ModuleParams<ModuleConfig>> {
+abstract class AnyModule : Module<ModuleConfig, ModuleParams<ModuleConfig>> {
 
 }
 
-@RequiresApi(Build.VERSION_CODES.M)
 open class AbstractModule<TConfig: ModuleConfig, TParams : ModuleParams<TConfig>>(override var params: TParams) : Module<TConfig, TParams> {
 
     val ModuleDiscoverQuerySchema = "network.xyo.query.module.discover"
@@ -69,17 +69,16 @@ open class AbstractModule<TConfig: ModuleConfig, TParams : ModuleParams<TConfig>
 
     private var _started = false
 
-    var account: XyoAccount
+    var account: Account
         get() {
             return this.params.account
         }
         set(value) {}
 
-    override var address: String
+    override val address: String
         get() {
             return this.params.account.address.hex
         }
-        set(value) {}
 
     override var config: TConfig
         get() {
@@ -87,7 +86,7 @@ open class AbstractModule<TConfig: ModuleConfig, TParams : ModuleParams<TConfig>
         }
         set(value) {}
 
-    fun started(notStartedAction: notStartedActionEnum): Boolean {
+    fun started(notStartedAction: notStartedActionEnum = notStartedActionEnum.THROW): Boolean {
         if (!this._started) {
             when(notStartedAction) {
                 notStartedActionEnum.THROW -> {
@@ -108,46 +107,47 @@ open class AbstractModule<TConfig: ModuleConfig, TParams : ModuleParams<TConfig>
     }
 
     override var downResolver: ModuleResolver = CompositeModuleResolver()
-    override var queries = listOf<String>()
+    override var queries = listOf<String>(ModuleDiscoverQuerySchema, ModuleSubscribeQuerySchema)
 
-    private fun parseQuery(query: QueryBoundWitness, payloads: List<XyoPayload>?): XyoPayload {
-        val queryPayload = payloads?.first { payload -> XyoSerializable.sha256String(payload) == query.query }
+    private fun parseQuery(query: QueryBoundWitness, payloads: List<Payload>?): Query {
+        val queryPayload = payloads?.first { payload -> payload.hash() == query.query }
         if (queryPayload == null) {
             throw NotFoundException()
         } else {
-            return queryPayload
+            return queryPayload as Query
         }
     }
 
-    fun discover(): List<XyoPayload> {
-        return listOf<XyoPayload>()
+    fun discover(): List<Payload> {
+        return listOf<Payload>()
+    }
+
+    fun previousHash(): List<Payload> {
+        val fields = mapOf<String, Any?>(Pair("huri", this.account.previousHash))
+        val previous = Payload("network.xyo.huri", fields)
+        return listOf(previous)
     }
 
     fun subscribe() {
 
     }
 
-    fun bindResult(results: List<XyoPayload>, queryAccount: XyoAccount?): Pair<XyoBoundWitnessJson, List<XyoPayload>> {
+    fun bindResult(results: List<Payload>, queryAccount: Account?): ModuleQueryResult {
         return Pair(XyoBoundWitnessBuilder().build(), results)
-    }
-
-    fun previousHash(): List<XyoPayload> {
-        val previous = XyoPayload("network.xyo.huri", this.account.previousHash)
-        return listOf(previous)
     }
 
     protected fun queryHandler(
         query: QueryBoundWitness,
-        payloads: List<XyoPayload>?
-    ): Pair<XyoBoundWitnessJson, List<XyoPayload>> {
+        payloads: List<Payload>?
+    ): ModuleQueryResult {
         this.started(notStartedActionEnum.THROW)
         val typedQuery = this.parseQuery(query, payloads)
 
         if (!this.queryable(query, payloads)) {
             throw InvalidParameterException()
         }
-        val resultPayloads = mutableListOf<XyoPayload>()
-        val queryAccount = XyoAccount()
+        val resultPayloads = mutableListOf<Payload>()
+        val queryAccount = Account()
         try {
             when (typedQuery.schema) {
                 ModuleDiscoverQuerySchema -> {
@@ -164,18 +164,18 @@ open class AbstractModule<TConfig: ModuleConfig, TParams : ModuleParams<TConfig>
                 }
             }
         } catch (error: Error) {
-            val errorPayload = XyoPayload("network.xyo.error")
+            val errorPayload = Payload("network.xyo.error")
             resultPayloads.add(errorPayload)
         }
         return this.bindResult(resultPayloads, queryAccount)
     }
 
-    override fun query(query: QueryBoundWitness, payloads: List<XyoPayload>?): Pair<XyoBoundWitnessJson, List<XyoPayload>> {
+    override fun query(query: QueryBoundWitness, payloads: List<Payload>?): ModuleQueryResult {
         this.started(notStartedActionEnum.THROW)
         return this.queryHandler(query, payloads)
     }
 
-    override fun queryable(query: QueryBoundWitness, payloads: List<XyoPayload>?): Boolean {
+    override fun queryable(query: QueryBoundWitness, payloads: List<Payload>?): Boolean {
         if (!this.started(notStartedActionEnum.WARN))
                 return false
 

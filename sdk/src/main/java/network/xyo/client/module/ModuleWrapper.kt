@@ -1,73 +1,43 @@
-package network.xyo.client.node.client
+package network.xyo.client.module
 
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.coroutines.withContext
 import network.xyo.client.XyoSerializable
 import network.xyo.client.address.Account
 import network.xyo.client.boundwitness.QueryBoundWitnessBuilder
 import network.xyo.client.boundwitness.QueryBoundWitnessJson
+import network.xyo.client.payload.Payload
 import network.xyo.client.payload.XyoPayload
 import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONArray
 import org.json.JSONObject
-import java.io.IOException
 
-
-
-
-class NodeClient(private val url: String, private val accountToUse: Account?) {
-
-    private val _internalAccount = Account()
-    private val okHttp = OkHttpClient()
-
-    private val account: Account
+class ModuleWrapper<TConfig: ModuleConfig, TParams: ModuleParams<TConfig>, TModule: Module<TConfig, TParams>>(val module: TModule, val params: TParams) {
+    val account: Account
         get() {
-            if (this.accountToUse === null) {
-                println("WARNING: Anonymous Queries not allowed, but running anyway.")
-                return this._internalAccount
-            }
-            return this.accountToUse
+            return this.params.account
         }
 
+    val address: String
+        get() {
+            return this.module.address
+        }
+
+    val config: TConfig
+        get() {
+            return this.params.config
+        }
+
+    val queries: List<String>
+        get() {
+            return this.module.queries
+        }
 
     @ExperimentalCoroutinesApi
-    suspend fun query(query: XyoPayload, payloads: List<XyoPayload>?, previousHash: String?): PostQueryResult {
-        val bodyString = buildQuery(query, payloads, previousHash)
-        val postBody = bodyString.toRequestBody(MEDIA_TYPE_JSON)
-        val request = Request.Builder()
-            .url(url)
-            .post(postBody)
-            .build()
-
-        return withContext(Dispatchers.IO) {
-            return@withContext suspendCancellableCoroutine { continuation ->
-                try {
-                    okHttp.newCall(request).execute().use { response ->
-                        if (!response.isSuccessful) {
-                            continuation.resume(PostQueryResult(
-                                null,
-                                arrayListOf(Error(response.message))
-                            ), null)
-                        } else {
-                            continuation.resume(PostQueryResult(QueryResponseWrapper.parse(response.body!!.string()), null), null)
-                        }
-                    }
-                } catch (ex: IOException) {
-                    Log.e("xyoClient", ex.message ?: ex.toString())
-                    continuation.resume(PostQueryResult(null, arrayListOf(Error(ex.message))), null)
-                }
-            }
-        }
+    suspend fun query(query: QueryBoundWitness, payloads: List<Payload>?): ModuleQueryResult {
+        return this.module.query(query, payloads)
     }
-
 
     private fun buildQuery(query: XyoPayload, payloads: List<XyoPayload>?, previousHash: String?): String {
         val builtQuery = queryBuilder(query, payloads, previousHash)
