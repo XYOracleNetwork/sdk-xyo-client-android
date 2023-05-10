@@ -48,12 +48,12 @@ android {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-reflect:1.8.20"
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4'
-    implementation 'com.squareup.moshi:moshi-kotlin:1.14.0'
-    implementation 'androidx.core:core-ktx:1.10.0'
+    implementation 'androidx.core:core-ktx:1.10.1'
     implementation 'com.squareup.okhttp3:okhttp:4.9.2'
     implementation 'com.madgag.spongycastle:prov:1.58.0.0'
     implementation 'com.madgag.spongycastle:pkix:1.54.0.0'
     implementation 'com.ionspin.kotlin:bignum:0.3.8'
+    implementation 'com.google.code.gson:gson:2.8.9'
     androidTestImplementation "androidx.test:runner:1.5.2"
     androidTestImplementation "androidx.test:rules:1.5.0"
     androidTestImplementation "androidx.test.ext:junit:1.1.5"

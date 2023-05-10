@@ -1,5 +1,5 @@
 package network.xyo.client.archivist.wrapper
 
-import network.xyo.client.payload.XyoPayload
+import network.xyo.client.payload.Payload
 
-data class ArchivistGetQueryPayload(val hashes: List<String>): XyoPayload("network.xyo.query.archivist.get")
+data class ArchivistGetQueryPayload(val hashes: List<String>): Payload("network.xyo.query.archivist.get")

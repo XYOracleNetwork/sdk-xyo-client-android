@@ -6,20 +6,19 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.wifi.WifiManager
 import android.os.Build
-import com.squareup.moshi.JsonClass
+import org.json.JSONObject
 import java.net.NetworkInterface
 
-@JsonClass(generateAdapter = true)
-class XyoSystemInfoNetworkWifi (
+class SystemInfoNetworkWifi (
     val ip: String?,
     val mac: String?,
     val rssi: Int?,
     val ssid: String?
-) {
+): JSONObject() {
     companion object {
 
         @SuppressLint("HardwareIds")
-        fun detect(context: Context): XyoSystemInfoNetworkWifi? {
+        fun detect(context: Context): SystemInfoNetworkWifi? {
             val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
             if (Build.VERSION.SDK_INT >= 23) {
                 val network = connectivityManager.activeNetwork
@@ -30,7 +29,7 @@ class XyoSystemInfoNetworkWifi (
                     // see - https://developer.android.com/reference/kotlin/android/net/wifi/WifiManager#getConnectionInfo()
                     val wifiInfo = wifiManager.connectionInfo
                     //we remove the extra quotes because for some reason the system puts the SSID in quotes
-                    return XyoSystemInfoNetworkWifi(
+                    return SystemInfoNetworkWifi(
                         getIpAddress(),
                         wifiInfo.macAddress,
                         wifiInfo.rssi,

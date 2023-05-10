@@ -1,26 +1,23 @@
 package network.xyo.client.archivist.wrapper
 
-import android.os.Build
-import androidx.annotation.RequiresApi
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import network.xyo.client.XyoSerializable
-import network.xyo.client.node.client.NodeClient
-import network.xyo.client.node.client.PostQueryResult
-import network.xyo.client.payload.XyoPayload
+import network.xyo.client.address.Account
+import network.xyo.client.module.Module
+import network.xyo.client.module.ModuleConfig
+import network.xyo.client.module.ModuleParams
+import network.xyo.client.module.ModuleQueryResult
+import network.xyo.client.module.ModuleWrapper
+import network.xyo.client.payload.Payload
 
-open class ArchivistWrapper(private val nodeClient: NodeClient) {
-    @OptIn(ExperimentalCoroutinesApi::class)
-    suspend fun get(hashes: List<String>, previousHash: String?): PostQueryResult {
-        val query = ArchivistGetQueryPayload(hashes)
-        return nodeClient.query(query, null, previousHash)
+open class ArchivistWrapper<TConfig: ModuleConfig, TParams: ModuleParams<TConfig>, TModule: Module<TConfig, TParams>>(
+        module: TModule,
+        account: Account
+    ): ModuleWrapper<TConfig, TParams, TModule>(module, account) {
+    suspend fun get(hashes: List<String>): ModuleQueryResult {
+        return this.sendQuery(ArchivistGetQueryPayload(hashes))
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    suspend fun insert(payloads: List<XyoPayload>, previousHash: String?): PostQueryResult {
-        val payloadHashes = arrayListOf<String>()
-        payloads.forEach { payloadHashes.add(XyoSerializable.sha256String(it)) }
-
-        val query = ArchivistInsertQueryPayload(payloadHashes)
-        return nodeClient.query(query, payloads, previousHash)
+    suspend fun insert(payloads: Set<Payload>): ModuleQueryResult {
+        return this.sendQuery(ArchivistInsertQueryPayload())
     }
 }

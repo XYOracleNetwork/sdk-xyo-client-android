@@ -1,34 +1,8 @@
 package network.xyo.client.payload
 
-import android.os.Build
-import androidx.annotation.RequiresApi
-import com.squareup.moshi.JsonClass
 import network.xyo.client.XyoSerializable
-import network.xyo.client.address.Account
 import org.json.JSONObject
-import org.json.JSONTokener
 import java.security.MessageDigest
-
-open class XyoException(message: String): Throwable(message)
-open class XyoValidationException(message: String): XyoException(message)
-open class XyoInvalidSchemaException(val schema: String): XyoValidationException("'schema' must be lowercase [${schema}]")
-open class XyoInvalidPreviousHashException(val previousHash: String?): XyoValidationException("'previous_hash' must be lowercase [${previousHash}]")
-
-@JsonClass(generateAdapter = true)
-@Deprecated("Use Payload instead")
-open class XyoPayload(schema: String, previousHash: String? = null): XyoSerializable() {
-    var schema = schema.lowercase()
-    var previousHash = previousHash?.lowercase()
-    @Throws(XyoValidationException::class)
-    open fun validate() {
-        if (schema != schema.lowercase()) {
-            throw XyoInvalidSchemaException(schema)
-        }
-        if (previousHash != previousHash?.lowercase()) {
-            throw XyoInvalidPreviousHashException(previousHash)
-        }
-    }
-}
 
 open class Payload(schema: String): JSONObject(mapOf(Pair("schema", schema))) {
     constructor(schema: String, fields: Map<String, Any?>?): this(schema) {
@@ -62,7 +36,29 @@ open class Payload(schema: String): JSONObject(mapOf(Pair("schema", schema))) {
             return this.getString("schema")
         }
 
+    fun getArrayAsStringList(name: String): List<String> {
+        val list = mutableListOf<String>()
+        val jsonArray = this.getJSONArray(name)
+        for (i in 0 until jsonArray.length()) {
+            list.add(jsonArray.getString(i))
+        }
+        return list
+    }
+
+    fun getArrayAsStringSet(name: String): Set<String> {
+        return this.getArrayAsStringList(name).toSet()
+    }
+
     companion object {
+
+        fun fromJson(json: String): Payload {
+            val fields = JSONObject(json)
+            return Payload(fields.getString("schema"), fields)
+        }
+
+        fun fromJson(json: JSONObject): Payload {
+            return Payload(json.getString("schema"), json)
+        }
         fun sort(obj: JSONObject): JSONObject {
             val keys = obj.keys().asSequence().sorted().toList().toTypedArray()
             val newObj = JSONObject()
@@ -96,3 +92,6 @@ open class Payload(schema: String): JSONObject(mapOf(Pair("schema", schema))) {
         }
     }
 }
+
+open class PayloadException(message: String): Throwable(message)
+open class PayloadValidationException(message: String): PayloadException(message)

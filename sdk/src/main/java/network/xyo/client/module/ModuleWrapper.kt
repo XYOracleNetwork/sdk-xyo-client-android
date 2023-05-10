@@ -1,23 +1,12 @@
 package network.xyo.client.module
 
-import android.os.Build
-import androidx.annotation.RequiresApi
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import network.xyo.client.XyoSerializable
 import network.xyo.client.address.Account
+import network.xyo.client.boundwitness.BoundWitness
+import network.xyo.client.boundwitness.QueryBoundWitness
 import network.xyo.client.boundwitness.QueryBoundWitnessBuilder
-import network.xyo.client.boundwitness.QueryBoundWitnessJson
 import network.xyo.client.payload.Payload
-import network.xyo.client.payload.XyoPayload
-import okhttp3.MediaType.Companion.toMediaType
-import org.json.JSONArray
-import org.json.JSONObject
 
-class ModuleWrapper<TConfig: ModuleConfig, TParams: ModuleParams<TConfig>, TModule: Module<TConfig, TParams>>(val module: TModule, val params: TParams) {
-    val account: Account
-        get() {
-            return this.params.account
-        }
+open class ModuleWrapper<TConfig: ModuleConfig, TParams: ModuleParams<TConfig>, TModule: Module<TConfig, TParams>>(val module: TModule, val account: Account) {
 
     val address: String
         get() {
@@ -26,7 +15,7 @@ class ModuleWrapper<TConfig: ModuleConfig, TParams: ModuleParams<TConfig>, TModu
 
     val config: TConfig
         get() {
-            return this.params.config
+            return this.module.config
         }
 
     val queries: List<String>
@@ -34,54 +23,39 @@ class ModuleWrapper<TConfig: ModuleConfig, TParams: ModuleParams<TConfig>, TModu
             return this.module.queries
         }
 
-    @ExperimentalCoroutinesApi
-    suspend fun query(query: QueryBoundWitness, payloads: List<Payload>?): ModuleQueryResult {
+    suspend fun query(query: QueryBoundWitness, payloads: Set<Payload>? = null): ModuleQueryResult {
         return this.module.query(query, payloads)
     }
 
-    private fun buildQuery(query: XyoPayload, payloads: List<XyoPayload>?, previousHash: String?): String {
-        val builtQuery = queryBuilder(query, payloads, previousHash)
-        val queryPayloads = buildQueryPayloads(query, payloads)
-        val queryPayloadsJsonArray = queryPayloadsJsonArray(queryPayloads)
-        val builtQueryTuple = arrayListOf(XyoSerializable.toJson((builtQuery)), queryPayloadsJsonArray.toString())
-        return builtQueryTuple.joinToString(",", "[", "]")
+    protected fun bindQuery(query: Payload, payloads: Set<Payload> = emptySet(), account: Account = this.account): Pair<QueryBoundWitness, Set<Payload>> {
+        return Pair(QueryBoundWitnessBuilder().payloads(payloads).witness(account).query(query).build(), payloads)
     }
 
-    private fun queryBuilder(query: XyoPayload, payloads: List<XyoPayload>?, previousHash: String?): QueryBoundWitnessJson {
-        return QueryBoundWitnessBuilder().let {
-            payloads?.let { payload ->
-                it.payloads(payload)
-            }
-            it.witness(this.account, previousHash).query(query).build(previousHash)
+    protected suspend fun sendQuery(queryPayload: Payload, payloads: Set<Payload> = emptySet()): ModuleQueryResult {
+        // Bind them
+        val query = this.bindQuery(queryPayload, payloads)
 
-        }
+        // Send them off
+        return this.module.query(query.first, query.second)
     }
 
-    // combine payloads and query
-    private fun buildQueryPayloads(query: XyoPayload, payloads: List<XyoPayload>?): List<XyoPayload>{
-        return arrayListOf<XyoPayload>().let { queryPayloads ->
-            payloads?.let { payloads ->
-                payloads.forEach { payload ->
-                    queryPayloads.add(payload)
-                }
-            }
-            queryPayloads.add(query)
-            queryPayloads
-        }
-    }
-
-    // stringify combined payloads
-    private fun queryPayloadsJsonArray(payloads: List<XyoPayload>): JSONArray {
-        return JSONArray().apply {
-            payloads.forEach { payload ->
-                val serializedPayload = XyoSerializable.toJson(payload)
-                val obj = JSONObject(serializedPayload)
-                this.put(obj)
+    suspend fun resolve(filter: ModuleFilter?): Set<AnyModule> {
+        val downModules = this.module.downResolver.resolve(filter)
+        val upModules = this.module.upResolver.resolve(filter)
+        val resultAddressSet = mutableSetOf<String>()
+        val resultModuleSet = mutableSetOf<AnyModule>()
+        for (downModule in downModules) {
+            if (!resultAddressSet.contains(downModule.address)) {
+                resultAddressSet.add(downModule.address)
+                resultModuleSet.add(downModule)
             }
         }
-    }
-
-    companion object {
-        val MEDIA_TYPE_JSON = "application/json; charset=utf-8".toMediaType()
+        for (upModule in upModules) {
+            if (!resultAddressSet.contains(upModule.address)) {
+                resultAddressSet.add(upModule.address)
+                resultModuleSet.add(upModule)
+            }
+        }
+        return resultModuleSet
     }
 }

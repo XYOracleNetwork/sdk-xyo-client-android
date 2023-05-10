@@ -5,7 +5,6 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import kotlinx.coroutines.runBlocking
 import network.xyo.client.address.Account
-import network.xyo.client.node.client.NodeClient
 import network.xyo.client.payload.XyoPayload
 import org.junit.Before
 import org.junit.Rule

@@ -1,12 +1,11 @@
 package network.xyo.client.witness.system.info
 
-import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
-import com.squareup.moshi.JsonClass
+import com.google.gson.Gson
+import org.json.JSONObject
 
-@JsonClass(generateAdapter = true)
-class XyoSystemInfoOs (
+data class SystemInfoOs (
     val base_os: String?,
     val codename: String?,
     val incremental: String?,
@@ -17,8 +16,9 @@ class XyoSystemInfoOs (
 ) {
     companion object {
         @RequiresApi(Build.VERSION_CODES.M)
-        fun detect(context: Context): XyoSystemInfoOs {
-            return XyoSystemInfoOs(
+        fun detect(): JSONObject {
+            val gson = Gson()
+            return JSONObject(gson.toJson(SystemInfoOs(
                 Build.VERSION.BASE_OS,
                 Build.VERSION.CODENAME,
                 Build.VERSION.INCREMENTAL,
@@ -26,7 +26,7 @@ class XyoSystemInfoOs (
                 Build.VERSION.RELEASE,
                 Build.VERSION.SDK_INT,
                 Build.VERSION.SECURITY_PATCH
-            )
+            )))
         }
     }
 }

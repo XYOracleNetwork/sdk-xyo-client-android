@@ -1,5 +1,6 @@
 package network.xyo.client
 
+import network.xyo.client.module.AnyModule
 import network.xyo.client.module.Module
 import network.xyo.client.module.ModuleConfig
 import network.xyo.client.module.ModuleFilter
@@ -34,9 +35,9 @@ class CompositeModuleResolver() : ModuleResolver {
         return this
     }
 
-    override fun resolve(filter: ModuleFilter?): List<Module<ModuleConfig, ModuleParams<ModuleConfig>>> {
+    override suspend fun resolve(filter: ModuleFilter?): Set<AnyModule> {
         val resolutions = mutableMapOf<String, Module<ModuleConfig, ModuleParams<ModuleConfig>>>()
         this.resolvers.forEach { resolver -> resolver.resolve(filter).forEach { module -> resolutions.set(module.address, module) } }
-        return resolutions.values.toList()
+        return resolutions.values.toSet()
     }
 }

@@ -1,13 +1,10 @@
 package network.xyo.client.witness.system.info
 
-import android.content.Context
 import android.os.Build
-import com.squareup.moshi.JsonClass
-import java.io.UnsupportedEncodingException
+import org.json.JSONObject
 import java.net.URLEncoder
 
-@JsonClass(generateAdapter = true)
-class XyoSystemInfoDevice(
+class SystemInfoDevice(
     val board: String?,
     val bootloader: String?,
     val brand: String?,
@@ -23,10 +20,10 @@ class XyoSystemInfoDevice(
     val time: Long?,
     val type: String?,
     val user: String?,
-) {
+): JSONObject() {
     companion object {
-        fun detect(context: Context): XyoSystemInfoDevice {
-            return XyoSystemInfoDevice(
+        fun detect(): SystemInfoDevice {
+            return SystemInfoDevice(
                 URLEncoder.encode(Build.BOARD, "UTF-8"),
                 URLEncoder.encode(Build.BOOTLOADER, "UTF-8"),
                 URLEncoder.encode(Build.BRAND, "UTF-8"),

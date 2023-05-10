@@ -1,5 +1,9 @@
 package network.xyo.client.archivist.wrapper
 
-import network.xyo.client.payload.XyoPayload
+import network.xyo.client.payload.Payload
 
-data class ArchivistInsertQueryPayload(val payloads: List<String>): XyoPayload("network.xyo.query.archivist.insert")
+class ArchivistInsertQueryPayload: Payload(schema) {
+    companion object {
+        const val schema = "network.xyo.query.archivist.insert"
+    }
+}

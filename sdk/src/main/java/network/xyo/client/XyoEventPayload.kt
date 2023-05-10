@@ -1,10 +1,11 @@
 package network.xyo.client
 
-import com.squareup.moshi.JsonClass
-import network.xyo.client.payload.XyoPayload
+import network.xyo.client.payload.Payload
 import java.util.*
 
-@JsonClass(generateAdapter = true)
-open class XyoEventPayload(val event: String, previousHash: String?): XyoPayload("network.xyo.event", previousHash) {
-    val time_stamp = Date().time
+open class EventPayload(name: String): Payload("network.xyo.event") {
+    init {
+        this.put("time_stamp", Date().time)
+        this.put("name", name)
+    }
 }

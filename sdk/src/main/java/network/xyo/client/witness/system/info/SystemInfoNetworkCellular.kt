@@ -6,22 +6,20 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
 import android.telephony.TelephonyManager
-import com.squareup.moshi.JsonClass
 import network.xyo.client.hasPermission
+import org.json.JSONObject
 import java.net.NetworkInterface
 
-@JsonClass(generateAdapter = true)
-data class XyoSystemInfoNetworkCellularProvider(
+data class SystemInfoNetworkCellularProvider(
     val name: String?,
 )
 
-@JsonClass(generateAdapter = true)
-class XyoSystemInfoNetworkCellular(
+class SystemInfoNetworkCellular(
     val ip: String?,
-    val provider: XyoSystemInfoNetworkCellularProvider?
-) {
+    val provider: SystemInfoNetworkCellularProvider?
+): JSONObject() {
     companion object {
-        fun detect(context: Context): XyoSystemInfoNetworkCellular? {
+        fun detect(context: Context): SystemInfoNetworkCellular? {
             if (Build.VERSION.SDK_INT >= 23) {
                 val connectivityManager =
                     context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -36,11 +34,11 @@ class XyoSystemInfoNetworkCellular(
                             "Manifest.permission.READ_PHONE_STATE required"
                         )
                     ) {
-                        val provider = XyoSystemInfoNetworkCellularProvider(
+                        val provider = SystemInfoNetworkCellularProvider(
                             telephonyManager.networkOperatorName
                         )
 
-                        return XyoSystemInfoNetworkCellular(getIpAddress(), provider)
+                        return SystemInfoNetworkCellular(getIpAddress(), provider)
                     }
                 }
             }

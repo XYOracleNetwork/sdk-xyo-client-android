@@ -4,21 +4,20 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
-import com.squareup.moshi.JsonClass
+import org.json.JSONObject
 import java.net.NetworkInterface
 
-@JsonClass(generateAdapter = true)
-class XyoSystemInfoNetworkWired(
+class SystemInfoNetworkWired(
     val ip: String?
-) {
+): JSONObject() {
     companion object {
-        fun detect(context: Context): XyoSystemInfoNetworkWired? {
+        fun detect(context: Context): SystemInfoNetworkWired? {
             val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
             if (Build.VERSION.SDK_INT >= 23) {
                 val network = connectivityManager.activeNetwork
                 val networkCaps = connectivityManager.getNetworkCapabilities(network)
                 if (networkCaps?.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) == true) {
-                    return XyoSystemInfoNetworkWired(getIpAddress())
+                    return SystemInfoNetworkWired(getIpAddress())
                 }
             }
             return null
