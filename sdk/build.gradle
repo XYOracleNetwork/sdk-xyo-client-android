@@ -2,6 +2,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'maven-publish'
 apply plugin: "de.mannodermaus.android-junit5"
+apply plugin: "com.google.protobuf"
 
 group = 'network.xyo'
 
@@ -38,11 +39,26 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_1_8
     }
 
     namespace 'sdk.xyo.client.android'
+
+    sourceSets {
+        main {
+            java {
+                srcDirs += 'build/generated/source/proto/main/java'
+            }
+            kotlin {
+                srcDirs += 'build/generated/source/proto/main/kotlin'
+            }
+            proto {
+                srcDir 'src/main/java/network/xyo/client/proto'
+            }
+        }
+    }
 }
 
 dependencies {
@@ -60,6 +76,8 @@ dependencies {
     androidTestImplementation "de.mannodermaus.junit5:android-test-core:1.3.0"
     androidTestRuntimeOnly "de.mannodermaus.junit5:android-test-runner:1.3.0"
     androidTestImplementation "org.junit.jupiter:junit-jupiter:5.9.2"
+    implementation "androidx.datastore:datastore:1.0.0"
+    implementation 'com.google.protobuf:protobuf-javalite:3.20.1'
 }
 
 publishing {
@@ -83,6 +101,21 @@ publishing {
                         dependencyNode.appendNode('artifactId', it.name)
                         dependencyNode.appendNode('version', it.version)
                     }
+                }
+            }
+        }
+    }
+}
+
+protobuf {
+    protoc {
+        artifact = 'com.google.protobuf:protoc:3.20.1'
+    }
+    generateProtoTasks {
+        all().configureEach { task ->
+            task.builtins {
+                java {
+                    option "lite"
                 }
             }
         }

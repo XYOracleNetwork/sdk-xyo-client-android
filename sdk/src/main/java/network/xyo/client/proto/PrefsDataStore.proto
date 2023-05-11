@@ -1,0 +1,8 @@
+syntax = "proto2";
+
+option java_package = "com.network.xyo.client.data";
+option java_outer_classname = "PrefsDataStoreProtos";
+
+message PrefsDataStore {
+  optional string account_key = 1;
+}
