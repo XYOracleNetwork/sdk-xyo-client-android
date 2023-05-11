@@ -34,7 +34,9 @@ open class SentinelConfig(schema: String = SentinelConfig.schema): ModuleConfig(
     }
 }
 
-class Sentinel<TConfig: SentinelConfig>(val context: Context, params: ModuleParams<SentinelConfig>): AbstractModule<SentinelConfig, ModuleParams<SentinelConfig>>(params) {
+open class SentinelParams<TConfig: SentinelConfig>(val context: Context, account: Account, config: TConfig): ModuleParams<TConfig>(account, config)
+
+open class Sentinel<TConfig: SentinelConfig>(params: SentinelParams<TConfig>): AbstractModule<TConfig, ModuleParams<TConfig>>(params) {
     override var downResolver: ModuleResolver = CompositeModuleResolver()
 
     private var _archivists: Set<AnyArchivist>? = null
@@ -55,7 +57,7 @@ class Sentinel<TConfig: SentinelConfig>(val context: Context, params: ModulePara
     suspend fun getWitnesses(account: Account? = null): Set<AnyWitness> {
         val witnesses = this.config.witnesses
         val filter = ModuleFilter(witnesses)
-        this._witnesses = this._witnesses ?: this.resolve(filter)
+        this._witnesses = this._witnesses ?: this.resolve(filter) as Set<AnyWitness>
         if (witnesses.size != this._witnesses?.size) {
             Log.w("Sentinel", "Not all witnesses found [Requested: ${witnesses.size}, Found: ${this._witnesses?.size}]")
         }
@@ -63,7 +65,7 @@ class Sentinel<TConfig: SentinelConfig>(val context: Context, params: ModulePara
         return this._witnesses!!
     }
 
-    fun report(payloads: List<Payload> = emptyList()) {
-
+    suspend fun report(payloads: Set<Payload> = emptySet()): Set<Payload> {
+        return setOf(*payloads.toTypedArray(), *this.getWitnesses().map { witness -> witness.observe()}.flatten().toTypedArray())
     }
 }

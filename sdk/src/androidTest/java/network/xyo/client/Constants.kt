@@ -1,9 +1,9 @@
 package network.xyo.client
 
 import network.xyo.client.address.Account
-import network.xyo.client.payload.XyoPayload
+import network.xyo.client.payload.Payload
 
-class DebugPayload(schema: String, val nonce: Int) : XyoPayload(schema)
+class DebugPayload(schema: String, val nonce: Int) : Payload(schema)
 
 
 class TestConstants {

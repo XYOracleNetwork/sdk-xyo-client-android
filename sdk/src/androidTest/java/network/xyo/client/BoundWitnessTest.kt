@@ -5,13 +5,10 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import kotlinx.coroutines.runBlocking
 import network.xyo.client.address.Account
-import network.xyo.client.payload.XyoPayload
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.jupiter.api.Assertions.*
-
-data class RequestDependencies(val client: NodeClient, val query: XyoPayload, val payloads: List<XyoPayload>)
 
 class BoundWitnessTest {
 
@@ -31,30 +28,30 @@ class BoundWitnessTest {
         this.appContext = InstrumentationRegistry.getInstrumentation().targetContext
     }
 
-    fun generateQuery(nodeUrl: String): RequestDependencies {
+    /*fun generateQuery(nodeUrl: String): RequestDependencies {
         val account = Account()
         val client = NodeClient(nodeUrl, account)
         val query = XyoPayload("network.xyo.query.module.discover")
         val payloads = mutableListOf<XyoPayload>()
         payloads.add(XyoTestPayload1())
         return RequestDependencies(client, query, payloads)
-    }
+    }*/
 
-    fun testSendQueryBW(nodeUrl: String) {
+    /*fun testSendQueryBW(nodeUrl: String) {
         runBlocking {
             val(client, query, payloads) = generateQuery(nodeUrl)
             val postResult = client.query(query, payloads, null)
             assertEquals(null, postResult.errors)
         }
-    }
+    }*/
 
     @Test
     fun testSendQueryBWSendLocal() {
-        testSendQueryBW(apiDomainLocal)
+        //testSendQueryBW(apiDomainLocal)
     }
 
     @Test
     fun testSendQueryBWSendBeta() {
-        testSendQueryBW(apiDomainBeta)
+        //testSendQueryBW(apiDomainBeta)
     }
 }

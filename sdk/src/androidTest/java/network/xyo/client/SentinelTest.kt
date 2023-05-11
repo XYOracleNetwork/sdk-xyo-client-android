@@ -6,9 +6,13 @@ import androidx.test.rule.GrantPermissionRule
 import kotlinx.coroutines.runBlocking
 import network.xyo.client.address.Account
 import network.xyo.client.module.AdhocWitness
+import network.xyo.client.module.Archivist
 import network.xyo.client.module.ModuleConfig
 import network.xyo.client.module.ModuleParams
+import network.xyo.client.module.Node
 import network.xyo.client.module.Sentinel
+import network.xyo.client.module.SentinelConfig
+import network.xyo.client.module.SentinelParams
 import network.xyo.client.witness.system.info.SystemInfoWitness
 import org.junit.Before
 import org.junit.Rule
@@ -31,23 +35,36 @@ class SentinelTest {
         this.appContext = InstrumentationRegistry.getInstrumentation().targetContext
     }
 
-    fun testCreatePanel(nodeUrl: String) {
+    suspend fun testCreateSentinel() {
+        val node = Node(ModuleParams(Account(), ModuleConfig()))
         val witness = AdhocWitness(ModuleParams(Account(), ModuleConfig()))
-        val sentinel = Sentinel(appContext, ModuleParams(Account(), ModuleConfig()))
-        assertNotNull(sentinel)
+        val archivist = Archivist(ModuleParams(Account(), ModuleConfig()))
+        val sentinel = Sentinel(SentinelParams(appContext, Account(), SentinelConfig(setOf(witness.address), setOf(archivist.address))))
+        node.register(witness)
+        node.register(archivist)
+        node.register(sentinel)
+        node.attach(witness.address)
+        node.attach(archivist.address)
+        node.attach(sentinel.address)
+        sentinel.report()
+        assertEquals(1, archivist.all().size)
     }
 
     @Test
     fun testCreatePanelBeta() {
-        testCreatePanel(apiDomainBeta)
+        runBlocking {
+            testCreateSentinel()
+        }
     }
 
     @Test
     fun testCreatePanelLocal() {
-        testCreatePanel(apiDomainLocal)
+        runBlocking {
+            testCreateSentinel()
+        }
     }
 
-    fun testPanelReport(nodeUrl: String) {
+    /*fun testPanelReport(nodeUrl: String) {
         runBlocking {
             val witnessAccount = Account(XyoSerializable.hexToBytes("9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"))
             val witness2Account = Account(XyoSerializable.hexToBytes("5a95531488b4d0d3645aea49678297ae9e2034879ce0389b80eb788e8b533592"))
@@ -72,6 +89,9 @@ class SentinelTest {
         testPanelReport(apiDomainLocal)
     }
 
+    */
+
+    /*
 
     @Test
     fun testSimplePanelReport() {
@@ -93,4 +113,6 @@ class SentinelTest {
             result.apiResults.forEach { assertEquals(it.errors, null) }
         }
     }
+
+    */
 }

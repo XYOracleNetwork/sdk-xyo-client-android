@@ -1,7 +1,6 @@
 package network.xyo.client.module
 
 import network.xyo.client.address.Account
-import network.xyo.client.boundwitness.BoundWitness
 import network.xyo.client.boundwitness.QueryBoundWitness
 import network.xyo.client.boundwitness.QueryBoundWitnessBuilder
 import network.xyo.client.payload.Payload
@@ -18,7 +17,7 @@ open class ModuleWrapper<TConfig: ModuleConfig, TParams: ModuleParams<TConfig>, 
             return this.module.config
         }
 
-    val queries: List<String>
+    val queries: Set<String>
         get() {
             return this.module.queries
         }

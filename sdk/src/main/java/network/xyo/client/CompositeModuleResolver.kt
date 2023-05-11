@@ -36,7 +36,7 @@ class CompositeModuleResolver() : ModuleResolver {
     }
 
     override suspend fun resolve(filter: ModuleFilter?): Set<AnyModule> {
-        val resolutions = mutableMapOf<String, Module<ModuleConfig, ModuleParams<ModuleConfig>>>()
+        val resolutions = mutableMapOf<String, AnyModule>()
         this.resolvers.forEach { resolver -> resolver.resolve(filter).forEach { module -> resolutions.set(module.address, module) } }
         return resolutions.values.toSet()
     }

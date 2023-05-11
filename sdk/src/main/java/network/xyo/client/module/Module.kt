@@ -14,7 +14,7 @@ import network.xyo.client.payload.Payload
 import java.security.InvalidParameterException
 
 open class ModuleConfig(schema: String = ModuleConfig.schema): Payload(schema) {
-    var name: String
+    var name: String?
         get() {
             return this.getString("name")
         }
@@ -38,7 +38,7 @@ class ModuleFilter(
 interface ModuleResolver {
     fun addResolver(resolver: ModuleResolver): ModuleResolver
     fun removeResolver(resolver: ModuleResolver): ModuleResolver
-    suspend fun resolve(filter: ModuleFilter?): Set<AnyModule>
+    suspend fun resolve(filter: ModuleFilter? = null): Set<AnyModule>
 }
 
 typealias ModuleQueryResult = Pair<BoundWitness, Set<Payload>>
@@ -48,20 +48,16 @@ interface Module<TConfig: ModuleConfig, TParams : ModuleParams<TConfig>> {
     val config: TConfig
     var downResolver: ModuleResolver
     val params: TParams
-    var queries: List<String>
+    var queries: Set<String>
     suspend fun query(query: QueryBoundWitness, payloads: Set<Payload>?): ModuleQueryResult
     fun queryable(query: QueryBoundWitness, payloads: Set<Payload>?): Boolean
     suspend fun start()
     var upResolver: ModuleResolver
 }
 
-typealias AnyModule = Module<ModuleConfig, ModuleParams<ModuleConfig>>
+typealias AnyModule = Module<*, *>
 
 open class AbstractModule<TConfig: ModuleConfig, TParams : ModuleParams<TConfig>>(override var params: TParams) : Module<TConfig, TParams> {
-
-    val ModuleDiscoverQuerySchema = "network.xyo.query.module.discover"
-    val ModulePreviousHashQuerySchema = "network.xyo.query.module.account.hash.previous"
-    val ModuleSubscribeQuerySchema = "network.xyo.query.module.subscribe"
 
     enum class notStartedActionEnum {
         ERROR, THROW, WARN, LOG, NONE
@@ -86,7 +82,7 @@ open class AbstractModule<TConfig: ModuleConfig, TParams : ModuleParams<TConfig>
         }
         set(value) {}
 
-    fun started(notStartedAction: notStartedActionEnum = notStartedActionEnum.THROW): Boolean {
+    open fun started(notStartedAction: notStartedActionEnum = notStartedActionEnum.THROW): Boolean {
         if (!this._started) {
             when(notStartedAction) {
                 notStartedActionEnum.THROW -> {
@@ -107,7 +103,7 @@ open class AbstractModule<TConfig: ModuleConfig, TParams : ModuleParams<TConfig>
     }
 
     override var downResolver: ModuleResolver = CompositeModuleResolver()
-    override var queries = listOf<String>(ModuleDiscoverQuerySchema, ModuleSubscribeQuerySchema)
+    override var queries = setOf(ModuleDiscoverQuerySchema, ModuleSubscribeQuerySchema)
 
     private fun parseQuery(query: QueryBoundWitness, payloads: Set<Payload>?): Payload {
         val queryPayload = payloads?.first { payload -> payload.hash() == query.query }
@@ -138,25 +134,25 @@ open class AbstractModule<TConfig: ModuleConfig, TParams : ModuleParams<TConfig>
         return resultModuleSet
     }
 
-    fun discover(): List<Payload> {
-        return listOf<Payload>()
+    open suspend fun discover(): Set<Payload> {
+        return setOf()
     }
 
-    fun previousHash(): List<Payload> {
+    open fun previousHash(): List<Payload> {
         val fields = mapOf<String, Any?>(Pair("huri", this.account.previousHash))
         val previous = Payload("network.xyo.huri", fields)
         return listOf(previous)
     }
 
-    fun subscribe() {
+    open fun subscribe() {
 
     }
 
-    fun bindResult(payloads: Set<Payload>, queryAccount: Account?): ModuleQueryResult {
+    open fun bindResult(payloads: Set<Payload>, queryAccount: Account?): ModuleQueryResult {
         return Pair(BoundWitnessBuilder().payloads(payloads).witness(queryAccount).build(), payloads)
     }
 
-    protected fun queryHandler(
+    protected open suspend fun queryHandler(
         query: QueryBoundWitness,
         payloads: Set<Payload>?
     ): ModuleQueryResult {
@@ -206,4 +202,10 @@ open class AbstractModule<TConfig: ModuleConfig, TParams : ModuleParams<TConfig>
 
     }
     override var upResolver: ModuleResolver = CompositeModuleResolver()
+
+    companion object {
+        const val ModuleDiscoverQuerySchema = "network.xyo.query.module.discover"
+        const val ModulePreviousHashQuerySchema = "network.xyo.query.module.account.hash.previous"
+        const val ModuleSubscribeQuerySchema = "network.xyo.query.module.subscribe"
+    }
 }

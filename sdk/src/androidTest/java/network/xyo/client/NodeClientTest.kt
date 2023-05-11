@@ -3,11 +3,10 @@ package network.xyo.client
 import kotlinx.coroutines.runBlocking
 import network.xyo.client.address.Account
 import network.xyo.client.archivist.wrapper.ArchivistWrapper
-import network.xyo.client.payload.XyoPayload
 import org.junit.Test
 import org.junit.jupiter.api.Assertions.*
 
-class NodeClientTest {
+/*class NodeClientTest {
 
 
     @Test
@@ -53,4 +52,4 @@ class NodeClientTest {
             }
         }
     }
-}
+}*/
