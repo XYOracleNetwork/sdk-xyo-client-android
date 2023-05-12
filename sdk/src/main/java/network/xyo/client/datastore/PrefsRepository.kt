@@ -35,7 +35,11 @@ class PrefsRepository {
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
-    suspend fun getAccountKey(): String {
+    suspend fun getAccount(): XyoAccount {
+        val savedKeyBytes = getAccountKey().encodeToByteArray()
+        return XyoAccount(savedKeyBytes)
+    }
+    private suspend fun getAccountKey(): String {
         val savedKey = prefsDataStore.data.first().accountKey
         Log.d("xyoClient", "savedKey: $savedKey")
         return if (savedKey.isEmpty()) {
