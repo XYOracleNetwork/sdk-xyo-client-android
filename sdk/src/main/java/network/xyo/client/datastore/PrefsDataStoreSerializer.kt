@@ -1,13 +1,16 @@
 package network.xyo.client.datastore
 
+import android.content.Context
 import androidx.datastore.core.CorruptionException
+import androidx.datastore.core.DataStore
 import androidx.datastore.core.Serializer
+import androidx.datastore.dataStore
 import com.google.protobuf.InvalidProtocolBufferException
 import com.network.xyo.client.data.PrefsDataStoreProtos.PrefsDataStore
 import java.io.InputStream
 import java.io.OutputStream
 
-object SdkDataStoreSerializer : Serializer<PrefsDataStore> {
+object PrefsDataStoreSerializer : Serializer<PrefsDataStore> {
     override val defaultValue: PrefsDataStore = PrefsDataStore.getDefaultInstance()
     override suspend fun readFrom(input: InputStream): PrefsDataStore {
         try {
