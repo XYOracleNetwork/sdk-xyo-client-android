@@ -4,6 +4,12 @@ import android.content.Context
 import android.os.Build
 import android.provider.Settings.Panel
 import androidx.annotation.RequiresApi
+import androidx.datastore.core.DataStore
+import androidx.datastore.dataStore
+import androidx.datastore.dataStoreFile
+import com.network.xyo.client.data.PrefsDataStoreProtos.PrefsDataStore
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import network.xyo.client.address.XyoAccount
 import network.xyo.client.archivist.api.PostBoundWitnessesResult
@@ -12,6 +18,8 @@ import network.xyo.client.archivist.api.XyoArchivistApiConfig
 import network.xyo.client.archivist.wrapper.ArchivistWrapper
 import network.xyo.client.boundwitness.XyoBoundWitnessBuilder
 import network.xyo.client.boundwitness.XyoBoundWitnessJson
+import network.xyo.client.datastore.DATA_STORE_FILE_NAME
+import network.xyo.client.datastore.PrefsRepository
 import network.xyo.client.node.client.NodeClient
 import network.xyo.client.node.client.PostQueryResult
 import network.xyo.client.payload.XyoPayload
@@ -64,10 +72,12 @@ class XyoPanel(val context: Context, private val archivists: List<XyoArchivistAp
     {
         if (nodeUrlsAndAccounts.isNotEmpty()) {
             nodes = mutableListOf<NodeClient>().let {
-                nodeUrlsAndAccounts.forEach(){ pair ->
-                    val nodeUrl = pair.first
-                    val account = pair.second
-                    it.add(NodeClient(nodeUrl, account ?: XyoAccount()))
+                resolveDefaultAccount(context).map { defaultAccount ->
+                    nodeUrlsAndAccounts.forEach(){ pair ->
+                        val nodeUrl = pair.first
+                        val account = pair.second ?: defaultAccount
+                        it.add(NodeClient(nodeUrl, account))
+                    }
                 }
                 it
             }
@@ -175,5 +185,20 @@ class XyoPanel(val context: Context, private val archivists: List<XyoArchivistAp
     companion object {
         const val DefaultApiDomain = "https://api.archivist.xyo.network"
         const val DefaultArchive = "temp"
+
+        fun resolveDefaultAccount(context: Context): Flow<XyoAccount> {
+            val prefsRepository = PrefsRepository(context)
+            return prefsRepository.getAccountKey().map { account ->
+                if (account.isNotEmpty()) {
+                    val accountBytes = account.encodeToByteArray()
+                     XyoAccount(accountBytes)
+
+                } else {
+                    val newAccount = XyoAccount()
+                    prefsRepository.setAccountKey(newAccount.private.hex)
+                    newAccount
+                }
+            }
+        }
     }
 }
