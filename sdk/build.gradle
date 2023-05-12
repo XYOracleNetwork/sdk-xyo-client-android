@@ -48,12 +48,6 @@ android {
 
     sourceSets {
         main {
-            java {
-                srcDirs += 'build/generated/source/proto/main/java'
-            }
-            kotlin {
-                srcDirs += 'build/generated/source/proto/main/kotlin'
-            }
             proto {
                 srcDir 'src/main/java/network/xyo/client/proto'
             }
