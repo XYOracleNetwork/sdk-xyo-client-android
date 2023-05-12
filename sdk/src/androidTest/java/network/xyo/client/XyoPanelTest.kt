@@ -6,6 +6,7 @@ import androidx.test.rule.GrantPermissionRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import network.xyo.client.address.XyoAccount
+import network.xyo.client.datastore.PrefsRepository
 import network.xyo.client.payload.XyoPayload
 import network.xyo.client.witness.system.info.XyoSystemInfoWitness
 import org.junit.Before
@@ -53,7 +54,7 @@ class XyoPanelTest {
             val witness = XyoWitness(witnessAccount, fun(context: Context, previousHash: String?): XyoPayload {
                 return XyoPayload("network.xyo.basic", previousHash)
             })
-            val panel = XyoPanel(appContext, arrayListOf(Pair(nodeUrl, XyoAccount())), listOf(witness, XyoSystemInfoWitness(witness2Account)))
+            val panel = XyoPanel(appContext, arrayListOf(Pair(nodeUrl, XyoAccount())), listOf(witness, XyoSystemInfoWitness(witness2Account))).buildNodeList()
             val result = panel.reportAsyncQuery()
             result.apiResults.forEach {
                 assertEquals(it.errors, null)
@@ -77,7 +78,7 @@ class XyoPanelTest {
         runBlocking {
             val panel = XyoPanel(appContext, fun(_context:Context, previousHash: String?): XyoEventPayload {
                 return XyoEventPayload("test_event", previousHash)
-            })
+            }).buildNodeList()
             val result = panel.reportAsyncQuery()
             result.apiResults.forEach { assertEquals(it.errors, null) }
         }
@@ -87,9 +88,25 @@ class XyoPanelTest {
     @Test
     fun testReportEvent() {
         runBlocking {
-            val panel = XyoPanel(appContext, arrayListOf(Pair(apiDomainBeta, XyoAccount())), listOf(XyoSystemInfoWitness()))
+            val panel = XyoPanel(appContext, arrayListOf(Pair(apiDomainBeta, XyoAccount())), listOf(XyoSystemInfoWitness())).buildNodeList()
             val result = panel.reportAsyncQuery()
             result.apiResults.forEach { assertEquals(it.errors, null) }
+        }
+    }
+
+    @Test
+    fun testAccountPersistence() {
+        runBlocking {
+            val prefsRepository = PrefsRepository(appContext)
+            prefsRepository.clearSavedAccountKey()
+
+            val panel = XyoPanel(appContext, arrayListOf(Pair(apiDomainBeta, null)), listOf(XyoSystemInfoWitness())).buildNodeList()
+            val generatedAddress = panel.defaultAccount?.address?.hex
+            assertNotEquals(generatedAddress, null)
+
+            val panel2 = XyoPanel(appContext, arrayListOf(Pair(apiDomainBeta, null)), listOf(XyoSystemInfoWitness())).buildNodeList()
+            val secondGeneratedAddress = panel2.defaultAccount?.address?.hex
+            assertEquals(generatedAddress, secondGeneratedAddress)
         }
     }
 }
