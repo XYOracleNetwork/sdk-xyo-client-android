@@ -2,16 +2,12 @@ package network.xyo.client.datastore
 
 import android.content.Context
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
 import androidx.datastore.dataStore
 import com.network.xyo.client.data.PrefsDataStoreProtos.PrefsDataStore
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import network.xyo.client.address.XyoAccount
 import network.xyo.client.xyoScope
@@ -26,11 +22,10 @@ private val Context.prefsDataStore: DataStore<PrefsDataStore> by dataStore(
     )
 )
 
-class PrefsRepository {
+class PrefsRepository(context: Context) {
     private val prefsDataStore: DataStore<PrefsDataStore>
-    constructor(
-        context: Context
-    ) {
+
+    init {
         this.prefsDataStore = context.prefsDataStore
     }
 
@@ -39,9 +34,9 @@ class PrefsRepository {
         val savedKeyBytes = getAccountKey().encodeToByteArray()
         return XyoAccount(savedKeyBytes)
     }
+    @RequiresApi(Build.VERSION_CODES.M)
     private suspend fun getAccountKey(): String {
         val savedKey = prefsDataStore.data.first().accountKey
-        Log.d("xyoClient", "savedKey: $savedKey")
         return if (savedKey.isEmpty()) {
             val newAccount = XyoAccount()
             setAccountKey(newAccount.private.hex)
