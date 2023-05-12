@@ -81,7 +81,7 @@ class XyoPanel(val context: Context, private val archivists: List<XyoArchivistAp
         arrayListOf(Pair("$DefaultApiDomain/Archivist", XyoAccount())),
         listOf(XyoWitness(observe))
     )
-    
+
     suspend fun buildNodeList(): XyoPanel {
         this.defaultAccount = PrefsRepository(context).getAccount()
         if (nodeUrlsAndAccounts!!.isNotEmpty()) {
@@ -175,7 +175,7 @@ class XyoPanel(val context: Context, private val archivists: List<XyoArchivistAp
         val results = mutableListOf<PostQueryResult>()
 
         if (nodes.isNullOrEmpty()) {
-            throw Error("Called reportAsync without first constructing any nodeClients")
+            throw Error("Called reportAsync without first constructing any nodeClients.  Did you forget to call buildNodeList?")
         }
 
         nodes?.forEach { node ->
