@@ -3,12 +3,9 @@ package network.xyo.client
 import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
-import kotlinx.coroutines.runBlocking
-import network.xyo.client.address.Account
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.junit.jupiter.api.Assertions.*
 
 class BoundWitnessTest {
 

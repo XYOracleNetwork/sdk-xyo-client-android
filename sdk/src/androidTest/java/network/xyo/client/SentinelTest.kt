@@ -51,20 +51,20 @@ class SentinelTest {
     }
 
     @Test
-    fun testCreatePanelBeta() {
+    fun testCreateSentinelBeta() {
         runBlocking {
             testCreateSentinel()
         }
     }
 
     @Test
-    fun testCreatePanelLocal() {
+    fun testCreateSentinelLocal() {
         runBlocking {
             testCreateSentinel()
         }
     }
 
-    /*fun testPanelReport(nodeUrl: String) {
+    /*fun testSentinelReport(nodeUrl: String) {
         runBlocking {
             val witnessAccount = Account(XyoSerializable.hexToBytes("9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"))
             val witness2Account = Account(XyoSerializable.hexToBytes("5a95531488b4d0d3645aea49678297ae9e2034879ce0389b80eb788e8b533592"))
@@ -80,13 +80,13 @@ class SentinelTest {
     }
 
     @Test
-    fun testPanelReportBeta() {
-        testPanelReport(apiDomainBeta)
+    fun testSentinelReportBeta() {
+        testSentinelReport(apiDomainBeta)
     }
 
     @Test
-    fun testPanelReportLocal() {
-        testPanelReport(apiDomainLocal)
+    fun testSentinelReportLocal() {
+        testSentinelReport(apiDomainLocal)
     }
 
     */
@@ -94,7 +94,7 @@ class SentinelTest {
     /*
 
     @Test
-    fun testSimplePanelReport() {
+    fun testSimpleSentinelReport() {
         runBlocking {
             val panel = Sentinel(appContext, fun(_context:Context, previousHash: String?): XyoEventPayload {
                 return XyoEventPayload("test_event", previousHash)

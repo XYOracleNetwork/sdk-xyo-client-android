@@ -1,8 +1,9 @@
 package network.xyo.client
 
 import network.xyo.client.address.Account
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Test
-import org.junit.jupiter.api.Assertions.*
 
 class AccountTest {
 

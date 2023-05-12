@@ -5,6 +5,7 @@ import android.util.Log
 import network.xyo.client.CompositeModuleResolver
 import network.xyo.client.address.Account
 import network.xyo.client.payload.Payload
+import org.json.JSONArray
 
 open class SentinelConfig(schema: String = SentinelConfig.schema): ModuleConfig(schema) {
 
@@ -18,7 +19,7 @@ open class SentinelConfig(schema: String = SentinelConfig.schema): ModuleConfig(
             return this.getArrayAsStringSet("witnesses")
         }
         set(value) {
-            this.put("witnesses", value)
+            this.put("witnesses", JSONArray(value))
         }
 
     var archivists: Set<String>
@@ -26,7 +27,7 @@ open class SentinelConfig(schema: String = SentinelConfig.schema): ModuleConfig(
             return this.getArrayAsStringSet("archivists")
         }
         set(value) {
-            this.put("archivists", value)
+            this.put("archivists", JSONArray(value))
         }
 
     companion object {
