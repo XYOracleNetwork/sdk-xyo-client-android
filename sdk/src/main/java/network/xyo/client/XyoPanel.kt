@@ -2,14 +2,9 @@ package network.xyo.client
 
 import android.content.Context
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.last
-import kotlinx.coroutines.flow.lastOrNull
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import network.xyo.client.address.XyoAccount
 import network.xyo.client.archivist.api.PostBoundWitnessesResult
 import network.xyo.client.archivist.api.XyoArchivistApiClient
@@ -26,10 +21,9 @@ data class XyoPanelReportResult(val bw: XyoBoundWitnessJson, val apiResults: Lis
 data class XyoPanelReportQueryResult(val bw: XyoBoundWitnessJson, val apiResults: List<PostQueryResult>)
 
 @RequiresApi(Build.VERSION_CODES.M)
-class XyoPanel(val context: Context, private val archivists: List<XyoArchivistApiClient>, private val witnesses: List<XyoWitness<XyoPayload>>?) {
+class XyoPanel(val context: Context, private val archivists: List<XyoArchivistApiClient>, private val witnesses: List<XyoWitness<XyoPayload>>?, private val nodeUrlsAndAccounts: ArrayList<Pair<String, XyoAccount?>>?) {
     var previousHash: String? = null
     private var nodes: MutableList<NodeClient>? = null
-    private var nodeUrlsAndAccounts: ArrayList<Pair<String, XyoAccount?>>? = null
     var defaultAccount: XyoAccount? = null
 
     @Deprecated("use constructors without deprecated archive field")
@@ -49,7 +43,8 @@ class XyoPanel(val context: Context, private val archivists: List<XyoArchivistAp
                         )
                     )
                 ),
-                witnesses
+                witnesses,
+                null
             )
 
     constructor(
@@ -67,11 +62,9 @@ class XyoPanel(val context: Context, private val archivists: List<XyoArchivistAp
                     )
                 )
             ),
-            witnesses
+            witnesses,
+            nodeUrlsAndAccounts
         )
-    {
-        this.nodeUrlsAndAccounts = nodeUrlsAndAccounts
-    }
 
     constructor(
         context: Context,
@@ -79,14 +72,16 @@ class XyoPanel(val context: Context, private val archivists: List<XyoArchivistAp
     ): this(
         context,
         arrayListOf(Pair("$DefaultApiDomain/Archivist", XyoAccount())),
-        listOf(XyoWitness(observe))
+        listOf(XyoWitness(observe)),
     )
 
-    suspend fun buildNodeList(): XyoPanel {
-        this.defaultAccount = PrefsRepository(context).getAccount()
-        if (nodeUrlsAndAccounts!!.isNotEmpty()) {
+    init {
+        runBlocking {
+            this@XyoPanel.defaultAccount = PrefsRepository(context).getAccount()
+        }
+        if (nodeUrlsAndAccounts?.isNotEmpty() == true) {
             nodes = mutableListOf<NodeClient>().let {
-                nodeUrlsAndAccounts?.forEach { pair ->
+                this@XyoPanel.nodeUrlsAndAccounts?.forEach { pair ->
                     val nodeUrl = pair.first
                     val account = pair.second ?: defaultAccount
                     it.add(NodeClient(nodeUrl, account))
@@ -94,7 +89,6 @@ class XyoPanel(val context: Context, private val archivists: List<XyoArchivistAp
                 it
             }
         }
-        return this
     }
 
     @kotlinx.coroutines.ExperimentalCoroutinesApi

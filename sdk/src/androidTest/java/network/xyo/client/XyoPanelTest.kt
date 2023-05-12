@@ -54,7 +54,7 @@ class XyoPanelTest {
             val witness = XyoWitness(witnessAccount, fun(context: Context, previousHash: String?): XyoPayload {
                 return XyoPayload("network.xyo.basic", previousHash)
             })
-            val panel = XyoPanel(appContext, arrayListOf(Pair(nodeUrl, XyoAccount())), listOf(witness, XyoSystemInfoWitness(witness2Account))).buildNodeList()
+            val panel = XyoPanel(appContext, arrayListOf(Pair(nodeUrl, XyoAccount())), listOf(witness, XyoSystemInfoWitness(witness2Account)))
             val result = panel.reportAsyncQuery()
             result.apiResults.forEach {
                 assertEquals(it.errors, null)
@@ -78,7 +78,7 @@ class XyoPanelTest {
         runBlocking {
             val panel = XyoPanel(appContext, fun(_context:Context, previousHash: String?): XyoEventPayload {
                 return XyoEventPayload("test_event", previousHash)
-            }).buildNodeList()
+            })
             val result = panel.reportAsyncQuery()
             result.apiResults.forEach { assertEquals(it.errors, null) }
         }
@@ -88,7 +88,7 @@ class XyoPanelTest {
     @Test
     fun testReportEvent() {
         runBlocking {
-            val panel = XyoPanel(appContext, arrayListOf(Pair(apiDomainBeta, XyoAccount())), listOf(XyoSystemInfoWitness())).buildNodeList()
+            val panel = XyoPanel(appContext, arrayListOf(Pair(apiDomainBeta, XyoAccount())), listOf(XyoSystemInfoWitness()))
             val result = panel.reportAsyncQuery()
             result.apiResults.forEach { assertEquals(it.errors, null) }
         }
@@ -100,11 +100,11 @@ class XyoPanelTest {
             val prefsRepository = PrefsRepository(appContext)
             prefsRepository.clearSavedAccountKey()
 
-            val panel = XyoPanel(appContext, arrayListOf(Pair(apiDomainBeta, null)), listOf(XyoSystemInfoWitness())).buildNodeList()
+            val panel = XyoPanel(appContext, arrayListOf(Pair(apiDomainBeta, null)), listOf(XyoSystemInfoWitness()))
             val generatedAddress = panel.defaultAccount?.address?.hex
             assertNotEquals(generatedAddress, null)
 
-            val panel2 = XyoPanel(appContext, arrayListOf(Pair(apiDomainBeta, null)), listOf(XyoSystemInfoWitness())).buildNodeList()
+            val panel2 = XyoPanel(appContext, arrayListOf(Pair(apiDomainBeta, null)), listOf(XyoSystemInfoWitness()))
             val secondGeneratedAddress = panel2.defaultAccount?.address?.hex
             assertEquals(generatedAddress, secondGeneratedAddress)
         }
