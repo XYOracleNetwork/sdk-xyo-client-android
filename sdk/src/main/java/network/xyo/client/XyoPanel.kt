@@ -2,7 +2,7 @@ package network.xyo.client
 
 import android.content.Context
 import android.os.Build
-import android.provider.Settings.Panel
+import android.util.Log
 import androidx.annotation.RequiresApi
 import kotlinx.coroutines.launch
 import network.xyo.client.address.XyoAccount
@@ -12,6 +12,7 @@ import network.xyo.client.archivist.api.XyoArchivistApiConfig
 import network.xyo.client.archivist.wrapper.ArchivistWrapper
 import network.xyo.client.boundwitness.XyoBoundWitnessBuilder
 import network.xyo.client.boundwitness.XyoBoundWitnessJson
+import network.xyo.client.datastore.PrefsRepository
 import network.xyo.client.node.client.NodeClient
 import network.xyo.client.node.client.PostQueryResult
 import network.xyo.client.payload.XyoPayload
@@ -19,10 +20,13 @@ import network.xyo.client.payload.XyoPayload
 data class XyoPanelReportResult(val bw: XyoBoundWitnessJson, val apiResults: List<PostBoundWitnessesResult>)
 data class XyoPanelReportQueryResult(val bw: XyoBoundWitnessJson, val apiResults: List<PostQueryResult>)
 
+class MissingNodesException(message: String) : Exception(message) {}
+
 @RequiresApi(Build.VERSION_CODES.M)
-class XyoPanel(val context: Context, private val archivists: List<XyoArchivistApiClient>, private val witnesses: List<XyoWitness<XyoPayload>>?) {
+class XyoPanel(val context: Context, private val archivists: List<XyoArchivistApiClient>, private val witnesses: List<XyoWitness<XyoPayload>>?, private val nodeUrlsAndAccounts: ArrayList<Pair<String, XyoAccount?>>?) {
     var previousHash: String? = null
     private var nodes: MutableList<NodeClient>? = null
+    var defaultAccount: XyoAccount? = null
 
     @Deprecated("use constructors without deprecated archive field")
     constructor(
@@ -41,7 +45,8 @@ class XyoPanel(val context: Context, private val archivists: List<XyoArchivistAp
                         )
                     )
                 ),
-                witnesses
+                witnesses,
+                null
             )
 
     constructor(
@@ -59,20 +64,9 @@ class XyoPanel(val context: Context, private val archivists: List<XyoArchivistAp
                     )
                 )
             ),
-            witnesses
+            witnesses,
+            nodeUrlsAndAccounts
         )
-    {
-        if (nodeUrlsAndAccounts.isNotEmpty()) {
-            nodes = mutableListOf<NodeClient>().let {
-                nodeUrlsAndAccounts.forEach(){ pair ->
-                    val nodeUrl = pair.first
-                    val account = pair.second
-                    it.add(NodeClient(nodeUrl, account ?: XyoAccount()))
-                }
-                it
-            }
-        }
-    }
 
     constructor(
         context: Context,
@@ -80,8 +74,23 @@ class XyoPanel(val context: Context, private val archivists: List<XyoArchivistAp
     ): this(
         context,
         arrayListOf(Pair("$DefaultApiDomain/Archivist", XyoAccount())),
-        listOf(XyoWitness(observe))
+        listOf(XyoWitness(observe)),
     )
+
+    suspend fun resolveNodes(resetNodes: Boolean = false) {
+        if (resetNodes) nodes = null
+        this.defaultAccount = PrefsRepository(context).getAccount()
+        if (nodeUrlsAndAccounts?.isNotEmpty() == true) {
+            nodes = mutableListOf<NodeClient>().let {
+                this@XyoPanel.nodeUrlsAndAccounts?.forEach { pair ->
+                    val nodeUrl = pair.first
+                    val account = pair.second ?: defaultAccount
+                    it.add(NodeClient(nodeUrl, account))
+                }
+                it
+            }
+        }
+    }
 
     @kotlinx.coroutines.ExperimentalCoroutinesApi
     fun event(event: String) {
@@ -156,12 +165,15 @@ class XyoPanel(val context: Context, private val archivists: List<XyoArchivistAp
 
     @kotlinx.coroutines.ExperimentalCoroutinesApi
     suspend fun reportAsyncQuery(adhocWitnesses: List<XyoWitness<XyoPayload>> = emptyList()): XyoPanelReportQueryResult {
+        if (nodes == null) resolveNodes()
         val bw = generateBoundWitnessJson()
         val payloads = generatePayloads(adhocWitnesses)
         val results = mutableListOf<PostQueryResult>()
 
         if (nodes.isNullOrEmpty()) {
-            throw Error("Called reportAsync without first constructing any nodeClients")
+            val message = "Called reportAsyncQuery without first constructing any nodeClients.  Try passing nodeUrls?"
+            Log.e("xyoClient", message)
+            throw MissingNodesException(message)
         }
 
         nodes?.forEach { node ->

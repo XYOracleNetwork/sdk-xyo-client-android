@@ -1,22 +1,25 @@
 package network.xyo.client
 
 import android.content.Context
+import android.util.Log
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import network.xyo.client.address.XyoAccount
+import network.xyo.client.datastore.PrefsRepository
 import network.xyo.client.payload.XyoPayload
 import network.xyo.client.witness.system.info.XyoSystemInfoWitness
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.jupiter.api.Assertions.*
+import java.lang.Exception
 
 class XyoPanelTest {
     @Rule
     @JvmField
-    val grantPermissionRule = GrantPermissionRule.grant(android.Manifest.permission.INTERNET, android.Manifest.permission.ACCESS_WIFI_STATE)
+    val grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(android.Manifest.permission.INTERNET, android.Manifest.permission.ACCESS_WIFI_STATE)
 
     lateinit var appContext: Context
 
@@ -29,7 +32,7 @@ class XyoPanelTest {
         this.appContext = InstrumentationRegistry.getInstrumentation().targetContext
     }
 
-    fun testCreatePanel(nodeUrl: String) {
+    private fun testCreatePanel(nodeUrl: String) {
         val witness = XyoWitness<XyoPayload>(XyoAccount())
         val panel = XyoPanel(appContext, arrayListOf(Pair(nodeUrl, XyoAccount())), listOf(witness))
         assertNotNull(panel)
@@ -90,6 +93,38 @@ class XyoPanelTest {
             val panel = XyoPanel(appContext, arrayListOf(Pair(apiDomainBeta, XyoAccount())), listOf(XyoSystemInfoWitness()))
             val result = panel.reportAsyncQuery()
             result.apiResults.forEach { assertEquals(it.errors, null) }
+        }
+    }
+
+    @Test
+    fun testMissingNodesException() {
+        runBlocking {
+            val panel = XyoPanel(appContext, arrayListOf(), listOf(XyoSystemInfoWitness()))
+            var error: MissingNodesException? = null
+            try {
+                panel.reportAsyncQuery()
+            } catch (exception: MissingNodesException) {
+                error = exception
+            }
+            assertNotNull(error)
+        }
+    }
+
+    @Test
+    fun testAccountPersistence() {
+        runBlocking {
+            val prefsRepository = PrefsRepository(appContext)
+            prefsRepository.clearSavedAccountKey()
+
+            val panel = XyoPanel(appContext, arrayListOf(Pair(apiDomainBeta, null)), listOf(XyoSystemInfoWitness()))
+            panel.resolveNodes()
+            val generatedAddress = panel.defaultAccount?.address?.hex
+            assertNotEquals(generatedAddress, null)
+
+            val panel2 = XyoPanel(appContext, arrayListOf(Pair(apiDomainBeta, null)), listOf(XyoSystemInfoWitness()))
+            panel2.resolveNodes()
+            val secondGeneratedAddress = panel2.defaultAccount?.address?.hex
+            assertEquals(generatedAddress, secondGeneratedAddress)
         }
     }
 }
