@@ -1,9 +1,9 @@
-package network.xyo.client.boundwitness
+package network.xyo.boundwitness
 
-import network.xyo.client.payload.Payload
+import network.xyo.payload.Payload
 import org.json.JSONArray
 
-open class BoundWitness(schema: String = BoundWitness.schema): Payload(schema) {
+open class BoundWitness(schema: String = Companion.schema): Payload(schema) {
     var addresses: List<String>
         get() {
             return getArrayAsStringList("addresses")

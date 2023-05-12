@@ -1,5 +1,5 @@
-package network.xyo.client.boundwitness
-import network.xyo.client.payload.Payload
+package network.xyo.boundwitness
+import network.xyo.payload.Payload
 
 class QueryBoundWitnessBuilder : AbstractBoundWitnessBuilder<QueryBoundWitness, QueryBoundWitnessBuilder>() {
     private lateinit var queryHash: String

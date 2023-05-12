@@ -1,4 +1,4 @@
-package network.xyo.client.payload
+package network.xyo.payload
 
 import network.xyo.client.XyoSerializable
 import org.json.JSONObject

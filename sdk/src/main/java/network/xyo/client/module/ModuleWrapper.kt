@@ -1,9 +1,9 @@
 package network.xyo.client.module
 
 import network.xyo.client.address.Account
-import network.xyo.client.boundwitness.QueryBoundWitness
-import network.xyo.client.boundwitness.QueryBoundWitnessBuilder
-import network.xyo.client.payload.Payload
+import network.xyo.boundwitness.QueryBoundWitness
+import network.xyo.boundwitness.QueryBoundWitnessBuilder
+import network.xyo.payload.Payload
 
 open class ModuleWrapper<TConfig: ModuleConfig, TParams: ModuleParams<TConfig>, TModule: Module<TConfig, TParams>>(val module: TModule, val account: Account) {
 

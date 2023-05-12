@@ -1,6 +1,6 @@
 package network.xyo.client.archivist.wrapper
 
-import network.xyo.client.payload.Payload
+import network.xyo.payload.Payload
 
 class ArchivistInsertQueryPayload: Payload(schema) {
     companion object {

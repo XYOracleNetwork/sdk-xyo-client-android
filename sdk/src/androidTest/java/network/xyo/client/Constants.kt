@@ -1,7 +1,7 @@
 package network.xyo.client
 
 import network.xyo.client.address.Account
-import network.xyo.client.payload.Payload
+import network.xyo.payload.Payload
 
 class DebugPayload(schema: String, val nonce: Int) : Payload(schema)
 

@@ -30,6 +30,9 @@ android {
     }
 
     buildTypes {
+        debug {
+            debuggable true
+        }
         release {
             minifyEnabled false
             shrinkResources false
@@ -56,17 +59,18 @@ dependencies {
     implementation 'com.madgag.spongycastle:pkix:1.54.0.0'
     implementation 'com.ionspin.kotlin:bignum:0.3.8'
     implementation 'com.google.code.gson:gson:2.8.9'
+    implementation 'androidx.test.ext:junit-ktx:1.1.5'
 
-    // (Required) Writing and executing Unit Tests on the JUnit Platform
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.3")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.3")
+    // Core library
+    androidTestImplementation("androidx.test:core:1.5.0")
 
-    // (Optional) If you need "Parameterized Tests"
-    testImplementation("org.junit.jupiter:junit-jupiter-params:5.9.3")
+    // AndroidJUnitRunner and JUnit Rules
+    androidTestImplementation("androidx.test:runner:1.5.2")
+    androidTestImplementation("androidx.test:rules:1.5.0")
 
-    // (Optional) If you also have JUnit 4-based tests
-    // testImplementation("junit:junit:4.13.2")
-    // testRuntimeOnly("org.junit.vintage:junit-vintage-engine:5.9.3")
+    // Assertions
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation("androidx.test.ext:truth:1.5.0")
 }
 
 publishing {

@@ -1,6 +1,6 @@
 package network.xyo.client.module
 
-import network.xyo.client.payload.Payload
+import network.xyo.payload.Payload
 
 typealias AnyWitness = Witness<*, *>
 

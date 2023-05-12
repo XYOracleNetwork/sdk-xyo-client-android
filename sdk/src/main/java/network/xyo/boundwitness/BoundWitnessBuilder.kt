@@ -1,4 +1,4 @@
-package network.xyo.client.boundwitness
+package network.xyo.boundwitness
 
 class BoundWitnessBuilder: AbstractBoundWitnessBuilder<BoundWitness, BoundWitnessBuilder>() {
     override fun createInstance(): BoundWitness {

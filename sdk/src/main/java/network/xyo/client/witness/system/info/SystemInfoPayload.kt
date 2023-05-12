@@ -3,10 +3,10 @@ package network.xyo.client.witness.system.info
 import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
-import network.xyo.client.payload.Payload
+import network.xyo.payload.Payload
 import org.json.JSONObject
 
-class SystemInfoPayload: Payload ("network.xyo.system.info") {
+class SystemInfoPayload: Payload("network.xyo.system.info") {
 
         var device: SystemInfoDevice?
             get() {

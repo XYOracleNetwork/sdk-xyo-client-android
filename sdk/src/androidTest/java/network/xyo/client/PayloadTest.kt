@@ -1,15 +1,10 @@
 package network.xyo.client
 
-import android.content.Context
-import androidx.test.platform.app.InstrumentationRegistry
-import androidx.test.rule.GrantPermissionRule
 import network.xyo.client.address.Account
-import network.xyo.client.boundwitness.BoundWitnessBuilder
-import network.xyo.client.payload.Payload
-import org.junit.Before
-import org.junit.Rule
+import network.xyo.payload.Payload
 import org.junit.Test
-import org.junit.jupiter.api.Assertions.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 
 class TestXyoPayload1SubObject {
     var number_value = 2
@@ -66,19 +61,6 @@ val knownAddress = Account(ByteArray(32) { index -> index.toByte()})
 const val knownHash = "6e173bbfc0577ebde66b44b090316eca5ecad8ecdb5c51886211d805c769d2ea"
 
 class PayloadTest {
-
-    @Rule
-    @JvmField
-    val grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(android.Manifest.permission.INTERNET, android.Manifest.permission.ACCESS_WIFI_STATE)
-
-    lateinit var appContext: Context
-
-    @Before
-    fun useAppContext() {
-        // Context of the app under test.
-        this.appContext = InstrumentationRegistry.getInstrumentation().targetContext
-    }
-
     /*@Test
     fun testInvalidSchemaPayload() {
         val payload = TestInvalidSchemaPayload()

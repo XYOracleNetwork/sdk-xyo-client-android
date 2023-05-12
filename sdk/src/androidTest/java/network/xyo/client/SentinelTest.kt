@@ -1,8 +1,6 @@
 package network.xyo.client
 
-import android.content.Context
-import androidx.test.platform.app.InstrumentationRegistry
-import androidx.test.rule.GrantPermissionRule
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.coroutines.runBlocking
 import network.xyo.client.address.Account
 import network.xyo.client.module.AdhocWitness
@@ -10,36 +8,20 @@ import network.xyo.client.module.Archivist
 import network.xyo.client.module.ModuleConfig
 import network.xyo.client.module.ModuleParams
 import network.xyo.client.module.Node
-import network.xyo.client.module.Sentinel
-import network.xyo.client.module.SentinelConfig
-import network.xyo.client.module.SentinelParams
-import network.xyo.client.witness.system.info.SystemInfoWitness
-import org.junit.Before
-import org.junit.Rule
+import network.xyo.sentinel.Sentinel
+import network.xyo.sentinel.SentinelConfig
+import network.xyo.sentinel.SentinelParams
+import org.junit.Assert.assertEquals
 import org.junit.Test
-import org.junit.jupiter.api.Assertions.*
+import org.junit.runner.RunWith
 
+@RunWith(AndroidJUnit4::class)
 class SentinelTest {
-    @Rule
-    @JvmField
-    val grantPermissionRule = GrantPermissionRule.grant(android.Manifest.permission.INTERNET, android.Manifest.permission.ACCESS_WIFI_STATE)
-
-    lateinit var appContext: Context
-
-    private val apiDomainBeta = "${TestConstants.nodeUrlBeta}/Archivist"
-    private val apiDomainLocal = "${TestConstants.nodeUrlLocal}/Archivist"
-
-    @Before
-    fun useAppContext() {
-        // Context of the app under test.
-        this.appContext = InstrumentationRegistry.getInstrumentation().targetContext
-    }
-
     suspend fun testCreateSentinel() {
         val node = Node(ModuleParams(Account(), ModuleConfig()))
         val witness = AdhocWitness(ModuleParams(Account(), ModuleConfig()))
         val archivist = Archivist(ModuleParams(Account(), ModuleConfig()))
-        val sentinel = Sentinel(SentinelParams(appContext, Account(), SentinelConfig(setOf(witness.address), setOf(archivist.address))))
+        val sentinel = Sentinel(SentinelParams(Account(), SentinelConfig(setOf(witness.address), setOf(archivist.address))))
         node.register(witness)
         node.register(archivist)
         node.register(sentinel)

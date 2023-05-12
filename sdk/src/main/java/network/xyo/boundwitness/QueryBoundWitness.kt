@@ -1,6 +1,6 @@
-package network.xyo.client.boundwitness
+package network.xyo.boundwitness
 
-open class QueryBoundWitness(schema: String = BoundWitness.schema): BoundWitness(schema) {
+open class QueryBoundWitness(schema: String = Companion.schema): BoundWitness(schema) {
 
     var query: String
         get() {

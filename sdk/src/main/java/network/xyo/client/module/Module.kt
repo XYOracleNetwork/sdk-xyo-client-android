@@ -6,11 +6,11 @@ import android.util.Log
 
 import network.xyo.client.CompositeModuleResolver
 import network.xyo.client.address.Account
-import network.xyo.client.boundwitness.BoundWitness
-import network.xyo.client.boundwitness.BoundWitnessBuilder
-import network.xyo.client.boundwitness.QueryBoundWitness
+import network.xyo.boundwitness.BoundWitness
+import network.xyo.boundwitness.BoundWitnessBuilder
+import network.xyo.boundwitness.QueryBoundWitness
 
-import network.xyo.client.payload.Payload
+import network.xyo.payload.Payload
 import java.security.InvalidParameterException
 
 open class ModuleConfig(schema: String = ModuleConfig.schema): Payload(schema) {

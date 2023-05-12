@@ -1,8 +1,8 @@
-package network.xyo.client.boundwitness
+package network.xyo.boundwitness
 
 import network.xyo.client.address.Account
-import network.xyo.client.payload.Payload
-import network.xyo.client.payload.PayloadValidationException
+import network.xyo.payload.Payload
+import network.xyo.payload.PayloadValidationException
 
 abstract class AbstractBoundWitnessBuilder<TBoundWitness: BoundWitness, This: AbstractBoundWitnessBuilder<TBoundWitness, This>> {
     protected var _accounts: MutableList<Account> = mutableListOf()

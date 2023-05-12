@@ -1,7 +1,7 @@
 package network.xyo.client.module
 
 import network.xyo.client.CompositeModuleResolver
-import network.xyo.client.payload.Payload
+import network.xyo.payload.Payload
 import java.security.InvalidParameterException
 
 const val AddressSchema = "network.xyo.address"

@@ -1,6 +1,6 @@
 package network.xyo.client
 
-import network.xyo.client.payload.Payload
+import network.xyo.payload.Payload
 import java.util.*
 
 open class EventPayload(name: String): Payload("network.xyo.event") {

@@ -7,7 +7,7 @@ import network.xyo.client.address.Account
 import network.xyo.client.module.ModuleConfig
 import network.xyo.client.module.ModuleParams
 import network.xyo.client.module.Witness
-import network.xyo.client.payload.Payload
+import network.xyo.payload.Payload
 
 class SystemInfoWitnessParams<TConfig : ModuleConfig>(
     val context: Context, account: Account, config: TConfig

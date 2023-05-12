@@ -1,7 +1,7 @@
 package network.xyo.client.module
 
 import android.content.Context
-import network.xyo.client.payload.Payload
+import network.xyo.payload.Payload
 
 typealias AnyDiviner = Module<ModuleConfig, ModuleParams<ModuleConfig>>
 

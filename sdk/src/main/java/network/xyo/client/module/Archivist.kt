@@ -1,7 +1,7 @@
 package network.xyo.client.module
 
 import android.util.LruCache
-import network.xyo.client.payload.Payload
+import network.xyo.payload.Payload
 
 typealias AnyArchivist = Module<*, *>
 

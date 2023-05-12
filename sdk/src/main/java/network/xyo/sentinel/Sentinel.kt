@@ -1,13 +1,18 @@
-package network.xyo.client.module
+package network.xyo.sentinel
 
-import android.content.Context
-import android.util.Log
 import network.xyo.client.CompositeModuleResolver
 import network.xyo.client.address.Account
-import network.xyo.client.payload.Payload
+import network.xyo.client.module.AbstractModule
+import network.xyo.client.module.AnyArchivist
+import network.xyo.client.module.AnyWitness
+import network.xyo.client.module.ModuleConfig
+import network.xyo.client.module.ModuleFilter
+import network.xyo.client.module.ModuleParams
+import network.xyo.client.module.ModuleResolver
+import network.xyo.payload.Payload
 import org.json.JSONArray
 
-open class SentinelConfig(schema: String = SentinelConfig.schema): ModuleConfig(schema) {
+open class SentinelConfig(schema: String = Companion.schema): ModuleConfig(schema) {
 
     constructor(witnesses: Set<String>, archivists: Set<String>): this() {
         this.witnesses = witnesses
@@ -35,7 +40,7 @@ open class SentinelConfig(schema: String = SentinelConfig.schema): ModuleConfig(
     }
 }
 
-open class SentinelParams<TConfig: SentinelConfig>(val context: Context, account: Account, config: TConfig): ModuleParams<TConfig>(account, config)
+open class SentinelParams<TConfig: SentinelConfig>(account: Account, config: TConfig): ModuleParams<TConfig>(account, config)
 
 open class Sentinel<TConfig: SentinelConfig>(params: SentinelParams<TConfig>): AbstractModule<TConfig, ModuleParams<TConfig>>(params) {
     override var downResolver: ModuleResolver = CompositeModuleResolver()
@@ -47,7 +52,7 @@ open class Sentinel<TConfig: SentinelConfig>(params: SentinelParams<TConfig>): A
         val filter = ModuleFilter(addresses)
         this._archivists = this._archivists ?: this.resolve(filter)
         if (addresses.size != this._archivists?.size) {
-            Log.w("Sentinel", "Not all archivists found [Requested: ${addresses.size}, Found: ${this._archivists?.size}]")
+            print("Not all archivists found [Requested: ${addresses.size}, Found: ${this._archivists?.size}]")
         }
 
         return this._archivists!!
@@ -60,7 +65,7 @@ open class Sentinel<TConfig: SentinelConfig>(params: SentinelParams<TConfig>): A
         val filter = ModuleFilter(witnesses)
         this._witnesses = this._witnesses ?: this.resolve(filter) as Set<AnyWitness>
         if (witnesses.size != this._witnesses?.size) {
-            Log.w("Sentinel", "Not all witnesses found [Requested: ${witnesses.size}, Found: ${this._witnesses?.size}]")
+            print("Not all witnesses found [Requested: ${witnesses.size}, Found: ${this._witnesses?.size}]")
         }
 
         return this._witnesses!!
