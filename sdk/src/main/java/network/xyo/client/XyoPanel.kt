@@ -2,12 +2,7 @@ package network.xyo.client
 
 import android.content.Context
 import android.os.Build
-import android.provider.Settings.Panel
 import androidx.annotation.RequiresApi
-import androidx.datastore.core.DataStore
-import androidx.datastore.dataStore
-import androidx.datastore.dataStoreFile
-import com.network.xyo.client.data.PrefsDataStoreProtos.PrefsDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -18,7 +13,6 @@ import network.xyo.client.archivist.api.XyoArchivistApiConfig
 import network.xyo.client.archivist.wrapper.ArchivistWrapper
 import network.xyo.client.boundwitness.XyoBoundWitnessBuilder
 import network.xyo.client.boundwitness.XyoBoundWitnessJson
-import network.xyo.client.datastore.DATA_STORE_FILE_NAME
 import network.xyo.client.datastore.PrefsRepository
 import network.xyo.client.node.client.NodeClient
 import network.xyo.client.node.client.PostQueryResult
@@ -73,7 +67,7 @@ class XyoPanel(val context: Context, private val archivists: List<XyoArchivistAp
         if (nodeUrlsAndAccounts.isNotEmpty()) {
             nodes = mutableListOf<NodeClient>().let {
                 resolveDefaultAccount(context).map { defaultAccount ->
-                    nodeUrlsAndAccounts.forEach(){ pair ->
+                    nodeUrlsAndAccounts.forEach{ pair ->
                         val nodeUrl = pair.first
                         val account = pair.second ?: defaultAccount
                         it.add(NodeClient(nodeUrl, account))
