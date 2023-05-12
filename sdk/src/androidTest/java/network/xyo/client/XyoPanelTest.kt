@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Assertions.*
 class XyoPanelTest {
     @Rule
     @JvmField
-    val grantPermissionRule = GrantPermissionRule.grant(android.Manifest.permission.INTERNET, android.Manifest.permission.ACCESS_WIFI_STATE)
+    val grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(android.Manifest.permission.INTERNET, android.Manifest.permission.ACCESS_WIFI_STATE)
 
     lateinit var appContext: Context
 
@@ -30,7 +30,7 @@ class XyoPanelTest {
         this.appContext = InstrumentationRegistry.getInstrumentation().targetContext
     }
 
-    fun testCreatePanel(nodeUrl: String) {
+    private fun testCreatePanel(nodeUrl: String) {
         val witness = XyoWitness<XyoPayload>(XyoAccount())
         val panel = XyoPanel(appContext, arrayListOf(Pair(nodeUrl, XyoAccount())), listOf(witness))
         assertNotNull(panel)
@@ -101,10 +101,12 @@ class XyoPanelTest {
             prefsRepository.clearSavedAccountKey()
 
             val panel = XyoPanel(appContext, arrayListOf(Pair(apiDomainBeta, null)), listOf(XyoSystemInfoWitness()))
+            panel.resolveNodes()
             val generatedAddress = panel.defaultAccount?.address?.hex
             assertNotEquals(generatedAddress, null)
 
             val panel2 = XyoPanel(appContext, arrayListOf(Pair(apiDomainBeta, null)), listOf(XyoSystemInfoWitness()))
+            panel2.resolveNodes()
             val secondGeneratedAddress = panel2.defaultAccount?.address?.hex
             assertEquals(generatedAddress, secondGeneratedAddress)
         }

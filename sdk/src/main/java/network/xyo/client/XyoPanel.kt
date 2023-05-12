@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import network.xyo.client.address.XyoAccount
 import network.xyo.client.archivist.api.PostBoundWitnessesResult
 import network.xyo.client.archivist.api.XyoArchivistApiClient
@@ -75,10 +74,9 @@ class XyoPanel(val context: Context, private val archivists: List<XyoArchivistAp
         listOf(XyoWitness(observe)),
     )
 
-    init {
-        runBlocking {
-            this@XyoPanel.defaultAccount = PrefsRepository(context).getAccount()
-        }
+    suspend fun resolveNodes(resetNodes: Boolean = false) {
+        if (resetNodes) nodes = null
+        this.defaultAccount = PrefsRepository(context).getAccount()
         if (nodeUrlsAndAccounts?.isNotEmpty() == true) {
             nodes = mutableListOf<NodeClient>().let {
                 this@XyoPanel.nodeUrlsAndAccounts?.forEach { pair ->
@@ -164,12 +162,13 @@ class XyoPanel(val context: Context, private val archivists: List<XyoArchivistAp
 
     @kotlinx.coroutines.ExperimentalCoroutinesApi
     suspend fun reportAsyncQuery(adhocWitnesses: List<XyoWitness<XyoPayload>> = emptyList()): XyoPanelReportQueryResult {
+        if (nodes == null) resolveNodes()
         val bw = generateBoundWitnessJson()
         val payloads = generatePayloads(adhocWitnesses)
         val results = mutableListOf<PostQueryResult>()
 
         if (nodes.isNullOrEmpty()) {
-            throw Error("Called reportAsync without first constructing any nodeClients.  Did you forget to call buildNodeList?")
+            throw Error("Called reportAsync without first constructing any nodeClients.  Try passing nodeUrls?")
         }
 
         nodes?.forEach { node ->
