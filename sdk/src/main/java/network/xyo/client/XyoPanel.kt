@@ -2,6 +2,7 @@ package network.xyo.client
 
 import android.content.Context
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import kotlinx.coroutines.launch
 import network.xyo.client.address.XyoAccount
@@ -18,6 +19,8 @@ import network.xyo.client.payload.XyoPayload
 
 data class XyoPanelReportResult(val bw: XyoBoundWitnessJson, val apiResults: List<PostBoundWitnessesResult>)
 data class XyoPanelReportQueryResult(val bw: XyoBoundWitnessJson, val apiResults: List<PostQueryResult>)
+
+class MissingNodesException(message: String) : Exception(message) {}
 
 @RequiresApi(Build.VERSION_CODES.M)
 class XyoPanel(val context: Context, private val archivists: List<XyoArchivistApiClient>, private val witnesses: List<XyoWitness<XyoPayload>>?, private val nodeUrlsAndAccounts: ArrayList<Pair<String, XyoAccount?>>?) {
@@ -168,7 +171,9 @@ class XyoPanel(val context: Context, private val archivists: List<XyoArchivistAp
         val results = mutableListOf<PostQueryResult>()
 
         if (nodes.isNullOrEmpty()) {
-            throw Error("Called reportAsync without first constructing any nodeClients.  Try passing nodeUrls?")
+            val message = "Called reportAsyncQuery without first constructing any nodeClients.  Try passing nodeUrls?"
+            Log.e("xyoClient", message)
+            throw MissingNodesException(message)
         }
 
         nodes?.forEach { node ->

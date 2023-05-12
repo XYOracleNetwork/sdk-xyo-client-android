@@ -1,6 +1,7 @@
 package network.xyo.client
 
 import android.content.Context
+import android.util.Log
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -13,6 +14,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.jupiter.api.Assertions.*
+import java.lang.Exception
 
 class XyoPanelTest {
     @Rule
@@ -91,6 +93,20 @@ class XyoPanelTest {
             val panel = XyoPanel(appContext, arrayListOf(Pair(apiDomainBeta, XyoAccount())), listOf(XyoSystemInfoWitness()))
             val result = panel.reportAsyncQuery()
             result.apiResults.forEach { assertEquals(it.errors, null) }
+        }
+    }
+
+    @Test
+    fun testMissingNodesException() {
+        runBlocking {
+            val panel = XyoPanel(appContext, arrayListOf(), listOf(XyoSystemInfoWitness()))
+            var error: MissingNodesException? = null
+            try {
+                panel.reportAsyncQuery()
+            } catch (exception: MissingNodesException) {
+                error = exception
+            }
+            assertNotNull(error)
         }
     }
 
