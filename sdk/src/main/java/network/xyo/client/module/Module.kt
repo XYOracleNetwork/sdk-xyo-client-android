@@ -11,12 +11,17 @@ import network.xyo.boundwitness.BoundWitnessBuilder
 import network.xyo.boundwitness.QueryBoundWitness
 
 import network.xyo.payload.Payload
+import org.json.JSONException
 import java.security.InvalidParameterException
 
 open class ModuleConfig(schema: String = ModuleConfig.schema): Payload(schema) {
     var name: String?
         get() {
-            return this.getString("name")
+            try {
+                return this.getString("name")
+            } catch (e: JSONException) {
+                return null
+            }
         }
         set(value) {
             this.put("name", value)
@@ -57,7 +62,19 @@ interface Module<TConfig: ModuleConfig, TParams : ModuleParams<TConfig>> {
 
 typealias AnyModule = Module<*, *>
 
-open class AbstractModule<TConfig: ModuleConfig, TParams : ModuleParams<TConfig>>(override var params: TParams) : Module<TConfig, TParams> {
+open class AbstractModule<TConfig: ModuleConfig, TParams : ModuleParams<TConfig>> : Module<TConfig, TParams> {
+
+    override var params: TParams
+    override var downResolver: ModuleResolver
+    override var queries: Set<String> = setOf(ModuleDiscoverQuerySchema, ModuleSubscribeQuerySchema)
+
+    constructor(params: TParams) {
+        val downResolver = CompositeModuleResolver()
+        this.downResolver = downResolver
+        this.params = params
+        downResolver.add(this)
+    }
+
 
     enum class notStartedActionEnum {
         ERROR, THROW, WARN, LOG, NONE
@@ -101,9 +118,6 @@ open class AbstractModule<TConfig: ModuleConfig, TParams : ModuleParams<TConfig>
         }
         return this._started
     }
-
-    override var downResolver: ModuleResolver = CompositeModuleResolver()
-    override var queries = setOf(ModuleDiscoverQuerySchema, ModuleSubscribeQuerySchema)
 
     private fun parseQuery(query: QueryBoundWitness, payloads: Set<Payload>?): Payload {
         val queryPayload = payloads?.first { payload -> payload.hash() == query.query }

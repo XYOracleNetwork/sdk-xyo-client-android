@@ -1,11 +1,11 @@
 package network.xyo.client.module
 
-import network.xyo.payload.Payload
+import org.json.JSONArray
 
 typealias AnyWitness = Witness<*, *>
 
 open class Witness<TConfig: ModuleConfig, TParams : ModuleParams<TConfig>>(params: TParams) : AbstractModule<TConfig, TParams>(params) {
-    open fun observe(payloads: Set<Payload> = emptySet()): Set<Payload> {
-        return payloads
+    open fun observe(payloads: JSONArray? = null): JSONArray {
+        return payloads ?: JSONArray()
     }
 }

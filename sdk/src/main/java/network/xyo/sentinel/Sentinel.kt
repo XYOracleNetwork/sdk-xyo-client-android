@@ -71,7 +71,21 @@ open class Sentinel<TConfig: SentinelConfig>(params: SentinelParams<TConfig>): A
         return this._witnesses!!
     }
 
-    suspend fun report(payloads: Set<Payload> = emptySet()): Set<Payload> {
-        return setOf(*payloads.toTypedArray(), *this.getWitnesses().map { witness -> witness.observe()}.flatten().toTypedArray())
+    suspend fun report(payloads: JSONArray = JSONArray()): JSONArray {
+        val result = JSONArray()
+        for (i in 0 until payloads.length()) {
+            result.put(i, payloads[i])
+        }
+
+        this.getWitnesses().map {
+                witness ->
+            val payloads = witness.observe()
+            for (i in 0 until payloads.length()) {
+                result.put(i, payloads[i])
+            }
+        }
+
+
+        return result
     }
 }

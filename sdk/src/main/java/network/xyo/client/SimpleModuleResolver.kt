@@ -9,9 +9,9 @@ import network.xyo.client.module.ModuleResolver
 
 class SimpleModuleResolver : ModuleResolver {
     private val addressToName = mutableMapOf<String, String>()
-    private val modules = mutableMapOf<String, Module<ModuleConfig, ModuleParams<ModuleConfig>>>()
+    private val modules = mutableMapOf<String, AnyModule>()
 
-    fun add(module: Module<ModuleConfig, ModuleParams<ModuleConfig>>): ModuleResolver {
+    fun add(module: AnyModule): ModuleResolver {
         this.modules[module.address] = module
         return this
     }
@@ -36,9 +36,9 @@ class SimpleModuleResolver : ModuleResolver {
     }
 
     override suspend fun resolve(filter: ModuleFilter?): Set<AnyModule> {
-        val filteredByName = this.resolveByName(this.modules.values.toSet(), filter?.name)
+        val filteredByName =  this.resolveByName(this.modules.values.toSet(), filter?.name)
 
-        return this.resolveByAddress(filteredByName, filter?.name)
+        return this.resolveByAddress(filteredByName, filter?.address)
     }
 
     private fun resolveByAddress(modules: Set<AnyModule>, addresses: Set<String>?): Set<AnyModule> {

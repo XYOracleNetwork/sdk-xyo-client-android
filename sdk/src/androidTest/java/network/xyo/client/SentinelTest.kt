@@ -4,13 +4,16 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.coroutines.runBlocking
 import network.xyo.client.address.Account
 import network.xyo.client.module.AdhocWitness
+import network.xyo.client.module.AdhocWitnessConfig
 import network.xyo.client.module.Archivist
 import network.xyo.client.module.ModuleConfig
 import network.xyo.client.module.ModuleParams
 import network.xyo.client.module.Node
+import network.xyo.payload.Payload
 import network.xyo.sentinel.Sentinel
 import network.xyo.sentinel.SentinelConfig
 import network.xyo.sentinel.SentinelParams
+import org.json.JSONArray
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -19,7 +22,9 @@ import org.junit.runner.RunWith
 class SentinelTest {
     suspend fun testCreateSentinel() {
         val node = Node(ModuleParams(Account(), ModuleConfig()))
-        val witness = AdhocWitness(ModuleParams(Account(), ModuleConfig()))
+        val payloads = JSONArray()
+        payloads.put(Payload("network.xyo.test"))
+        val witness = AdhocWitness(ModuleParams(Account(), AdhocWitnessConfig(payloads)))
         val archivist = Archivist(ModuleParams(Account(), ModuleConfig()))
         val sentinel = Sentinel(SentinelParams(Account(), SentinelConfig(setOf(witness.address), setOf(archivist.address))))
         node.register(witness)
