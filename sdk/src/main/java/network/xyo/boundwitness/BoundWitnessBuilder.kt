@@ -1,7 +1,7 @@
 package network.xyo.boundwitness
 
-class BoundWitnessBuilder: AbstractBoundWitnessBuilder<BoundWitness, BoundWitnessBuilder>() {
-    override fun createInstance(): BoundWitness {
-        return BoundWitness()
+class BoundWitnessBuilder: AbstractBoundWitnessBuilder<IBoundWitness, BoundWitnessBuilder>() {
+    override fun build(): IBoundWitness {
+        return JSONBoundWitness()
     }
 }

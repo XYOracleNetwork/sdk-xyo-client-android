@@ -1,7 +1,8 @@
 package network.xyo.client.module
 
 import network.xyo.client.CompositeModuleResolver
-import network.xyo.payload.Payload
+import network.xyo.payload.IPayload
+import network.xyo.payload.JSONPayload
 import java.security.InvalidParameterException
 
 const val AddressSchema = "network.xyo.address"
@@ -27,10 +28,10 @@ open class Node<TConfig: ModuleConfig, TParams : ModuleParams<TConfig>>(params: 
         return this.privateResolver.resolve()
     }
 
-    override suspend fun discover(): Set<Payload> {
+    override suspend fun discover(): Set<IPayload> {
         val childMods = this.attachedModules()
         val childModAddresses = childMods.map { mod ->
-            Payload(AddressSchema, mapOf(Pair("address", mod.address), Pair("name", mod.config.name)))
+            JSONPayload(AddressSchema, mapOf(Pair("address", mod.address), Pair("name", mod.config.name)))
         }
 
         return setOf(*super.discover().toTypedArray(), *childModAddresses.toTypedArray())

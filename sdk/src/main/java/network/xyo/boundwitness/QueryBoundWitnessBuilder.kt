@@ -1,22 +1,23 @@
 package network.xyo.boundwitness
-import network.xyo.payload.Payload
+import network.xyo.payload.IPayload
 
-class QueryBoundWitnessBuilder : AbstractBoundWitnessBuilder<QueryBoundWitness, QueryBoundWitnessBuilder>() {
-    private lateinit var queryHash: String
+class QueryBoundWitnessBuilder(query: IPayload) : AbstractBoundWitnessBuilder<QueryBoundWitness, QueryBoundWitnessBuilder>() {
+    private var queryHash: String
 
-    override fun createInstance(): QueryBoundWitness {
-        return QueryBoundWitness()
+    init {
+        this.queryHash = query.hash()
     }
 
-    fun query(query: Payload): QueryBoundWitnessBuilder {
+    fun query(query: IPayload): QueryBoundWitnessBuilder {
         this.queryHash = query.hash()
         this.payload(query)
         return this
     }
 
     override fun build(): QueryBoundWitness {
-        val bw = super.build()
+        val bw = QueryBoundWitness(queryHash)
         bw.put("query", queryHash)
+        this.setFields(bw)
         return bw
     }
 }

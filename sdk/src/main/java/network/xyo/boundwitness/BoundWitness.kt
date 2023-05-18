@@ -1,10 +1,18 @@
 package network.xyo.boundwitness
 
-import network.xyo.payload.Payload
+import network.xyo.payload.IPayload
+import network.xyo.payload.JSONPayload
 import org.json.JSONArray
 
-open class BoundWitness(schema: String = Companion.schema): Payload(schema) {
+interface IBoundWitness: IPayload {
     var addresses: List<String>
+    var _signatures: List<String>
+    var payload_hashes: List<String>
+    var payload_schemas: List<String>
+    var previous_hashes: List<String?>
+}
+open class JSONBoundWitness(schema: String = Companion.schema): JSONPayload(schema), IBoundWitness {
+    override var addresses: List<String>
         get() {
             return getArrayAsStringList("addresses")
         }
@@ -13,7 +21,7 @@ open class BoundWitness(schema: String = Companion.schema): Payload(schema) {
             this.put("addresses", JSONArray(value) )
         }
 
-    var _signatures: List<String>
+    override var _signatures: List<String>
         get() {
             return getArrayAsStringList("_signatures")
         }
@@ -22,7 +30,7 @@ open class BoundWitness(schema: String = Companion.schema): Payload(schema) {
             this.put("_signatures", JSONArray(value) )
         }
 
-    var payload_hashes: List<String>
+    override var payload_hashes: List<String>
         get() {
             return getArrayAsStringList("payload_hashes")
         }
@@ -31,7 +39,7 @@ open class BoundWitness(schema: String = Companion.schema): Payload(schema) {
             this.put("payload_hashes", JSONArray(value) )
         }
 
-    var payload_schemas: List<String>
+    override var payload_schemas: List<String>
         get() {
             return getArrayAsStringList("payload_schemas")
         }
@@ -40,7 +48,7 @@ open class BoundWitness(schema: String = Companion.schema): Payload(schema) {
             this.put("payload_schemas", JSONArray(value) )
         }
 
-    var previous_hashes: List<String?>
+    override var previous_hashes: List<String?>
         get() {
             return getArrayAsStringList("previous_hashes")
         }

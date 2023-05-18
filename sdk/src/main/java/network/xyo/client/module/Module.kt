@@ -6,15 +6,20 @@ import android.util.Log
 
 import network.xyo.client.CompositeModuleResolver
 import network.xyo.client.address.Account
-import network.xyo.boundwitness.BoundWitness
 import network.xyo.boundwitness.BoundWitnessBuilder
+import network.xyo.boundwitness.IBoundWitness
 import network.xyo.boundwitness.QueryBoundWitness
+import network.xyo.payload.IPayload
+import network.xyo.payload.JSONPayload
 
-import network.xyo.payload.Payload
 import org.json.JSONException
 import java.security.InvalidParameterException
 
-open class ModuleConfig(schema: String = ModuleConfig.schema): Payload(schema) {
+interface IModuleConfig {
+    var name: String?
+}
+
+open class ModuleConfig(schema: String = ModuleConfig.schema): JSONPayload(schema) {
     var name: String?
         get() {
             try {
@@ -46,39 +51,29 @@ interface ModuleResolver {
     suspend fun resolve(filter: ModuleFilter? = null): Set<AnyModule>
 }
 
-typealias ModuleQueryResult = Pair<BoundWitness, Set<Payload>>
+typealias ModuleQueryResult = Pair<IBoundWitness, Set<IPayload>>
 
-interface Module<TConfig: ModuleConfig, TParams : ModuleParams<TConfig>> {
+interface IModule<TConfig: ModuleConfig, TParams : ModuleParams<TConfig>, TResolver : ModuleResolver> {
     val address: String
     val config: TConfig
-    var downResolver: ModuleResolver
+    var downResolver: TResolver
     val params: TParams
     var queries: Set<String>
-    suspend fun query(query: QueryBoundWitness, payloads: Set<Payload>?): ModuleQueryResult
-    fun queryable(query: QueryBoundWitness, payloads: Set<Payload>?): Boolean
+    suspend fun query(query: QueryBoundWitness, payloads: Set<IPayload>?): ModuleQueryResult
+    fun queryable(query: QueryBoundWitness, payloads: Set<IPayload>?): Boolean
     suspend fun start()
-    var upResolver: ModuleResolver
+    var upResolver: TResolver
 }
 
-typealias AnyModule = Module<*, *>
+typealias AnyModule = IModule<*, *, *>
 
-open class AbstractModule<TConfig: ModuleConfig, TParams : ModuleParams<TConfig>> : Module<TConfig, TParams> {
+open class AbstractModule<TConfig: ModuleConfig, TParams : ModuleParams<TConfig>>(
+    final override var params: TParams
+    ) : IModule<TConfig, TParams, CompositeModuleResolver> {
 
-    override var params: TParams
-    override var downResolver: ModuleResolver
+    final override var downResolver = CompositeModuleResolver()
+    final override var upResolver = CompositeModuleResolver()
     override var queries: Set<String> = setOf(ModuleDiscoverQuerySchema, ModuleSubscribeQuerySchema)
-
-    constructor(params: TParams) {
-        val downResolver = CompositeModuleResolver()
-        this.downResolver = downResolver
-        this.params = params
-        downResolver.add(this)
-    }
-
-
-    enum class notStartedActionEnum {
-        ERROR, THROW, WARN, LOG, NONE
-    }
 
     private var _started = false
 
@@ -99,16 +94,16 @@ open class AbstractModule<TConfig: ModuleConfig, TParams : ModuleParams<TConfig>
         }
         set(value) {}
 
-    open fun started(notStartedAction: notStartedActionEnum = notStartedActionEnum.THROW): Boolean {
+    open fun started(notStartedAction: NotStartedActionEnum = NotStartedActionEnum.THROW): Boolean {
         if (!this._started) {
             when(notStartedAction) {
-                notStartedActionEnum.THROW -> {
+                NotStartedActionEnum.THROW -> {
                     throw InternalError()
                 }
-                notStartedActionEnum.WARN -> {
+                NotStartedActionEnum.WARN -> {
                     Log.w("AbstractModule", "Not started")
                 }
-                notStartedActionEnum.ERROR -> {
+                NotStartedActionEnum.ERROR -> {
                     Log.e("AbstractModule", "Not started")
                 }
                 else -> {
@@ -119,8 +114,12 @@ open class AbstractModule<TConfig: ModuleConfig, TParams : ModuleParams<TConfig>
         return this._started
     }
 
-    private fun parseQuery(query: QueryBoundWitness, payloads: Set<Payload>?): Payload {
-        val queryPayload = payloads?.first { payload -> payload.hash() == query.query }
+    protected fun parseQuery(query: QueryBoundWitness, payloads: Set<IPayload>?): IPayload {
+        val queryPayload = payloads?.first { payload ->
+            val hash = payload.hash()
+            val query = query.query
+            hash == query
+        }
         if (queryPayload == null) {
             throw NotFoundException()
         } else {
@@ -148,13 +147,13 @@ open class AbstractModule<TConfig: ModuleConfig, TParams : ModuleParams<TConfig>
         return resultModuleSet
     }
 
-    open suspend fun discover(): Set<Payload> {
+    open suspend fun discover(): Set<IPayload> {
         return setOf()
     }
 
-    open fun previousHash(): List<Payload> {
+    open fun previousHash(): List<IPayload> {
         val fields = mapOf<String, Any?>(Pair("huri", this.account.previousHash))
-        val previous = Payload("network.xyo.huri", fields)
+        val previous = JSONPayload("network.xyo.huri", fields)
         return listOf(previous)
     }
 
@@ -162,21 +161,21 @@ open class AbstractModule<TConfig: ModuleConfig, TParams : ModuleParams<TConfig>
 
     }
 
-    open fun bindResult(payloads: Set<Payload>, queryAccount: Account?): ModuleQueryResult {
+    open fun bindResult(payloads: Set<IPayload>, queryAccount: Account?): ModuleQueryResult {
         return Pair(BoundWitnessBuilder().payloads(payloads).witness(queryAccount).build(), payloads)
     }
 
     protected open suspend fun queryHandler(
         query: QueryBoundWitness,
-        payloads: Set<Payload>?
+        payloads: Set<IPayload>?
     ): ModuleQueryResult {
-        this.started(notStartedActionEnum.THROW)
+        this.started(NotStartedActionEnum.THROW)
         val typedQuery = this.parseQuery(query, payloads)
 
         if (!this.queryable(query, payloads)) {
             throw InvalidParameterException()
         }
-        val resultPayloads = mutableSetOf<Payload>()
+        val resultPayloads = mutableSetOf<IPayload>()
         val queryAccount = Account()
         try {
             when (typedQuery.schema) {
@@ -194,32 +193,41 @@ open class AbstractModule<TConfig: ModuleConfig, TParams : ModuleParams<TConfig>
                 }
             }
         } catch (error: Error) {
-            val errorPayload = Payload("network.xyo.error")
+            val errorPayload = JSONPayload("network.xyo.error")
             resultPayloads.add(errorPayload)
         }
         return this.bindResult(resultPayloads, queryAccount)
     }
 
-    override suspend fun query(query: QueryBoundWitness, payloads: Set<Payload>?): ModuleQueryResult {
-        this.started(notStartedActionEnum.THROW)
+    override suspend fun query(query: QueryBoundWitness, payloads: Set<IPayload>?): ModuleQueryResult {
+        this.started(NotStartedActionEnum.THROW)
         return this.queryHandler(query, payloads)
     }
 
-    override fun queryable(query: QueryBoundWitness, payloads: Set<Payload>?): Boolean {
-        if (!this.started(notStartedActionEnum.WARN))
+    override fun queryable(query: QueryBoundWitness, payloads: Set<IPayload>?): Boolean {
+        if (!this.started(NotStartedActionEnum.WARN))
                 return false
-
-        return true
+        val typedQuery = this.parseQuery(query, payloads)
+        return this.queries.contains(typedQuery.schema)
     }
 
     override suspend fun start() {
-
+        this.downResolver.add(this)
+        this._started = true
     }
-    override var upResolver: ModuleResolver = CompositeModuleResolver()
 
     companion object {
         const val ModuleDiscoverQuerySchema = "network.xyo.query.module.discover"
         const val ModulePreviousHashQuerySchema = "network.xyo.query.module.account.hash.previous"
         const val ModuleSubscribeQuerySchema = "network.xyo.query.module.subscribe"
+
+        enum class NotStartedActionEnum {
+            ERROR, THROW, WARN, LOG, NONE
+        }
+    }
+
+    init {
+        val downResolver = CompositeModuleResolver()
+        this.downResolver = downResolver
     }
 }

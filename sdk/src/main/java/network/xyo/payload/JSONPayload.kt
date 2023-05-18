@@ -1,10 +1,12 @@
 package network.xyo.payload
 
 import network.xyo.client.XyoSerializable
+import org.json.JSONArray
 import org.json.JSONObject
+import java.io.InvalidObjectException
 import java.security.MessageDigest
 
-open class Payload(schema: String): JSONObject(mapOf(Pair("schema", schema))) {
+open class JSONPayload(schema: String): JSONObject(mapOf(Pair("schema", schema))), IPayload {
     constructor(schema: String, fields: Map<String, Any?>?): this(schema) {
         this.merge(fields)
     }
@@ -27,14 +29,31 @@ open class Payload(schema: String): JSONObject(mapOf(Pair("schema", schema))) {
         return sort(this)
     }
 
-    fun hash(): String {
+    override fun hash(): String {
         return sha256String(this.sorted().toString())
     }
 
-    val schema: String
+    override val schema: String
         get() {
             return this.getString("schema")
         }
+
+    override fun toJSON(): JSONObject {
+        return this
+    }
+
+    fun getArrayAsObjectList(name: String) : List<JSONObject> {
+        val list = mutableListOf<JSONObject>()
+        val jsonArray = this.getJSONArray(name)
+        for (i in 0 until jsonArray.length()) {
+            list.add(jsonArray.getJSONObject(i))
+        }
+        return list
+    }
+
+    fun getArrayAsObjectSet(name: String): Set<JSONObject> {
+        return this.getArrayAsObjectList(name).toSet()
+    }
 
     fun getArrayAsStringList(name: String): List<String> {
         val list = mutableListOf<String>()
@@ -51,13 +70,13 @@ open class Payload(schema: String): JSONObject(mapOf(Pair("schema", schema))) {
 
     companion object {
 
-        fun fromJson(json: String): Payload {
+        fun fromJson(json: String): JSONPayload {
             val fields = JSONObject(json)
-            return Payload(fields.getString("schema"), fields)
+            return JSONPayload(fields.getString("schema"), fields)
         }
 
-        fun fromJson(json: JSONObject): Payload {
-            return Payload(json.getString("schema"), json)
+        fun fromJson(json: JSONObject): JSONPayload {
+            return JSONPayload(json.getString("schema"), json)
         }
         fun sort(obj: JSONObject): JSONObject {
             val keys = obj.keys().asSequence().sorted().toList().toTypedArray()

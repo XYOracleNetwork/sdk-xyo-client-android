@@ -1,7 +1,7 @@
 package network.xyo.client
 
 import network.xyo.client.address.Account
-import network.xyo.payload.Payload
+import network.xyo.payload.JSONPayload
 import org.junit.Test
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -11,14 +11,14 @@ class TestXyoPayload1SubObject {
     var string_value = "yo"
 }
 
-class XyoTestPayload1: Payload("network.xyo.test") {
+class XyoTestPayload1: JSONPayload("network.xyo.test") {
     var timestamp = 1618603439107
     var number_field = 1
     var object_field = TestXyoPayload1SubObject()
     var string_field = "there"
 }
 
-var TestPayload1 = Payload("network.xyo.test", mapOf(
+var TestPayload1 = JSONPayload("network.xyo.test", mapOf(
     "timestamp" to 1618603439107,
     "number_field" to "1",
     "object_field" to mapOf(
@@ -33,14 +33,14 @@ class TestXyoPayload2SubObject {
     var number_value = 2
 }
 
-class TestXyoPayload2: Payload("network.xyo.test") {
+class TestXyoPayload2: JSONPayload("network.xyo.test") {
     var string_field = "there"
     var object_field = TestXyoPayload2SubObject()
     var timestamp = 1618603439107
     var number_field = 1
 }
 
-var TestPayload2 = Payload("network.xyo.test", mapOf(
+var TestPayload2 = JSONPayload("network.xyo.test", mapOf(
     "string_field" to "there",
     "object_field" to mapOf(
         "number_value" to 2,
@@ -50,7 +50,7 @@ var TestPayload2 = Payload("network.xyo.test", mapOf(
     "number_field" to "1"
 ))
 
-class TestInvalidSchemaXyoPayload: Payload("network.xyo.Test") {
+class TestInvalidSchemaXyoPayload: JSONPayload("network.xyo.Test") {
     var timestamp = 1618603439107
     var number_field = 1
     var object_field = TestXyoPayload1SubObject()
@@ -84,7 +84,7 @@ class PayloadTest {
     fun testRoundTripPayload() {
         val payload = TestPayload1
         val payloadJsonString = payload.toString()
-        val payloadMirrored = Payload.fromJson(payloadJsonString)
+        val payloadMirrored = JSONPayload.fromJson(payloadJsonString)
         assertNotNull(payloadMirrored)
         if (payloadMirrored != null) {
             assertEquals(payload.schema, payloadMirrored.schema)

@@ -3,9 +3,9 @@ package network.xyo.client.module
 import network.xyo.client.address.Account
 import network.xyo.boundwitness.QueryBoundWitness
 import network.xyo.boundwitness.QueryBoundWitnessBuilder
-import network.xyo.payload.Payload
+import network.xyo.payload.IPayload
 
-open class ModuleWrapper<TConfig: ModuleConfig, TParams: ModuleParams<TConfig>, TModule: Module<TConfig, TParams>>(val module: TModule, val account: Account) {
+open class ModuleWrapper<TConfig: ModuleConfig, TParams: ModuleParams<TConfig>, TModule: AnyModule>(val module: TModule, val account: Account = Account()) {
 
     val address: String
         get() {
@@ -14,7 +14,7 @@ open class ModuleWrapper<TConfig: ModuleConfig, TParams: ModuleParams<TConfig>, 
 
     val config: TConfig
         get() {
-            return this.module.config
+            return this.module.config as TConfig
         }
 
     val queries: Set<String>
@@ -22,15 +22,15 @@ open class ModuleWrapper<TConfig: ModuleConfig, TParams: ModuleParams<TConfig>, 
             return this.module.queries
         }
 
-    suspend fun query(query: QueryBoundWitness, payloads: Set<Payload>? = null): ModuleQueryResult {
+    suspend fun query(query: QueryBoundWitness, payloads: Set<IPayload>? = null): ModuleQueryResult {
         return this.module.query(query, payloads)
     }
 
-    protected fun bindQuery(query: Payload, payloads: Set<Payload> = emptySet(), account: Account = this.account): Pair<QueryBoundWitness, Set<Payload>> {
-        return Pair(QueryBoundWitnessBuilder().payloads(payloads).witness(account).query(query).build(), payloads)
+    protected fun bindQuery(query: IPayload, payloads: Set<IPayload> = emptySet(), account: Account = this.account): Pair<QueryBoundWitness, Set<IPayload>> {
+        return Pair(QueryBoundWitnessBuilder(query).payloads(payloads).witness(account).build(), setOf(*payloads.toTypedArray(), query))
     }
 
-    protected suspend fun sendQuery(queryPayload: Payload, payloads: Set<Payload> = emptySet()): ModuleQueryResult {
+    protected suspend fun sendQuery(queryPayload: IPayload, payloads: Set<IPayload> = emptySet()): ModuleQueryResult {
         // Bind them
         val query = this.bindQuery(queryPayload, payloads)
 

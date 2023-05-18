@@ -1,10 +1,7 @@
 package network.xyo.client
 
 import network.xyo.client.module.AnyModule
-import network.xyo.client.module.Module
-import network.xyo.client.module.ModuleConfig
 import network.xyo.client.module.ModuleFilter
-import network.xyo.client.module.ModuleParams
 import network.xyo.client.module.ModuleResolver
 
 class CompositeModuleResolver() : ModuleResolver {

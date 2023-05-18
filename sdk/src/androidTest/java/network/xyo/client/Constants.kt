@@ -1,9 +1,9 @@
 package network.xyo.client
 
 import network.xyo.client.address.Account
-import network.xyo.payload.Payload
+import network.xyo.payload.JSONPayload
 
-class DebugPayload(schema: String, val nonce: Int) : Payload(schema)
+class DebugPayload(schema: String, val nonce: Int) : JSONPayload(schema)
 
 
 class TestConstants {

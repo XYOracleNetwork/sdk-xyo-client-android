@@ -1,14 +1,12 @@
 package network.xyo.boundwitness
 
 import network.xyo.client.address.Account
-import network.xyo.payload.Payload
+import network.xyo.payload.IPayload
 import network.xyo.payload.PayloadValidationException
 
-abstract class AbstractBoundWitnessBuilder<TBoundWitness: BoundWitness, This: AbstractBoundWitnessBuilder<TBoundWitness, This>> {
+abstract class AbstractBoundWitnessBuilder<TBoundWitness: IBoundWitness, This: AbstractBoundWitnessBuilder<TBoundWitness, This>> {
     protected var _accounts: MutableList<Account> = mutableListOf()
-    protected var _payloads: MutableList<Payload> = mutableListOf()
-
-    abstract fun createInstance(): TBoundWitness
+    protected var _payloads: MutableList<IPayload> = mutableListOf()
 
     val payloadHashes: List<String>
         get() {
@@ -35,13 +33,12 @@ abstract class AbstractBoundWitnessBuilder<TBoundWitness: BoundWitness, This: Ab
         }
 
     @Throws(PayloadValidationException::class)
-    fun <T: Payload>payload(payload: T): This {
+    fun <T: IPayload>payload(payload: T) {
         _payloads.add(payload)
-        return this as This
     }
 
     @Throws(PayloadValidationException::class)
-    fun payloads(payloads: Set<Payload>?): This {
+    fun payloads(payloads: Set<IPayload>?): This {
         payloads?.forEach { payload ->
             payload(payload)
         }
@@ -64,13 +61,9 @@ abstract class AbstractBoundWitnessBuilder<TBoundWitness: BoundWitness, This: Ab
         return this as This
     }
 
-    open fun build(): TBoundWitness {
-        val bw = this.createInstance()
-        this.setFields(bw)
-        return bw
-    }
+    abstract fun build(): TBoundWitness
 
-    private fun setFields(bw: TBoundWitness): Pair<TBoundWitness,  Set<Payload>> {
+    protected fun setFields(bw: TBoundWitness): Pair<TBoundWitness,  Set<IPayload>> {
         bw.addresses = this._addresses
         bw.payload_hashes = this.payloadHashes
         bw.payload_schemas = this.payloadSchemas

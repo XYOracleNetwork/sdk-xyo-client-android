@@ -6,14 +6,16 @@ import network.xyo.client.address.Account
 import network.xyo.client.module.AdhocWitness
 import network.xyo.client.module.AdhocWitnessConfig
 import network.xyo.client.module.Archivist
+import network.xyo.client.module.ArchivistConfig
+import network.xyo.client.module.ArchivistParams
 import network.xyo.client.module.ModuleConfig
 import network.xyo.client.module.ModuleParams
 import network.xyo.client.module.Node
-import network.xyo.payload.Payload
+import network.xyo.client.module.WitnessParams
+import network.xyo.payload.JSONPayload
 import network.xyo.sentinel.Sentinel
 import network.xyo.sentinel.SentinelConfig
 import network.xyo.sentinel.SentinelParams
-import org.json.JSONArray
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -22,19 +24,22 @@ import org.junit.runner.RunWith
 class SentinelTest {
     suspend fun testCreateSentinel() {
         val node = Node(ModuleParams(Account(), ModuleConfig()))
-        val payloads = JSONArray()
-        payloads.put(Payload("network.xyo.test"))
-        val witness = AdhocWitness(ModuleParams(Account(), AdhocWitnessConfig(payloads)))
-        val archivist = Archivist(ModuleParams(Account(), ModuleConfig()))
+        val payloads = setOf(JSONPayload("network.xyo.test"))
+        val witness = AdhocWitness(WitnessParams(Account(), AdhocWitnessConfig(payloads)))
+        val archivist = Archivist(ArchivistParams(Account(), ArchivistConfig()))
         val sentinel = Sentinel(SentinelParams(Account(), SentinelConfig(setOf(witness.address), setOf(archivist.address))))
         node.register(witness)
         node.register(archivist)
         node.register(sentinel)
+        witness.start()
+        archivist.start()
+        sentinel.start()
+        node.start()
         node.attach(witness.address)
         node.attach(archivist.address)
         node.attach(sentinel.address)
         sentinel.report()
-        assertEquals(1, archivist.all().size)
+        assertEquals(2, archivist.all().size)
     }
 
     @Test
