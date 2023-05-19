@@ -6,7 +6,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.core.Serializer
 import androidx.datastore.dataStore
 import com.google.protobuf.InvalidProtocolBufferException
-import com.network.xyo.client.data.PrefsDataStoreProtos.PrefsDataStore
+import network.xyo.data.PrefsDataStoreProtos.PrefsDataStore
 import java.io.InputStream
 import java.io.OutputStream
 

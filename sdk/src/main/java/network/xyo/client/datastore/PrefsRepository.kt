@@ -6,13 +6,13 @@ import androidx.annotation.RequiresApi
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
 import androidx.datastore.dataStore
-import com.network.xyo.client.data.PrefsDataStoreProtos.PrefsDataStore
+import network.xyo.data.PrefsDataStoreProtos.PrefsDataStore
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import network.xyo.client.address.XyoAccount
 import network.xyo.client.xyoScope
 
-const val DATA_STORE_FILE_NAME = "prefs.pb"
+const val DATA_STORE_FILE_NAME = "network-xyo-sdk-prefs.pb"
 
 private val Context.prefsDataStore: DataStore<PrefsDataStore> by dataStore(
     fileName = DATA_STORE_FILE_NAME,
