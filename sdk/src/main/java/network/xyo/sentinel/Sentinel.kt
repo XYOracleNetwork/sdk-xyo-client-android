@@ -1,17 +1,15 @@
 package network.xyo.sentinel
 
-import network.xyo.client.CompositeModuleResolver
-import network.xyo.client.address.Account
-import network.xyo.client.archivist.wrapper.ArchivistWrapper
-import network.xyo.client.module.AbstractModule
-import network.xyo.client.module.AnyArchivist
-import network.xyo.client.module.AnyWitness
-import network.xyo.client.module.ArchivistConfig
-import network.xyo.client.module.ArchivistParams
-import network.xyo.client.module.IArchivist
-import network.xyo.client.module.ModuleConfig
-import network.xyo.client.module.ModuleFilter
-import network.xyo.client.module.ModuleParams
+import network.xyo.account.Account
+import network.xyo.archivist.ArchivistWrapper
+import network.xyo.module.AbstractModule
+import network.xyo.archivist.AnyArchivist
+import network.xyo.witness.AnyWitness
+import network.xyo.archivist.ArchivistConfig
+import network.xyo.archivist.ArchivistParams
+import network.xyo.module.ModuleConfig
+import network.xyo.module.ModuleFilter
+import network.xyo.module.ModuleParams
 import network.xyo.payload.IPayload
 import org.json.JSONArray
 
@@ -52,7 +50,7 @@ open class Sentinel<TConfig: SentinelConfig>(params: SentinelParams<TConfig>): A
     suspend fun getArchivists(account: Account? = null): Set<AnyArchivist> {
         val addresses = this.config.archivists
         val filter = ModuleFilter(addresses)
-        this._archivists = this._archivists ?: this.resolve(filter).map { module -> module as AnyArchivist}.toSet()
+        this._archivists = this._archivists ?: this.resolve(filter).map { module -> module as AnyArchivist }.toSet()
         if (addresses.size != this._archivists?.size) {
             print("Not all archivists found [Requested: ${addresses.size}, Found: ${this._archivists?.size}]")
         }

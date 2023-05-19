@@ -1,10 +1,10 @@
 package network.xyo.payload
 
-import network.xyo.client.XyoSerializable
-import org.json.JSONArray
+import network.xyo.Bytes
 import org.json.JSONObject
-import java.io.InvalidObjectException
+import java.security.InvalidParameterException
 import java.security.MessageDigest
+import kotlin.experimental.or
 
 open class JSONPayload(schema: String): JSONObject(mapOf(Pair("schema", schema))), IPayload {
     constructor(schema: String, fields: Map<String, Any?>?): this(schema) {
@@ -106,8 +106,8 @@ open class JSONPayload(schema: String): JSONObject(mapOf(Pair("schema", schema))
         }
 
         fun sha256String(value: String): String {
-            val shaBytes = XyoSerializable.sha256(value)
-            return XyoSerializable.bytesToHex(shaBytes)
+            val shaBytes = sha256(value)
+            return Bytes.bytesToHex(shaBytes)
         }
     }
 }

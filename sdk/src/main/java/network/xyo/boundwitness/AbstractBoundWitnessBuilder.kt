@@ -1,6 +1,6 @@
 package network.xyo.boundwitness
 
-import network.xyo.client.address.Account
+import network.xyo.account.Account
 import network.xyo.payload.IPayload
 import network.xyo.payload.PayloadValidationException
 
