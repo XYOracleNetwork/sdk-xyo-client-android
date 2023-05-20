@@ -3,6 +3,8 @@ package network.xyo.module
 import android.content.res.Resources.NotFoundException
 
 import android.util.Log
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 import network.xyo.resolver.CompositeModuleResolver
 import network.xyo.account.Account
@@ -11,6 +13,7 @@ import network.xyo.boundwitness.IBoundWitness
 import network.xyo.boundwitness.QueryBoundWitness
 import network.xyo.payload.IPayload
 import network.xyo.payload.JSONPayload
+import network.xyo.xyoScope
 
 import org.json.JSONException
 import java.security.InvalidParameterException
@@ -37,7 +40,7 @@ open class ModuleConfig(schema: String = Companion.schema): JSONPayload(schema) 
     }
 }
 
-open class ModuleParams<TConfig : ModuleConfig>(val account: Account, val config: TConfig)
+open class ModuleParams<TConfig : ModuleConfig>(val account: Account, val config: TConfig, val scope: CoroutineScope = xyoScope)
 
 class ModuleFilter(
     var address: Set<String>? = null,
@@ -117,8 +120,8 @@ open class AbstractModule<TConfig: ModuleConfig, TParams : ModuleParams<TConfig>
     protected fun parseQuery(query: QueryBoundWitness, payloads: Set<IPayload>?): IPayload {
         val queryPayload = payloads?.first { payload ->
             val hash = payload.hash()
-            val query = query.query
-            hash == query
+            val queryHash = query.query
+            hash == queryHash
         }
         if (queryPayload == null) {
             throw NotFoundException()
@@ -128,23 +131,25 @@ open class AbstractModule<TConfig: ModuleConfig, TParams : ModuleParams<TConfig>
     }
 
     suspend fun resolve(filter: ModuleFilter?): Set<AnyModule> {
-        val downModules = this.downResolver.resolve(filter)
-        val upModules = this.upResolver.resolve(filter)
-        val resultAddressSet = mutableSetOf<String>()
-        val resultModuleSet = mutableSetOf<AnyModule>()
-        for (downModule in downModules) {
-            if (!resultAddressSet.contains(downModule.address)) {
-                resultAddressSet.add(downModule.address)
-                resultModuleSet.add(downModule)
+        this.params.scope.run {
+            val downModules = this@AbstractModule.downResolver.resolve(filter)
+            val upModules = this@AbstractModule.upResolver.resolve(filter)
+            val resultAddressSet = mutableSetOf<String>()
+            val resultModuleSet = mutableSetOf<AnyModule>()
+            for (downModule in downModules) {
+                if (!resultAddressSet.contains(downModule.address)) {
+                    resultAddressSet.add(downModule.address)
+                    resultModuleSet.add(downModule)
+                }
             }
-        }
-        for (upModule in upModules) {
-            if (!resultAddressSet.contains(upModule.address)) {
-                resultAddressSet.add(upModule.address)
-                resultModuleSet.add(upModule)
+            for (upModule in upModules) {
+                if (!resultAddressSet.contains(upModule.address)) {
+                    resultAddressSet.add(upModule.address)
+                    resultModuleSet.add(upModule)
+                }
             }
+            return resultModuleSet
         }
-        return resultModuleSet
     }
 
     open suspend fun discover(): Set<IPayload> {

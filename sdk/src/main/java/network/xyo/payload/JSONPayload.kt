@@ -1,17 +1,21 @@
 package network.xyo.payload
 
+import com.google.gson.Gson
+import com.google.gson.JsonObject
 import network.xyo.Bytes
 import org.json.JSONObject
-import java.security.InvalidParameterException
 import java.security.MessageDigest
-import kotlin.experimental.or
 
 open class JSONPayload(schema: String): JSONObject(mapOf(Pair("schema", schema))), IPayload {
-    constructor(schema: String, fields: Map<String, Any?>?): this(schema) {
+    constructor(schema: String, fields: Map<String, Any?>): this(schema) {
         this.merge(fields)
     }
 
-    constructor(schema: String, fields: JSONObject?): this(schema) {
+    constructor(schema: String, fields: JSONObject): this(schema) {
+        this.merge(fields)
+    }
+
+    constructor(schema: String, fields: JsonObject): this(schema) {
         this.merge(fields)
     }
 
@@ -19,10 +23,18 @@ open class JSONPayload(schema: String): JSONObject(mapOf(Pair("schema", schema))
         fields?.keys()?.forEach { key -> this.put(key, fields.get(key)) }
     }
 
+    fun merge(fields: JsonObject?) {
+        this.merge(JSONObject(fields.toString()))
+    }
+
     fun merge(fields: Map<String, Any?>?) {
         if (fields != null) {
             this.merge(JSONObject(fields))
         }
+    }
+
+    fun <T: PayloadData>merge(fields: T) {
+         this.merge(from(fields))
     }
 
     fun sorted(): JSONObject {
@@ -70,14 +82,24 @@ open class JSONPayload(schema: String): JSONObject(mapOf(Pair("schema", schema))
 
     companion object {
 
-        fun fromJson(json: String): JSONPayload {
+        fun from(json: String): JSONPayload {
             val fields = JSONObject(json)
             return JSONPayload(fields.getString("schema"), fields)
         }
 
-        fun fromJson(json: JSONObject): JSONPayload {
+        fun from(json: JSONObject): JSONPayload {
             return JSONPayload(json.getString("schema"), json)
         }
+
+        fun from(json: JsonObject): JSONPayload {
+            return JSONPayload(json.get("schema").asString, json)
+        }
+
+        fun <T: PayloadData>from(obj: T): JSONPayload {
+            val gson = Gson()
+            return this.from(gson.toJson(obj).toString())
+        }
+
         fun sort(obj: JSONObject): JSONObject {
             val keys = obj.keys().asSequence().sorted().toList().toTypedArray()
             val newObj = JSONObject()
