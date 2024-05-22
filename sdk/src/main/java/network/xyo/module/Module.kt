@@ -167,7 +167,7 @@ open class AbstractModule<TConfig: ModuleConfig, TParams : ModuleParams<TConfig>
     }
 
     open fun bindResult(payloads: Set<IPayload>, queryAccount: Account?): ModuleQueryResult {
-        return Pair(BoundWitnessBuilder().payloads(payloads).witness(queryAccount).build(), payloads)
+        return Pair(BoundWitnessBuilder().payloads(payloads).signer(queryAccount).build(), payloads)
     }
 
     protected open suspend fun queryHandler(

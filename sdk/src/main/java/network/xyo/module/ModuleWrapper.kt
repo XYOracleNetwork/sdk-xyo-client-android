@@ -27,7 +27,7 @@ open class ModuleWrapper<TConfig: ModuleConfig, TParams: ModuleParams<TConfig>, 
     }
 
     protected fun bindQuery(query: IPayload, payloads: Set<IPayload> = emptySet(), account: Account = this.account): Pair<QueryBoundWitness, Set<IPayload>> {
-        return Pair(QueryBoundWitnessBuilder(query).payloads(payloads).witness(account).build(), setOf(*payloads.toTypedArray(), query))
+        return Pair(QueryBoundWitnessBuilder(query).payloads(payloads).signer(account).build(), setOf(*payloads.toTypedArray(), query))
     }
 
     protected suspend fun sendQuery(queryPayload: IPayload, payloads: Set<IPayload> = emptySet()): ModuleQueryResult {

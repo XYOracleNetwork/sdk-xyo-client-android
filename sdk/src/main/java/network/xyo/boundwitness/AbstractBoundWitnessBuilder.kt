@@ -3,6 +3,8 @@ package network.xyo.boundwitness
 import network.xyo.account.Account
 import network.xyo.payload.IPayload
 import network.xyo.payload.PayloadValidationException
+import org.json.JSONArray
+import org.json.JSONObject
 
 abstract class AbstractBoundWitnessBuilder<TBoundWitness: IBoundWitness, This: AbstractBoundWitnessBuilder<TBoundWitness, This>> {
     protected var _accounts: MutableList<Account> = mutableListOf()
@@ -22,7 +24,7 @@ abstract class AbstractBoundWitnessBuilder<TBoundWitness: IBoundWitness, This: A
             }
         }
 
-    val _addresses: List<String>
+    val addresses: List<String>
         get() {
             return this._accounts.map { account -> account.address.hex }
         }
@@ -46,7 +48,7 @@ abstract class AbstractBoundWitnessBuilder<TBoundWitness: IBoundWitness, This: A
     }
 
     @Throws(PayloadValidationException::class)
-    fun witness(account: Account?): This {
+    fun signer(account: Account?): This {
         if (account != null) {
             _accounts.add(account)
         }
@@ -54,9 +56,9 @@ abstract class AbstractBoundWitnessBuilder<TBoundWitness: IBoundWitness, This: A
     }
 
     @Throws(PayloadValidationException::class)
-    fun witnesses(accounts: Set<Account>): This {
+    fun signers(accounts: Set<Account>): This {
         accounts.forEach { account ->
-            witness(account)
+            signer(account)
         }
         return this as This
     }
@@ -64,12 +66,18 @@ abstract class AbstractBoundWitnessBuilder<TBoundWitness: IBoundWitness, This: A
     abstract fun build(): TBoundWitness
 
     protected fun setFields(bw: TBoundWitness): Pair<TBoundWitness,  Set<IPayload>> {
-        bw.addresses = this._addresses
+        bw.addresses = this.addresses
         bw.payload_hashes = this.payloadHashes
         bw.payload_schemas = this.payloadSchemas
         bw.previous_hashes = this.previousHashes
         val hash = bw.hash()
-        bw._signatures = this._accounts.map {account -> account.sign(hash)}
+        val meta = JSONObject()
+        val signatures = JSONArray()
+        this._accounts.forEach {
+            account -> signatures.put(account.sign(hash))
+        }
+        meta.put("signatures", signatures)
+        bw._meta = meta
         return Pair(bw, this._payloads.toSet())
     }
 }

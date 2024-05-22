@@ -22,7 +22,7 @@ class PayloadTest {
     fun testRoundTripPayload() {
         val payload = TestPayload1
         val payloadJsonString = payload.toString()
-        val payloadMirrored = JSONPayload.fromJson(payloadJsonString)
+        val payloadMirrored = JSONPayload.from(payloadJsonString)
         assertNotNull(payloadMirrored)
         assertEquals(payload.schema, payloadMirrored.schema)
         assertEquals(payload.hash(), payloadMirrored.hash())
