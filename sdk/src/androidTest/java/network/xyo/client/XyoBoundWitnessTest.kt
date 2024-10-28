@@ -51,10 +51,11 @@ class XyoBoundWitnessTest {
         }
     }
 
-    @Test
+    /* @Test
     fun testSendQueryBWSendLocal() {
         testSendQueryBW(apiDomainLocal)
     }
+    */
 
     @Test
     fun testSendQueryBWSendBeta() {

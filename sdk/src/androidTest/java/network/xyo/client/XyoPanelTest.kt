@@ -67,10 +67,12 @@ class XyoPanelTest {
         testPanelReport(apiDomainBeta)
     }
 
+    /*
     @Test
     fun testPanelReportLocal() {
         testPanelReport(apiDomainLocal)
     }
+    */
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test

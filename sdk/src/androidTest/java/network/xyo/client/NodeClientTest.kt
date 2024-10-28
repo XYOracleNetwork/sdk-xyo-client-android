@@ -13,9 +13,9 @@ class NodeClientTest {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun discoverTest() {
+    fun discoverTestBeta() {
         val account = XyoAccount()
-        val client = NodeClient(TestConstants.nodeUrlLocal, account)
+        val client = NodeClient(TestConstants.nodeUrlBeta, account)
         val query = XyoPayload("network.xyo.query.module.discover")
 
         runBlocking {
@@ -23,6 +23,21 @@ class NodeClientTest {
             assertEquals(null, postResult.errors)
         }
     }
+
+    /*
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun discoverTestLocal() {
+        val account = XyoAccount()
+        val client = NodeClient(TestConstants.nodeUrlBeta, account)
+        val query = XyoPayload("network.xyo.query.module.discover")
+
+        runBlocking {
+            val postResult = client.query(query, null, null)
+            assertEquals(null, postResult.errors)
+        }
+    }
+     */
 
     @Test
     fun archivistInsertTest() {
