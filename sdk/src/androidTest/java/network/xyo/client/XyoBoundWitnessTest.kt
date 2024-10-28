@@ -3,12 +3,9 @@ package network.xyo.client
 import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
-import network.xyo.client.boundwitness.XyoBoundWitnessBuilder
 import network.xyo.client.address.XyoAccount
-import network.xyo.client.archivist.api.XyoArchivistApiClient
-import network.xyo.client.archivist.api.XyoArchivistApiConfig
-import network.xyo.client.boundwitness.QueryBoundWitnessBuilder
 import network.xyo.client.node.client.NodeClient
 import network.xyo.client.payload.XyoPayload
 import org.junit.Before
@@ -45,6 +42,7 @@ class XyoBoundWitnessTest {
         return RequestDependencies(client, query, payloads)
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     fun testSendQueryBW(nodeUrl: String) {
         runBlocking {
             val(client, query, payloads) = generateQuery(nodeUrl)

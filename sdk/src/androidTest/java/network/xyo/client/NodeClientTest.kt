@@ -26,7 +26,6 @@ class NodeClientTest {
 
     @Test
     fun archivistInsertTest() {
-        val hash2 = "2967d5719b610e1dfa38651e8ff1a67d47b7bb4cea4ccfc8735b05d1660ef36f"
         val archivist = ArchivistWrapper(NodeClient("${TestConstants.nodeUrlBeta}/Archivist", TestConstants.TestAccount))
 
         val payloads = arrayListOf(TestConstants.debugPayload)
@@ -49,7 +48,7 @@ class NodeClientTest {
 
             val response = getResult.response
             if (response != null) {
-                assertEquals(response?.payloads?.get(0)?.schema, TestConstants.debugPayload.schema)
+                assertEquals(response.payloads?.get(0)?.schema, TestConstants.debugPayload.schema)
             } else {
                 throw(Error("Response should not be null"))
             }
