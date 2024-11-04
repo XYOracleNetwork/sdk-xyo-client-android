@@ -15,10 +15,15 @@ import com.squareup.moshi.JsonClass
 import java.net.NetworkInterface
 
 @JsonClass(generateAdapter = true)
+
 class XyoSystemInfoNetworkWifi (
+    @Suppress("unused")
     val ip: String?,
+    @Suppress("unused")
     val mac: String?,
+    @Suppress("unused")
     val rssi: Int?,
+    @Suppress("unused")
     val ssid: String?
 ) {
     companion object {
