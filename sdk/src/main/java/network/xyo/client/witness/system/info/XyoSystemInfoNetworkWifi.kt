@@ -12,6 +12,8 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import com.squareup.moshi.JsonClass
 import java.net.NetworkInterface
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 @JsonClass(generateAdapter = true)
 
@@ -26,25 +28,33 @@ class XyoSystemInfoNetworkWifi (
     val ssid: String?
 ) {
     companion object {
+        val latch = CountDownLatch(1)
         var wifiInfo: WifiInfo? = null
 
         @RequiresApi(Build.VERSION_CODES.M)
         @SuppressLint("HardwareIds")
         fun detect(context: Context): XyoSystemInfoNetworkWifi? {
             accessNetworkChanges(context)
-            val connectivityManager = context.getSystemService(ConnectivityManager::class.java)
+            try {
+                // Wait for up to 5 seconds for the network capabilities
+                latch.await(5, TimeUnit.SECONDS)
+                val connectivityManager = context.getSystemService(ConnectivityManager::class.java)
 
-            if (Build.VERSION.SDK_INT >= 23) {
-                val network = connectivityManager.activeNetwork
-                val networkCaps = connectivityManager.getNetworkCapabilities(network)
-                if (networkCaps?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true) {
-                    return XyoSystemInfoNetworkWifi(
-                        getIpAddress(),
-                        wifiInfo?.macAddress,
-                        wifiInfo?.rssi,
-                        wifiInfo?.ssid?.replace("\"", "")
-                    )
+                if (Build.VERSION.SDK_INT >= 23) {
+                    val network = connectivityManager.activeNetwork
+                    val networkCaps = connectivityManager.getNetworkCapabilities(network)
+                    if (networkCaps?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true) {
+                        return XyoSystemInfoNetworkWifi(
+                            getIpAddress(),
+                            wifiInfo?.macAddress,
+                            wifiInfo?.rssi,
+                            wifiInfo?.ssid?.replace("\"", "")
+                        )
+                    }
                 }
+                return null
+            } catch (e: InterruptedException) {
+                e.printStackTrace()
             }
             return null
         }
@@ -62,6 +72,7 @@ class XyoSystemInfoNetworkWifi (
                 override fun onCapabilitiesChanged(network: Network, networkCapabilities: NetworkCapabilities) {
                     val localWifiInfo = networkCapabilities.transportInfo as? WifiInfo
                     wifiInfo = localWifiInfo
+                    latch.countDown()
                 }
             }
 
