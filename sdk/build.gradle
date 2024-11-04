@@ -14,8 +14,7 @@ def verCode = majorVersion  * 10000000 + minorVersion * 10000 + patchVersion
 def verString = "" + majorVersion + "." + minorVersion + "(Build-" + patchVersion + ")"
 
 android {
-    compileSdk 34
-    buildToolsVersion '35.0.0'
+    compileSdk 35
 
     defaultConfig {
         minSdkVersion 21
@@ -59,7 +58,7 @@ dependencies {
     implementation 'org.jetbrains.kotlin:kotlin-reflect:2.0.21'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0'
     implementation 'com.squareup.moshi:moshi-kotlin:1.15.1'
-    implementation 'androidx.core:core-ktx:1.13.1'
+    implementation 'androidx.core:core-ktx:1.15.0'
     implementation 'com.squareup.okhttp3:okhttp:4.12.0'
     implementation 'com.madgag.spongycastle:prov:1.58.0.0'
     implementation 'com.madgag.spongycastle:pkix:1.54.0.0'
@@ -86,7 +85,7 @@ publishing {
 
             //The publication doesn't know about our dependencies, so we have to manually add them to the pom
             pom.withXml {
-                def dependenciesNode = asNode()['dependencies'][0] ?: asNode().appendNode('dependencies')
+                def dependenciesNode = asNode(null)['dependencies'][0] ?: asNode(null).appendNode('dependencies')
                 //Iterate over the compile dependencies (we don't want the test ones), adding a <dependency> node for each
                 configurations.implementation.allDependencies.each {
                     if (it.name != 'unspecified') {
