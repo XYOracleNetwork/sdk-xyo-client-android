@@ -3,9 +3,14 @@ package network.xyo.client.witness.system.info
 import android.annotation.SuppressLint
 import android.content.Context
 import android.net.ConnectivityManager
+import android.net.ConnectivityManager.NetworkCallback
+import android.net.Network
 import android.net.NetworkCapabilities
+import android.net.NetworkRequest
+import android.net.wifi.WifiInfo
 import android.net.wifi.WifiManager
 import android.os.Build
+import androidx.annotation.RequiresApi
 import com.squareup.moshi.JsonClass
 import java.net.NetworkInterface
 
@@ -17,28 +22,50 @@ class XyoSystemInfoNetworkWifi (
     val ssid: String?
 ) {
     companion object {
+        var wifiInfo: WifiInfo? = null
 
+        @RequiresApi(Build.VERSION_CODES.M)
         @SuppressLint("HardwareIds")
         fun detect(context: Context): XyoSystemInfoNetworkWifi? {
-            val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            accessNetworkChanges(context)
+            val connectivityManager = context.getSystemService(ConnectivityManager::class.java)
+
             if (Build.VERSION.SDK_INT >= 23) {
                 val network = connectivityManager.activeNetwork
                 val networkCaps = connectivityManager.getNetworkCapabilities(network)
                 if (networkCaps?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true) {
-                    val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
-                    // WifiInfo has moved to the ConnectivityManager and requires API level 29
-                    // see - https://developer.android.com/reference/kotlin/android/net/wifi/WifiManager#getConnectionInfo()
-                    val wifiInfo = wifiManager.connectionInfo
-                    //we remove the extra quotes because for some reason the system puts the SSID in quotes
                     return XyoSystemInfoNetworkWifi(
                         getIpAddress(),
-                        wifiInfo.macAddress,
-                        wifiInfo.rssi,
-                        wifiInfo.ssid.replace("\"", "")
+                        wifiInfo?.macAddress,
+                        wifiInfo?.rssi,
+                        wifiInfo?.ssid?.replace("\"", "")
                     )
                 }
             }
             return null
+        }
+
+        @RequiresApi(Build.VERSION_CODES.M)
+        private fun accessNetworkChanges(context: Context) {
+            val request = NetworkRequest.Builder()
+                .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+                .build()
+
+            val connectivityManager = context.getSystemService(ConnectivityManager::class.java)
+
+            val networkCallback = object : NetworkCallback() {
+                @RequiresApi(Build.VERSION_CODES.Q)
+                override fun onCapabilitiesChanged(network: Network, networkCapabilities: NetworkCapabilities) {
+                    val localWifiInfo = networkCapabilities.transportInfo as? WifiInfo
+                    wifiInfo = localWifiInfo
+                }
+            }
+
+            // For requesting a network
+            connectivityManager.requestNetwork(request, networkCallback)
+
+            // For listening to network changes
+            connectivityManager.registerNetworkCallback(request, networkCallback)
         }
 
         private fun getIpAddress(): String? {
