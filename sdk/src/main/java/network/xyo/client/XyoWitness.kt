@@ -15,8 +15,9 @@ open class XyoWitness<out T: XyoPayload> constructor(
 
     constructor(
         observer: ((context: Context, previousHash: String) -> T?)?,
-        previousHash: String = ""
-    ): this(XyoAccount(), observer, previousHash)
+        previousHash: String = "",
+        account: XyoAccount = XyoAccount()
+    ): this(account, observer, previousHash)
 
     open fun observe(context: Context): T? {
         observer?.let {
