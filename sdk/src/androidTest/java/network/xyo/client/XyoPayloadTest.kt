@@ -84,9 +84,10 @@ class XyoPayloadTest {
         val witness = XyoWitness(address, fun(_context: Context, previousHash: String?): XyoPayload {
             return XyoPayload("network.xyo.basic", previousHash)
         })
-        val payloads = arrayListOf(witness.observe(appContext))
+        val response = arrayListOf(witness.observe(appContext))
+        val payloads = response.map { it!!.second }
         val bwJson = XyoBoundWitnessBuilder()
-            .payloads(payloads.mapNotNull { payload -> payload })
+            .payloads(payloads.flatten())
             .witnesses(arrayListOf(witness))
             .build()
         val bwJsonString = XyoSerializable.toJson(bwJson)

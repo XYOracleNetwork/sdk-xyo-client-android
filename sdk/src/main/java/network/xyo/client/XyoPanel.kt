@@ -145,10 +145,12 @@ class XyoPanel(val context: Context, private val archivists: List<XyoArchivistAp
 
     private fun generatePayloads(adhocWitnesses: List<XyoWitness<XyoPayload>> = emptyList()): List<XyoPayload> {
         val witnesses: List<XyoWitness<XyoPayload>> = (this.witnesses ?: emptyList()).plus(adhocWitnesses)
-        val payloads = witnesses.map { witness ->
+        val response = witnesses.map { witness ->
             witness.observe(context)
         }
-        return payloads.mapNotNull { payload -> payload }
+        val payloads = response.map { it!!.second }
+
+        return payloads.flatten()
     }
 
     @Deprecated("use reportAsyncQuery instead")
