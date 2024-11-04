@@ -53,17 +53,29 @@ class NodeClient(private val url: String, private val accountToUse: XyoAccount?)
                 try {
                     okHttp.newCall(request).execute().use { response ->
                         if (!response.isSuccessful) {
-                            continuation.resume(PostQueryResult(
-                                null,
-                                arrayListOf(Error(response.message))
-                            ), null)
+                            continuation.resume(
+                                PostQueryResult(
+                                    null,
+                                    arrayListOf(Error(response.message))
+                                )
+                            ) { cause, _, _ -> null?.let { it(cause) } }
                         } else {
-                            continuation.resume(PostQueryResult(QueryResponseWrapper.parse(response.body!!.string()), null), null)
+                            continuation.resume(
+                                PostQueryResult(
+                                    QueryResponseWrapper.parse(response.body!!.string()),
+                                    null
+                                )
+                            ) { cause, _, _ -> null?.let { it(cause) } }
                         }
                     }
                 } catch (ex: IOException) {
                     Log.e("xyoClient", ex.message ?: ex.toString())
-                    continuation.resume(PostQueryResult(null, arrayListOf(Error(ex.message))), null)
+                    continuation.resume(
+                        PostQueryResult(
+                            null,
+                            arrayListOf(Error(ex.message))
+                        )
+                    ) { cause, _, _ -> null?.let { it(cause) } }
                 }
             }
         }
