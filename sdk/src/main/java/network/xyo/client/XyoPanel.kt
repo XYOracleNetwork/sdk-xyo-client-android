@@ -180,7 +180,8 @@ class XyoPanel(val context: Context, private val archivists: List<XyoArchivistAp
 
         nodes?.forEach { node ->
             val archivist = ArchivistWrapper(node)
-            val queryResult = archivist.insert(payloads, previousHash)
+            val payloadsWithBoundWitness = payloads.plus(bw)
+            val queryResult = archivist.insert(payloadsWithBoundWitness, previousHash)
             results.add(queryResult)
         }
         return XyoPanelReportQueryResult(bw, results)
