@@ -1,6 +1,8 @@
 package network.xyo.client.boundwitness
 
-interface XyoBoundWitnessMetaInterface {
+import network.xyo.client.payload.Payload
+
+interface XyoBoundWitnessMetaInterface : Payload {
     var _hash: String?
     var _signatures: List<String>?
     var _payloads: List<*>?
