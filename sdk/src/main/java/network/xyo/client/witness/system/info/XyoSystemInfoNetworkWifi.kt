@@ -28,13 +28,13 @@ class XyoSystemInfoNetworkWifi (
     val ssid: String?
 ) {
     companion object {
-        val latch = CountDownLatch(1)
-        var wifiInfo: WifiInfo? = null
-
         @RequiresApi(Build.VERSION_CODES.M)
         @SuppressLint("HardwareIds")
         fun detect(context: Context): XyoSystemInfoNetworkWifi? {
-            accessNetworkChanges(context)
+            // setup latch and wifiInfo inside companion so it isn't shared across instances
+            val latch = CountDownLatch(1)
+            val wifiInfo = accessNetworkChanges(context, latch)
+
             try {
                 // Wait for up to 5 seconds for the network capabilities
                 latch.await(5, TimeUnit.SECONDS)
@@ -60,7 +60,8 @@ class XyoSystemInfoNetworkWifi (
         }
 
         @RequiresApi(Build.VERSION_CODES.M)
-        private fun accessNetworkChanges(context: Context) {
+        private fun accessNetworkChanges(context: Context, latch: CountDownLatch): WifiInfo? {
+            var wifiInfo: WifiInfo? = null
             val request = NetworkRequest.Builder()
                 .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
                 .build()
@@ -72,6 +73,7 @@ class XyoSystemInfoNetworkWifi (
                 override fun onCapabilitiesChanged(network: Network, networkCapabilities: NetworkCapabilities) {
                     val localWifiInfo = networkCapabilities.transportInfo as? WifiInfo
                     wifiInfo = localWifiInfo
+                    // countDown to zero to lift the latch
                     latch.countDown()
                 }
             }
@@ -81,6 +83,8 @@ class XyoSystemInfoNetworkWifi (
 
             // For listening to network changes
             connectivityManager.registerNetworkCallback(request, networkCallback)
+
+            return wifiInfo
         }
 
         private fun getIpAddress(): String? {
