@@ -33,7 +33,7 @@ open class XyoWitness<out T: XyoPayload> constructor(
 
             val result: ModuleQueryResult<T>? = bw?.let {
                 payload?.let { notNullPayload ->
-                    Triple(it, listOf(notNullPayload), listOf<Exception>())
+                    Triple(it, listOf(notNullPayload), listOf())
                 }
             }
 
