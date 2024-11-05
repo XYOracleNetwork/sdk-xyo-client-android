@@ -47,6 +47,10 @@ android {
 
     sourceSets {
         main {
+            java {
+                exclude '**/test/**', '**/androidTest/**'
+            }
+            manifest.srcFile 'src/main/AndroidManifest.xml'
             proto {
                 srcDir 'src/main/java/network/xyo/client/proto'
             }
