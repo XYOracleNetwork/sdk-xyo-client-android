@@ -1,5 +1,7 @@
 package network.xyo.client.archivist.wrapper
 
+import com.squareup.moshi.JsonClass
 import network.xyo.client.payload.XyoPayload
 
-data class ArchivistGetQueryPayload(val hashes: List<String>): XyoPayload("network.xyo.query.archivist.get")
+@JsonClass(generateAdapter = true)
+open class ArchivistGetQueryPayload(val hashes: List<String>, schema: String = "network.xyo.query.archivist.get"): XyoPayload(schema)
