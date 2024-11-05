@@ -10,6 +10,7 @@ import org.junit.Test
 import org.junit.jupiter.api.Assertions.*
 
 class NodeClientTest {
+    private val apiDomainBeta = "${TestConstants.nodeUrlBeta}/Archivist"
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
@@ -41,7 +42,7 @@ class NodeClientTest {
 
     @Test
     fun archivistInsertTest() {
-        val archivist = ArchivistWrapper(NodeClient("${TestConstants.nodeUrlBeta}/Archivist", TestConstants.TestAccount))
+        val archivist = ArchivistWrapper(NodeClient(apiDomainBeta, TestConstants.TestAccount))
 
         val payloads = arrayListOf(TestConstants.debugPayload)
 
