@@ -57,10 +57,12 @@ open class XyoArchivistApiClient(private val config: XyoArchivistApiConfig) {
                 try {
                     okHttp.newCall(request).execute().use { response ->
                         if (!response.isSuccessful) {
-                            continuation.resume(PostBoundWitnessesResult(
-                                0,
-                                arrayListOf(Error(response.message))
-                            ), null)
+                            continuation.resume(
+                                PostBoundWitnessesResult(
+                                    0,
+                                    arrayListOf(Error(response.message))
+                                )
+                            ) { cause, _, _ -> null?.let { it(cause) } }
                         } else {
                             continuation.resume(PostBoundWitnessesResult(1), null)
                         }

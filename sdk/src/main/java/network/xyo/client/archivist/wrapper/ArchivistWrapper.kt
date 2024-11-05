@@ -4,7 +4,6 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import network.xyo.client.XyoSerializable
-import network.xyo.client.address.XyoAccount
 import network.xyo.client.node.client.NodeClient
 import network.xyo.client.node.client.PostQueryResult
 import network.xyo.client.payload.XyoPayload
@@ -23,7 +22,7 @@ open class ArchivistWrapper(private val nodeClient: NodeClient) {
         val payloadHashes = arrayListOf<String>()
         payloads.forEach { payloadHashes.add(XyoSerializable.sha256String(it)) }
 
-        val query = ArchivistInsertQueryPayload(payloadHashes)
+        val query = ArchivistInsertQueryPayload()
         return nodeClient.query(query, payloads, previousHash)
     }
 }

@@ -18,12 +18,12 @@ import network.xyo.client.node.client.PostQueryResult
 import network.xyo.client.payload.XyoPayload
 
 data class XyoPanelReportResult(val bw: XyoBoundWitnessJson, val apiResults: List<PostBoundWitnessesResult>)
-data class XyoPanelReportQueryResult(val bw: XyoBoundWitnessJson, val apiResults: List<PostQueryResult>)
+data class XyoPanelReportQueryResult(val bw: XyoBoundWitnessJson, val apiResults: List<PostQueryResult>?, val payloads: List<XyoPayload>?)
 
 class MissingNodesException(message: String) : Exception(message) {}
 
 @RequiresApi(Build.VERSION_CODES.M)
-class XyoPanel(val context: Context, private val archivists: List<XyoArchivistApiClient>, private val witnesses: List<XyoWitness<XyoPayload>>?, private val nodeUrlsAndAccounts: ArrayList<Pair<String, XyoAccount?>>?) {
+class XyoPanel(val context: Context, private val archivists: List<XyoArchivistApiClient>?, private val witnesses: List<XyoWitness<XyoPayload>>?, private val nodeUrlsAndAccounts: ArrayList<Pair<String, XyoAccount?>>?) {
     var previousHash: String? = null
     private var nodes: MutableList<NodeClient>? = null
     var defaultAccount: XyoAccount? = null
@@ -148,6 +148,7 @@ class XyoPanel(val context: Context, private val archivists: List<XyoArchivistAp
         val payloads = witnesses.map { witness ->
             witness.observe(context)
         }
+
         return payloads.mapNotNull { payload -> payload }
     }
 
@@ -157,7 +158,7 @@ class XyoPanel(val context: Context, private val archivists: List<XyoArchivistAp
         val bw = generateBoundWitnessJson(adhocWitnesses)
         previousHash = bw._hash
         val results = mutableListOf<PostBoundWitnessesResult>()
-        archivists.forEach { archivist ->
+        archivists?.forEach { archivist ->
             results.add(archivist.postBoundWitnessAsync(bw))
         }
         return XyoPanelReportResult(bw, results)
@@ -171,17 +172,16 @@ class XyoPanel(val context: Context, private val archivists: List<XyoArchivistAp
         val results = mutableListOf<PostQueryResult>()
 
         if (nodes.isNullOrEmpty()) {
-            val message = "Called reportAsyncQuery without first constructing any nodeClients.  Try passing nodeUrls?"
-            Log.e("xyoClient", message)
-            throw MissingNodesException(message)
+            Log.e("xyoClient", "No Nodes found, so no payloads will be sent to archivist(s)")
         }
 
         nodes?.forEach { node ->
             val archivist = ArchivistWrapper(node)
-            val queryResult = archivist.insert(payloads, previousHash)
+            val payloadsWithBoundWitness = payloads.plus(bw)
+            val queryResult = archivist.insert(payloadsWithBoundWitness, previousHash)
             results.add(queryResult)
         }
-        return XyoPanelReportQueryResult(bw, results)
+        return XyoPanelReportQueryResult(bw, results, payloads)
     }
 
     companion object {

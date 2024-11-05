@@ -1,6 +1,8 @@
 package network.xyo.client.witness.system.info
 
 import android.content.Context
+import android.os.Build
+import androidx.annotation.RequiresApi
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
@@ -10,6 +12,7 @@ class XyoSystemInfoNetwork (
     val wired: XyoSystemInfoNetworkWired?
 ) {
     companion object {
+        @RequiresApi(Build.VERSION_CODES.M)
         fun detect(context: Context): XyoSystemInfoNetwork? {
             val result = XyoSystemInfoNetwork(
                 XyoSystemInfoNetworkCellular.detect(context),
