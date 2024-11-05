@@ -85,7 +85,7 @@ publishing {
 
             //The publication doesn't know about our dependencies, so we have to manually add them to the pom
             pom.withXml {
-                def dependenciesNode = asNode(null)['dependencies'][0] ?: asNode(null).appendNode('dependencies')
+                def dependenciesNode = asNode()['dependencies'][0] ?: asNode().appendNode('dependencies')
                 //Iterate over the compile dependencies (we don't want the test ones), adding a <dependency> node for each
                 configurations.implementation.allDependencies.each {
                     if (it.name != 'unspecified') {
