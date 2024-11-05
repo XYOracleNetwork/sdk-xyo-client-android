@@ -29,26 +29,26 @@ open class XyoWitness<out T: XyoPayload> constructor(
                 previousHash = XyoSerializable.sha256String(notNullPayload)
             }
 
-            val bw = XyoBoundWitnessBuilder().let { boundWitnessBuilder ->
-                payload?.let {
-                    boundWitnessBuilder.payloads(listOf(it))
-                        .witness(address, previousHash)
-                        .build()
-                }
-            }
+            val bw = buildBoundWitness(payload)
 
-            val returning = bw?.let {
+            val result: ModuleQueryResult<T>? = bw?.let {
                 payload?.let { notNullPayload ->
                     Triple(it, listOf(notNullPayload), listOf<Exception>())
                 }
             }
 
-            if (returning !== null) {
-                return returning
-            } else {
-                return null
-            }
+            return result
         }
         return null
+    }
+
+    private fun buildBoundWitness(payload: XyoPayload?): XyoBoundWitnessJson? {
+        return XyoBoundWitnessBuilder().let { boundWitnessBuilder ->
+            payload?.let {
+                boundWitnessBuilder.payloads(listOf(it))
+                    .witness(address, previousHash)
+                    .build()
+            }
+        }
     }
 }
