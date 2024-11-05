@@ -2,7 +2,6 @@ package network.xyo.client
 
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
-import network.xyo.client.boundwitness.XyoBoundWitnessJson
 import network.xyo.client.witness.system.info.XyoSystemInfoPayload
 import network.xyo.client.witness.system.info.XyoSystemInfoWitness
 import org.junit.Test
@@ -15,18 +14,11 @@ class SystemInfoWitnessTest {
         val context = ApplicationProvider.getApplicationContext<Context>()
 
         val witness = XyoSystemInfoWitness()
-        val response = witness.observe(context)
-        val bw = response?.first
-        val payloads = response?.second
-        val systemInfoPayload = payloads?.get(0)
-        val errors = response?.third
+        val payload = witness.observe(context)
 
-
-        assertInstanceOf<XyoBoundWitnessJson>(bw)
-        assertInstanceOf<List<Exception>>(errors)
-        assertInstanceOf<List<XyoSystemInfoPayload>>(payloads)
-        assert(systemInfoPayload?.os != null)
-        assert(systemInfoPayload?.device != null)
+        assertInstanceOf<XyoSystemInfoPayload>(payload)
+        assert(payload.os != null)
+        assert(payload.device != null)
 
         // Cannot test network reliably in local jvm tests
         // assert(payload.network != null)
