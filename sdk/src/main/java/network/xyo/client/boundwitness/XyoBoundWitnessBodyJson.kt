@@ -1,7 +1,6 @@
 package network.xyo.client.boundwitness
 
 import com.squareup.moshi.JsonClass
-import network.xyo.client.XyoSerializable
 import network.xyo.client.payload.XyoPayload
 
 @JsonClass(generateAdapter = true)
