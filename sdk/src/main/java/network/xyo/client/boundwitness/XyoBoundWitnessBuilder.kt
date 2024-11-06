@@ -15,6 +15,7 @@ open class XyoBoundWitnessBuilder {
     protected var _payload_hashes = mutableListOf<String>()
     protected var _payload_schemas = mutableListOf<String>()
     protected var _payloads = mutableListOf<XyoPayload>()
+    protected var _timestamp: Long = System.currentTimeMillis()
 
     open fun witness(account: XyoAccount, previousHash: String?): XyoBoundWitnessBuilder {
         _witnesses.add(account)
@@ -33,7 +34,8 @@ open class XyoBoundWitnessBuilder {
             _witnesses.map { witness -> witness.address.hex},
             _previous_hashes,
             _payload_hashes,
-            _payload_schemas
+            _payload_schemas,
+            _timestamp
         )
     }
 
@@ -73,6 +75,7 @@ open class XyoBoundWitnessBuilder {
         bw.payload_hashes = _payload_hashes
         bw.payload_schemas = _payload_schemas
         bw.previous_hashes = _previous_hashes
+        bw.timestamp = _timestamp
     }
 
     open fun build(previousHash: String? = null): XyoBoundWitnessJson {

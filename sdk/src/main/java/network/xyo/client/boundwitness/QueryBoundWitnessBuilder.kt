@@ -17,7 +17,8 @@ class QueryBoundWitnessBuilder : XyoBoundWitnessBuilder() {
             this._previous_hashes,
             this._payload_hashes,
             this._payload_schemas,
-            this.queryHash
+            this.queryHash,
+            this._timestamp,
         )
     }
 
