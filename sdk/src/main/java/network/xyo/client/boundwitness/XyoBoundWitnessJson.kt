@@ -9,4 +9,8 @@ open class XyoBoundWitnessJson: XyoBoundWitnessBodyJson(), XyoBoundWitnessMetaIn
     override var _client: String? = null
     override var _previous_hash: String? = null
     override var _hash: String? = null
+
+    open fun getBodyJson(): XyoBoundWitnessBodyJson {
+        return this
+    }
 }
