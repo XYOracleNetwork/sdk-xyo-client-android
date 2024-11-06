@@ -6,24 +6,18 @@ import network.xyo.client.XyoSerializable
 open class XyoException(message: String): Throwable(message)
 open class XyoValidationException(message: String): XyoException(message)
 open class XyoInvalidSchemaException(val schema: String): XyoValidationException("'schema' must be lowercase [${schema}]")
-open class XyoInvalidPreviousHashException(val previousHash: String?): XyoValidationException("'previous_hash' must be lowercase [${previousHash}]")
 
 @JsonClass(generateAdapter = true)
-open class XyoPayload(schema: String, previousHash: String? = null): Payload, XyoSerializable() {
+open class XyoPayload(schema: String): Payload, XyoSerializable() {
     private val internalSchema = schema.lowercase()
 
     override val schema: String
         get() = this.internalSchema
 
-    var previousHash = previousHash?.lowercase()
-
     @Throws(XyoValidationException::class)
     open fun validate() {
         if (schema != schema.lowercase()) {
             throw XyoInvalidSchemaException(schema)
-        }
-        if (previousHash != previousHash?.lowercase()) {
-            throw XyoInvalidPreviousHashException(previousHash)
         }
     }
 }
