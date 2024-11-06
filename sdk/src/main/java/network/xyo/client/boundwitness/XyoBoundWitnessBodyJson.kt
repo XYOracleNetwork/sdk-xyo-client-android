@@ -10,7 +10,7 @@ open class XyoBoundWitnessBodyJson(schema: String = "network.xyo.boundwitness"):
     final override var payload_schemas = emptyList<String>()
     final override var previous_hashes = emptyList<String?>()
     final override var schema = "network.xyo.boundwitness"
-    final override var timestamp: Long = 0L
+    final override var timestamp: Long = System.currentTimeMillis()
 
     constructor (addresses: List<String>, previous_hashes: List<String?>, payload_hashes: List<String>, payload_schemas: List<String>, timestamp: Long) : this() {
         this.addresses = addresses
