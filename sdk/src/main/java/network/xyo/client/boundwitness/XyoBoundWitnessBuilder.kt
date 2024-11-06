@@ -73,7 +73,6 @@ open class XyoBoundWitnessBuilder {
 
         // update underscore fields
         bw._client = "android"
-        bw._payloads = _payloads
 
         // construct fields involved in hashing
         constructHashableFieldsFields(bw)

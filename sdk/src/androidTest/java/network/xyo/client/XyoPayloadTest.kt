@@ -93,8 +93,5 @@ class XyoPayloadTest {
         val bwJsonString = XyoSerializable.toJson(bwJson)
         val bwMirrored = XyoSerializable.fromJson(bwJsonString, bwJson)
         assertNotNull(bwMirrored)
-        if (bwMirrored != null) {
-            assertEquals(bwJson._payloads?.size, bwMirrored._payloads?.size)
-        }
     }
 }
