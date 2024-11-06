@@ -15,7 +15,10 @@ open class XyoBoundWitnessBuilder {
     protected var _payload_hashes = mutableListOf<String>()
     protected var _payload_schemas = mutableListOf<String>()
     protected var _payloads = mutableListOf<XyoPayload>()
-    protected var _timestamp: Long = System.currentTimeMillis()
+    var _timestamp: Long? = null
+
+    val addresses: List<String>
+        get() = _witnesses.map { witness -> witness.address.hex }
 
     open fun witness(account: XyoAccount, previousHash: String?): XyoBoundWitnessBuilder {
         _witnesses.add(account)
@@ -29,14 +32,12 @@ open class XyoBoundWitnessBuilder {
         return this
     }
 
-    open fun hashableFields(): XyoBoundWitnessBodyJson {
-        return XyoBoundWitnessBodyJson(
-            _witnesses.map { witness -> witness.address.hex},
-            _previous_hashes,
-            _payload_hashes,
-            _payload_schemas,
-            _timestamp
-        )
+    open fun hashableFields(bw: XyoBoundWitnessJson): XyoBoundWitnessBodyJson {
+        // if a timestamp is not provided, set one at the time hashable fields are set
+        bw.timestamp = _timestamp ?: System.currentTimeMillis()
+
+        // return the body with hashable fields
+        return bw.getBodyJson()
     }
 
     @Throws(XyoValidationException::class)
@@ -63,24 +64,38 @@ open class XyoBoundWitnessBuilder {
         }
     }
 
-    protected fun  constructFields(bw: XyoBoundWitnessJson, previousHash: String?) {
-        val hashable = hashableFields()
-        val hash = XyoSerializable.sha256String(hashable)
-        bw._previous_hash = previousHash
-        bw._signatures = this.sign(hash)
-        bw._hash = hash
-        bw._client = "android"
-        bw._payloads = _payloads
-        bw.addresses = _witnesses.map { witness -> witness.address.hex}
+    protected fun constructFields(bw: XyoBoundWitnessJson) {
+        // update json class properties
         bw.payload_hashes = _payload_hashes
         bw.payload_schemas = _payload_schemas
         bw.previous_hashes = _previous_hashes
-        bw.timestamp = _timestamp
+        bw.addresses = addresses
+
+        // update underscore fields
+        bw._client = "android"
+        bw._payloads = _payloads
+
+        // construct fields involved in hashing
+        constructHashableFieldsFields(bw)
+    }
+
+    private fun  constructHashableFieldsFields(bw: XyoBoundWitnessJson) {
+        // Note: Once fields are hashed, do not update class properties that are expected
+        // in the serialized version of the bw because they will invalidate the hash
+        val hashable = hashableFields(bw)
+        val hash = XyoSerializable.sha256String(hashable)
+        bw._signatures = this.sign(hash)
+        bw._hash = hash
     }
 
     open fun build(previousHash: String? = null): XyoBoundWitnessJson {
         val bw = XyoBoundWitnessJson().let{
-            constructFields(it, previousHash)
+            // store the previous hash on the class
+            it._previous_hash = previousHash
+
+            // update fields
+            constructFields(it)
+            constructHashableFieldsFields(it)
             it
         }
         return bw
