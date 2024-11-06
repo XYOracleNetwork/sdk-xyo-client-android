@@ -19,9 +19,6 @@ open class ArchivistWrapper(private val nodeClient: NodeClient) {
     @OptIn(ExperimentalCoroutinesApi::class)
     @RequiresApi(Build.VERSION_CODES.M)
     suspend fun insert(payloads: List<XyoPayload>, previousHash: String?): PostQueryResult {
-        val payloadHashes = arrayListOf<String>()
-        payloads.forEach { payloadHashes.add(XyoSerializable.sha256String(it)) }
-
         val query = ArchivistInsertQueryPayload()
         return nodeClient.query(query, payloads, previousHash)
     }

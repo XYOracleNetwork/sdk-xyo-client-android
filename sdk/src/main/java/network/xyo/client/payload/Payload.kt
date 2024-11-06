@@ -1,5 +1,7 @@
 package network.xyo.client.payload
 
-interface Payload {
+import java.io.Serializable
+
+interface Payload : Serializable {
     val schema: String
 }

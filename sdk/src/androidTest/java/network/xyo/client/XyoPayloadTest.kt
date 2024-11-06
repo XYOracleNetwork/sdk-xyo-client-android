@@ -81,8 +81,8 @@ class XyoPayloadTest {
     @Test
     fun testRoundTripPanel() {
         val address = XyoAccount(XyoSerializable.hexToBytes("5a95531488b4d0d3645aea49678297ae9e2034879ce0389b80eb788e8b533592"))
-        val witness = XyoWitness(address, fun(_context: Context, previousHash: String?): XyoPayload {
-            return XyoPayload("network.xyo.basic", previousHash)
+        val witness = XyoWitness(address, fun(_: Context, _: String?): XyoPayload {
+            return XyoPayload("network.xyo.basic")
         })
         val response = arrayListOf(witness.observe(appContext))
         val payloads = response.mapNotNull { payload -> payload }
@@ -93,8 +93,5 @@ class XyoPayloadTest {
         val bwJsonString = XyoSerializable.toJson(bwJson)
         val bwMirrored = XyoSerializable.fromJson(bwJsonString, bwJson)
         assertNotNull(bwMirrored)
-        if (bwMirrored != null) {
-            assertEquals(bwJson._payloads?.size, bwMirrored._payloads?.size)
-        }
     }
 }

@@ -3,6 +3,7 @@ package network.xyo.client.boundwitness
 import android.os.Build
 import androidx.annotation.RequiresApi
 import network.xyo.client.XyoSerializable
+import network.xyo.client.XyoWitness
 import network.xyo.client.address.XyoAccount
 import network.xyo.client.payload.XyoPayload
 
@@ -11,16 +12,6 @@ import network.xyo.client.payload.XyoPayload
 class QueryBoundWitnessBuilder : XyoBoundWitnessBuilder() {
     private lateinit var queryHash: String
 
-    override fun hashableFields(): QueryBoundWitnessBodyJson {
-        return QueryBoundWitnessBodyJson(
-            this._witnesses.map { witness -> witness.address.hex},
-            this._previous_hashes,
-            this._payload_hashes,
-            this._payload_schemas,
-            this.queryHash
-        )
-    }
-
     fun query(query: XyoPayload): QueryBoundWitnessBuilder {
         this.queryHash = XyoSerializable.sha256String(query)
         this.payload(query.schema, query)
@@ -28,18 +19,25 @@ class QueryBoundWitnessBuilder : XyoBoundWitnessBuilder() {
     }
 
     override fun witness(account: XyoAccount, previousHash: String?): QueryBoundWitnessBuilder {
-        _witnesses.add(account)
-        _previous_hashes.add(previousHash)
+        super.witness(account, previousHash)
+        return this
+    }
+
+    override fun witnesses(witnesses: List<XyoWitness<XyoPayload>>): QueryBoundWitnessBuilder {
+        super.witnesses(witnesses)
         return this
     }
 
     override fun build(previousHash: String?): QueryBoundWitnessJson {
-        val bw = QueryBoundWitnessJson().let {
-            constructFields(it, previousHash)
-            it.query = this.queryHash
+        bw = QueryBoundWitnessJson()
+        // override to support additional properties for query bound witnesses
+        return bw.let {
+            val qbw = it as QueryBoundWitnessJson
+            qbw.query = this.queryHash
+            qbw._previous_hash = previousHash
+            constructFields()
             it
         }
-        return bw
     }
 
 }

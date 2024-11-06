@@ -103,7 +103,7 @@ class XyoPanel(val context: Context, private val archivists: List<XyoArchivistAp
     suspend fun eventAsync(event: String): XyoPanelReportResult {
         val adhocWitnessList = listOf(
             XyoWitness({
-                _, previousHash -> XyoEventPayload(event, previousHash)
+                _, previousHash -> XyoEventPayload(event)
             })
         )
         return this.reportAsync(adhocWitnessList)
@@ -113,7 +113,7 @@ class XyoPanel(val context: Context, private val archivists: List<XyoArchivistAp
     suspend fun eventAsyncQuery(event: String): XyoPanelReportQueryResult {
         val adhocWitnessList = listOf(
             XyoWitness({
-                    _, previousHash -> XyoEventPayload(event, previousHash)
+                    _, previousHash -> XyoEventPayload(event)
             })
         )
         return reportAsyncQuery(adhocWitnessList)
