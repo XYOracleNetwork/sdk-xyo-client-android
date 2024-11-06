@@ -3,6 +3,7 @@ package network.xyo.client.boundwitness
 import android.os.Build
 import androidx.annotation.RequiresApi
 import network.xyo.client.XyoSerializable
+import network.xyo.client.XyoWitness
 import network.xyo.client.address.XyoAccount
 import network.xyo.client.payload.XyoPayload
 
@@ -18,8 +19,12 @@ class QueryBoundWitnessBuilder : XyoBoundWitnessBuilder() {
     }
 
     override fun witness(account: XyoAccount, previousHash: String?): QueryBoundWitnessBuilder {
-        _witnesses.add(account)
-        _previous_hashes.add(previousHash)
+        super.witness(account, previousHash)
+        return this
+    }
+
+    override fun witnesses(witnesses: List<XyoWitness<XyoPayload>>): QueryBoundWitnessBuilder {
+        super.witnesses(witnesses)
         return this
     }
 

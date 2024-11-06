@@ -34,7 +34,7 @@ open class XyoBoundWitnessBuilder {
         return this
     }
 
-    open fun hashableFields(): XyoBoundWitnessBodyJson {
+    private fun hashableFields(): XyoBoundWitnessBodyJson {
         // if a timestamp is not provided, set one at the time hashable fields are set
         bw.timestamp = _timestamp ?: System.currentTimeMillis()
 
