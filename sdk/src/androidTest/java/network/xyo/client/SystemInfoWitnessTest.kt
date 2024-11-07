@@ -19,8 +19,6 @@ class SystemInfoWitnessTest {
         assertInstanceOf<XyoSystemInfoPayload>(payload)
         assert(payload.os != null)
         assert(payload.device != null)
-
-        // Cannot test network reliably in local jvm tests
-        // assert(payload.network != null)
+        assert(payload.network != null)
     }
 }
