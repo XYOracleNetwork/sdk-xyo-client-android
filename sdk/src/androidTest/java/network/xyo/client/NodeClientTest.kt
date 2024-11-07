@@ -9,6 +9,10 @@ import network.xyo.client.payload.XyoPayload
 import org.junit.Test
 import org.junit.jupiter.api.Assertions.*
 
+class DiscoverPayload(): XyoPayload() {
+    override var schema = "network.xyo.query.module.discover"
+}
+
 class NodeClientTest {
     private val apiDomainBeta = "${TestConstants.nodeUrlBeta}/Archivist"
 
@@ -17,7 +21,7 @@ class NodeClientTest {
     fun discoverTestBeta() {
         val account = XyoAccount()
         val client = NodeClient(TestConstants.nodeUrlBeta, account)
-        val query = XyoPayload("network.xyo.query.module.discover")
+        val query = DiscoverPayload()
 
         runBlocking {
             val postResult = client.query(query, null, null)

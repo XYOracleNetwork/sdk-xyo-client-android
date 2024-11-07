@@ -36,7 +36,7 @@ class XyoBoundWitnessTest {
     fun generateQuery(nodeUrl: String): RequestDependencies {
         val account = XyoAccount()
         val client = NodeClient(nodeUrl, account)
-        val query = XyoPayload("network.xyo.query.module.discover")
+        val query = DiscoverPayload()
         val payloads = mutableListOf<XyoPayload>()
         payloads.add(TestPayload1())
         return RequestDependencies(client, query, payloads)

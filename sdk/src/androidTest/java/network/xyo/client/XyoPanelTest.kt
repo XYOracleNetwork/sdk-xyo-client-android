@@ -55,7 +55,7 @@ class XyoPanelTest {
             val witnessAccount = XyoAccount(XyoSerializable.hexToBytes("9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"))
             val witness2Account = XyoAccount(XyoSerializable.hexToBytes("5a95531488b4d0d3645aea49678297ae9e2034879ce0389b80eb788e8b533592"))
             val witness = XyoWitness(witnessAccount, fun(_: Context, _: String?): XyoPayload {
-                return XyoPayload("network.xyo.basic")
+                return BasicPayload()
             })
             val panel = XyoPanel(appContext, arrayListOf(Pair(nodeUrl, XyoAccount())), listOf(witness, XyoSystemInfoWitness(witness2Account)))
             val result = panel.reportAsyncQuery()

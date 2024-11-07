@@ -2,4 +2,6 @@ package network.xyo.client.archivist.wrapper
 
 import network.xyo.client.payload.XyoPayload
 
-open class ArchivistGetQueryPayload(val hashes: List<String>, schema: String = "network.xyo.query.archivist.get"): XyoPayload(schema)
+open class ArchivistGetQueryPayload(val hashes: List<String>): XyoPayload() {
+    override var schema = "network.xyo.query.archivist.get"
+}

@@ -8,11 +8,11 @@ open class XyoValidationException(message: String): XyoException(message)
 open class XyoInvalidSchemaException(val schema: String): XyoValidationException("'schema' must be lowercase [${schema}]")
 
 @JsonClass(generateAdapter = true)
-open class XyoPayload(schema: String): Payload, XyoSerializable() {
-    private val internalSchema = schema.lowercase()
-
-    override val schema: String
-        get() = this.internalSchema
+open class XyoPayload(): Payload, XyoSerializable() {
+    // Note: Has to be var because "Moshi does not consider a val as a serializable member because
+    // it cannot be symmetrically deserialized."
+    // see - https://github.com/square/moshi/issues/1803
+    override var schema: String = "network.xyo.missing.schema"
 
     @Throws(XyoValidationException::class)
     open fun validate() {

@@ -11,12 +11,16 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.jupiter.api.Assertions.*
 
+open class TestSubject: XyoPayload() {
+    override var schema = "network.xyo.test"
+}
+
 class TestPayload1SubObject {
     var number_value = 2
     var string_value = "yo"
 }
 
-class TestPayload1: XyoPayload("network.xyo.test") {
+class TestPayload1: TestSubject() {
     var timestamp = 1618603439107
     var number_field = 1
     var object_field = TestPayload1SubObject()
@@ -28,14 +32,14 @@ class TestPayload2SubObject {
     var number_value = 2
 }
 
-class TestPayload2: XyoPayload("network.xyo.test") {
+class TestPayload2: TestSubject() {
     var string_field = "there"
     var object_field = TestPayload2SubObject()
     var timestamp = 1618603439107
     var number_field = 1
 }
 
-class TestInvalidSchemaPayload: XyoPayload("network.xyo.Test") {
+class TestInvalidSchemaPayload: TestSubject() {
     var timestamp = 1618603439107
     var number_field = 1
     var object_field = TestPayload1SubObject()
@@ -78,11 +82,12 @@ class XyoPayloadTest {
         }
     }
 
+
     @Test
     fun testRoundTripPanel() {
         val address = XyoAccount(XyoSerializable.hexToBytes("5a95531488b4d0d3645aea49678297ae9e2034879ce0389b80eb788e8b533592"))
         val witness = XyoWitness(address, fun(_: Context, _: String?): XyoPayload {
-            return XyoPayload("network.xyo.basic")
+            return BasicPayload()
         })
         val response = arrayListOf(witness.observe(appContext))
         val payloads = response.mapNotNull { payload -> payload }

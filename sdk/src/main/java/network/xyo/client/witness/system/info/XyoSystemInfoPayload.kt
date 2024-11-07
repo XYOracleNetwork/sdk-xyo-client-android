@@ -11,9 +11,10 @@ class XyoSystemInfoPayload(
     val device: XyoSystemInfoDevice? = null,
     val network: XyoSystemInfoNetwork? = null,
     val os: XyoSystemInfoOs? = null,
-    override val schema: String = "network.xyo.system.info.android"
-    ): XyoPayload (schema) {
+    ): XyoPayload () {
+        override var schema: String = "network.xyo.system.info.android"
         companion object {
+
             @RequiresApi(Build.VERSION_CODES.M)
             fun detect(context: Context): XyoSystemInfoPayload {
                 return XyoSystemInfoPayload(
