@@ -1,5 +1,6 @@
 package network.xyo.client.witness.system.info
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.net.ConnectivityManager
@@ -11,6 +12,7 @@ import android.net.wifi.WifiInfo
 import android.os.Build
 import androidx.annotation.RequiresApi
 import com.squareup.moshi.JsonClass
+import network.xyo.client.hasPermission
 import java.net.NetworkInterface
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
@@ -31,6 +33,9 @@ class XyoSystemInfoNetworkWifi (
         @RequiresApi(Build.VERSION_CODES.M)
         @SuppressLint("HardwareIds")
         fun detect(context: Context): XyoSystemInfoNetworkWifi? {
+            if (!hasPermission(context, Manifest.permission.CHANGE_NETWORK_STATE)) {
+                return null
+            }
             // setup latch and wifiInfo inside companion so it isn't shared across instances
             val latch = CountDownLatch(1)
             val wifiInfo = accessNetworkChanges(context, latch)

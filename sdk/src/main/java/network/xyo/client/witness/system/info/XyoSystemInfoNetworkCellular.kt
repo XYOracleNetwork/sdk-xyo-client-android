@@ -22,6 +22,9 @@ class XyoSystemInfoNetworkCellular(
 ) {
     companion object {
         fun detect(context: Context): XyoSystemInfoNetworkCellular? {
+            if (!hasPermission(context, Manifest.permission.CHANGE_NETWORK_STATE)) {
+                return null
+            }
             if (Build.VERSION.SDK_INT >= 23) {
                 val connectivityManager =
                     context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -30,18 +33,11 @@ class XyoSystemInfoNetworkCellular(
                 if (networkCaps?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) == true) {
                     val telephonyManager =
                         context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-                    if (hasPermission(
-                            context,
-                            Manifest.permission.READ_PHONE_STATE,
-                            "Manifest.permission.READ_PHONE_STATE required"
-                        )
-                    ) {
-                        val provider = XyoSystemInfoNetworkCellularProvider(
-                            telephonyManager.networkOperatorName
-                        )
+                    val provider = XyoSystemInfoNetworkCellularProvider(
+                        telephonyManager.networkOperatorName
+                    )
 
-                        return XyoSystemInfoNetworkCellular(getIpAddress(), provider)
-                    }
+                    return XyoSystemInfoNetworkCellular(getIpAddress(), provider)
                 }
             }
             return null
