@@ -1,8 +1,6 @@
 package network.xyo.client.witness.location.info
 
 import android.content.Context
-import android.os.Build
-import androidx.annotation.RequiresApi
 import com.squareup.moshi.JsonClass
 import network.xyo.client.payload.XyoPayload
 
@@ -28,8 +26,21 @@ class XyoLocationInfoPayload (
     override var schema: String = "network.xyo.location.android"
 
     companion object {
-        fun detect(context: Context) {
-            return
+        fun detect(context: Context): XyoLocationInfoPayload {
+            val coordinates = Coordinates(
+                accuracy = 10.0,
+                altitude = 100.5,
+                altitudeAccuracy = null,
+                heading = 90.0,
+                latitude = 40.7128,
+                longitude = -74.0060,
+                speed = null
+            )
+            val currentLocation = CurrentLocation(
+                coords = coordinates,
+                timestamp = System.currentTimeMillis()
+            )
+            return XyoLocationInfoPayload(currentLocation)
         }
     }
 }
