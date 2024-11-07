@@ -10,6 +10,6 @@ import network.xyo.client.address.XyoAccount
 @RequiresApi(Build.VERSION_CODES.M)
 class XyoLocationWitness(address: XyoAccount = XyoAccount()) : XyoWitness<XyoLocationPayload>(
     address,
-    fun (context: Context, _: String?): XyoLocationPayload {
+    fun (context: Context, _: String?): XyoLocationPayload? {
         return XyoLocationPayload.detect(context)
     })
