@@ -22,9 +22,6 @@ class XyoSystemInfoNetworkCellular(
 ) {
     companion object {
         fun detect(context: Context): XyoSystemInfoNetworkCellular? {
-            if (!hasPermission(context, Manifest.permission.CHANGE_NETWORK_STATE)) {
-                return null
-            }
             if (Build.VERSION.SDK_INT >= 23) {
                 val connectivityManager =
                     context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager

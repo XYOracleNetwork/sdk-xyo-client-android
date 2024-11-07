@@ -33,6 +33,7 @@ class XyoSystemInfoNetworkWifi (
         @RequiresApi(Build.VERSION_CODES.M)
         @SuppressLint("HardwareIds")
         fun detect(context: Context): XyoSystemInfoNetworkWifi? {
+            // Accessing Wifi network requires CHANGE_NETWORK_STATE permission
             if (!hasPermission(context, Manifest.permission.CHANGE_NETWORK_STATE)) {
                 return null
             }
