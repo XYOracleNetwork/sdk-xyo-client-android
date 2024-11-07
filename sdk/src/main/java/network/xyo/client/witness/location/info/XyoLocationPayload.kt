@@ -20,13 +20,13 @@ data class CurrentLocation(
 )
 
 @JsonClass(generateAdapter = true)
-class XyoLocationInfoPayload (
+class XyoLocationPayload (
     currentLocation: CurrentLocation
 ): XyoPayload() {
     override var schema: String = "network.xyo.location.android"
 
     companion object {
-        fun detect(context: Context): XyoLocationInfoPayload {
+        fun detect(context: Context): XyoLocationPayload {
             val coordinates = Coordinates(
                 accuracy = 10.0,
                 altitude = 100.5,
@@ -40,7 +40,7 @@ class XyoLocationInfoPayload (
                 coords = coordinates,
                 timestamp = System.currentTimeMillis()
             )
-            return XyoLocationInfoPayload(currentLocation)
+            return XyoLocationPayload(currentLocation)
         }
     }
 }

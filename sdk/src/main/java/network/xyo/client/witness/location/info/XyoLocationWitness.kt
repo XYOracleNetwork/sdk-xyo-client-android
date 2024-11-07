@@ -8,8 +8,8 @@ import network.xyo.client.address.XyoAccount
 
 
 @RequiresApi(Build.VERSION_CODES.M)
-class XyoLocationInfoWitness(address: XyoAccount = XyoAccount()) : XyoWitness<XyoLocationInfoPayload>(
+class XyoLocationWitness(address: XyoAccount = XyoAccount()) : XyoWitness<XyoLocationPayload>(
     address,
-    fun (context: Context, _: String?): XyoLocationInfoPayload {
-        return XyoLocationInfoPayload.detect(context)
+    fun (context: Context, _: String?): XyoLocationPayload {
+        return XyoLocationPayload.detect(context)
     })
