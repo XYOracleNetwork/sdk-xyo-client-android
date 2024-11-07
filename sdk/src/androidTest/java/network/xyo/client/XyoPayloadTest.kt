@@ -11,7 +11,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.jupiter.api.Assertions.*
 
-open class TestSubject: XyoPayload() {
+open class TestSubjectPayload: XyoPayload() {
     override var schema = "network.xyo.test"
 }
 
@@ -20,7 +20,7 @@ class TestPayload1SubObject {
     var string_value = "yo"
 }
 
-class TestPayload1: TestSubject() {
+class TestPayload1: TestSubjectPayload() {
     var timestamp = 1618603439107
     var number_field = 1
     var object_field = TestPayload1SubObject()
@@ -32,14 +32,14 @@ class TestPayload2SubObject {
     var number_value = 2
 }
 
-class TestPayload2: TestSubject() {
+class TestPayload2: TestSubjectPayload() {
     var string_field = "there"
     var object_field = TestPayload2SubObject()
     var timestamp = 1618603439107
     var number_field = 1
 }
 
-class TestInvalidSchemaPayload: TestSubject() {
+class TestInvalidSchemaPayload: TestSubjectPayload() {
     var timestamp = 1618603439107
     var number_field = 1
     var object_field = TestPayload1SubObject()
@@ -75,6 +75,10 @@ class XyoPayloadTest {
     fun testRoundTripPayload() {
         val payload = TestPayload1()
         val payloadJsonString = XyoSerializable.toJson(payload)
+
+        // ensure the schema is properly serialized from the base class
+        assert(payloadJsonString.contains("network.xyo.test"))
+
         val payloadMirrored = XyoSerializable.fromJson(payloadJsonString, TestPayload1())
         assertNotNull(payloadMirrored)
         if (payloadMirrored != null) {
