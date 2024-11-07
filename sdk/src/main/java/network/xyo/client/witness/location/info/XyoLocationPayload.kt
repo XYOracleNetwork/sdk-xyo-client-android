@@ -1,6 +1,8 @@
 package network.xyo.client.witness.location.info
 
 import android.content.Context
+import android.util.Log
+import com.google.android.gms.common.GoogleApiAvailability
 import com.squareup.moshi.JsonClass
 import network.xyo.client.payload.XyoPayload
 
@@ -19,28 +21,22 @@ data class CurrentLocation(
     val timestamp: Long
 )
 
+
+
 @JsonClass(generateAdapter = true)
 class XyoLocationPayload (
-    currentLocation: CurrentLocation
+    currentLocation: CurrentLocation?
 ): XyoPayload() {
     override var schema: String = "network.xyo.location.android"
 
     companion object {
-        fun detect(context: Context): XyoLocationPayload {
-            val coordinates = Coordinates(
-                accuracy = 10.0,
-                altitude = 100.5,
-                altitudeAccuracy = null,
-                heading = 90.0,
-                latitude = 40.7128,
-                longitude = -74.0060,
-                speed = null
-            )
-            val currentLocation = CurrentLocation(
-                coords = coordinates,
-                timestamp = System.currentTimeMillis()
-            )
-            return XyoLocationPayload(currentLocation)
+        fun detect(context: Context): XyoLocationPayload? {
+            if (GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(context) != 1) {
+                Log.e("xyoClient", "Google Play Service not installed")
+                return null
+            }
+
+            return XyoLocationPayload(stubCurrentLocation)
         }
     }
 }
