@@ -11,7 +11,7 @@ fun hasPermission(context: Context, permission: String, message: String? = null)
         permission
     ) == PackageManager.PERMISSION_GRANTED
     if (!result && message != null) {
-        Log.w("xyoClientSdk", "Missing Permission: ${message}")
+        Log.e("xyoClientSdk", "Missing Permission: ${message}")
     }
     return result
 }
