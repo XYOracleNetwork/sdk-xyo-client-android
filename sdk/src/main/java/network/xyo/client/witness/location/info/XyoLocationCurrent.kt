@@ -31,7 +31,7 @@ class XyoLocationCurrent {
                                 latch.countDown()
                             } else {
                                 // countDown to zero to lift the latch
-                                latch.countDown()
+//                                latch.countDown()
                                 Log.e("xyoClient","Location not available")
                             }
                         }
