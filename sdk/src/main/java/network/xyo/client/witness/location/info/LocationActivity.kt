@@ -1,6 +1,7 @@
 package network.xyo.client.witness.location.info
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.os.Bundle
 import android.os.Looper
 import android.util.Log
@@ -10,21 +11,20 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 
-class LocationActivity : AppCompatActivity() {
+const val REQUESTING_LOCATION_UPDATES_KEY = "REQUESTING_LOCATION_UPDATES_KEY"
+
+class LocationActivity : Activity() {
     private var requestingLocationUpdates: Boolean = false
     private lateinit var locationCallback: LocationCallback
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(null)
 
         requestingLocationUpdates = true
         locationCallback = object : LocationCallback() {
-            fun onLocationResult(locationResult: LocationResult?) {
-                locationResult ?: return
-                for (location in locationResult.locations){
-                    Log.i("xyoClient", "lat: ${location.latitude}, long: ${location.longitude}")
-                }
+            override fun onLocationResult(locationResult: LocationResult) {
+                // No action necessary but we need to start the activity to get location results
+                 Log.i("xyoClient", "LocationActivity: locationCallback fired successfully")
             }
         }
         startLocationUpdates()
@@ -33,6 +33,11 @@ class LocationActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         if (requestingLocationUpdates) startLocationUpdates()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putBoolean(REQUESTING_LOCATION_UPDATES_KEY, requestingLocationUpdates)
+        super.onSaveInstanceState(outState)
     }
 
     // Already checking in class
