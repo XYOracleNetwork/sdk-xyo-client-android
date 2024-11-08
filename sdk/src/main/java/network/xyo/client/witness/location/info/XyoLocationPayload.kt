@@ -33,7 +33,7 @@ data class CurrentLocation(
 
 @JsonClass(generateAdapter = true)
 class XyoLocationPayload (
-    currentLocation: CurrentLocation?
+    val currentLocation: CurrentLocation? = null
 ): XyoPayload() {
     override var schema: String = "network.xyo.location.android"
 
@@ -41,7 +41,7 @@ class XyoLocationPayload (
 
         @SuppressLint("MissingPermission")
         fun detect(context: Context): XyoLocationPayload? {
-            if (LocationPermissions.check((context))) {
+            if (LocationPermissions.check((context)) && LocationPermissions.checkGooglePlayServices(context)) {
                 val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
                 var coordinates: Coordinates? = null
 
@@ -51,16 +51,8 @@ class XyoLocationPayload (
                     fusedLocationClient.lastLocation
                         .addOnSuccessListener { location: Location? ->
                             if (location != null) {
-                                Log.w("xyoClient", "Location was null")
-                                coordinates = Coordinates(
-                                    location.accuracy,
-                                    location.altitude,
-                                    null,
-                                    location.bearing,
-                                    location.latitude,
-                                    location.longitude,
-                                    location.speed
-                                )
+                                Log.w("xyoClient", "Location was found")
+                                coordinates = setCoordinatesFromLocation(location)
                                 // countDown to zero to lift the latch
                                 latch.countDown()
                             } else {
@@ -86,7 +78,18 @@ class XyoLocationPayload (
                 }
             }
             return null
+        }
 
+        private fun setCoordinatesFromLocation(location: Location): Coordinates {
+            return Coordinates(
+                location.accuracy,
+                location.altitude,
+                null,
+                location.bearing,
+                location.latitude,
+                location.longitude,
+                location.speed
+            )
         }
     }
 }
