@@ -68,6 +68,7 @@ class XyoLocationPayload (
                 fusedLocationClient.lastLocation
                     .addOnSuccessListener { location: Location? ->
                         if (location != null) {
+                            Log.w("xyoClient", "Location was null")
                             coordinates = Coordinates(
                                 location.accuracy,
                                 location.altitude,
