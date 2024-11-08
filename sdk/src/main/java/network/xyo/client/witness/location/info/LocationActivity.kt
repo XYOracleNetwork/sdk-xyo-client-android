@@ -12,7 +12,7 @@ import com.google.android.gms.location.LocationServices
 
 const val REQUESTING_LOCATION_UPDATES_KEY = "REQUESTING_LOCATION_UPDATES_KEY"
 
-class LocationActivity : Activity() {
+open class LocationActivity : Activity() {
     private var requestingLocationUpdates: Boolean = false
     private lateinit var locationCallback: LocationCallback
 
