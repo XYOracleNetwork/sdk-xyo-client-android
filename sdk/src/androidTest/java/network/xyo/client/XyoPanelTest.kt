@@ -1,6 +1,8 @@
 package network.xyo.client
 
+import android.Manifest
 import android.content.Context
+import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -9,6 +11,8 @@ import network.xyo.client.address.XyoAccount
 import network.xyo.client.boundwitness.XyoBoundWitnessJson
 import network.xyo.client.datastore.PrefsRepository
 import network.xyo.client.payload.XyoPayload
+import network.xyo.client.witness.location.info.LocationActivity
+import network.xyo.client.witness.location.info.XyoLocationWitness
 import network.xyo.client.witness.system.info.XyoSystemInfoPayload
 import network.xyo.client.witness.system.info.XyoSystemInfoWitness
 import org.junit.Before
@@ -20,7 +24,15 @@ import org.junit.jupiter.api.assertInstanceOf
 class XyoPanelTest {
     @Rule
     @JvmField
-    val grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(android.Manifest.permission.INTERNET, android.Manifest.permission.ACCESS_WIFI_STATE)
+    val grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(
+        Manifest.permission.INTERNET,
+        Manifest.permission.ACCESS_WIFI_STATE,
+        Manifest.permission.ACCESS_COARSE_LOCATION,
+        Manifest.permission.ACCESS_FINE_LOCATION
+    )
+
+    @get:Rule
+    val activityRule = ActivityScenarioRule(LocationActivity::class.java)
 
     lateinit var appContext: Context
 
@@ -57,10 +69,12 @@ class XyoPanelTest {
             val witness = XyoWitness(witnessAccount, fun(_: Context, _: String?): XyoPayload {
                 return BasicPayload()
             })
-            val panel = XyoPanel(appContext, arrayListOf(Pair(nodeUrl, XyoAccount())), listOf(witness, XyoSystemInfoWitness(witness2Account)))
+            val panel = XyoPanel(appContext, arrayListOf(Pair(nodeUrl, XyoAccount())), listOf(witness, XyoSystemInfoWitness(witness2Account), XyoLocationWitness()))
             val result = panel.reportAsyncQuery()
             if (result.apiResults === null) throw NullPointerException("apiResults should not be null")
-            result.apiResults?.forEach { assertEquals(it.errors, null) }
+            result.apiResults?.forEach {
+                assertEquals(it.errors, null)
+            }
         }
     }
 
