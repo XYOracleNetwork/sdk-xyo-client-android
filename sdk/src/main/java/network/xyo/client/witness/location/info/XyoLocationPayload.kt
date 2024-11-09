@@ -5,6 +5,7 @@ import android.content.Context
 import com.squareup.moshi.JsonClass
 import network.xyo.client.payload.XyoPayload
 
+@JsonClass(generateAdapter = true)
 data class Coordinates(
     val accuracy: Float?,
     val altitude: Double?,
