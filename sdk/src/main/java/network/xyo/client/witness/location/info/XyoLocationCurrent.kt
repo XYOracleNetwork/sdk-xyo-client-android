@@ -46,7 +46,10 @@ class XyoLocationCurrent {
                     if (coordinates == null) {
                         return null
                     } else {
-                        return CurrentLocation(coordinates!!, System.currentTimeMillis())
+                        val currentLocation = CurrentLocation(coordinates!!, System.currentTimeMillis())
+                        val serialized = XyoSerializable.toJson(currentLocation)
+                        Log.i("xyoClient", "serialized currentLocation: ${serialized}")
+                        return currentLocation
                     }
                 } catch (e: InterruptedException) {
                     e.printStackTrace()
@@ -68,7 +71,7 @@ class XyoLocationCurrent {
                 location.speed
             )
             val serialized = XyoSerializable.toJson(coordinates)
-            Log.i("xyoClient", "serialized: ${serialized}")
+            Log.i("xyoClient", "serialized Coordinates: ${serialized}")
             return coordinates
         }
     }

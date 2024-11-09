@@ -16,6 +16,7 @@ data class Coordinates(
     val speed: Float?
 )
 
+@JsonClass(generateAdapter = true)
 data class CurrentLocation(
     val coords: Coordinates,
     val timestamp: Long
