@@ -6,6 +6,7 @@ import android.location.Location
 import android.util.Log
 import com.google.android.gms.location.LocationServices
 import com.squareup.moshi.JsonClass
+import network.xyo.client.XyoSerializable
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
@@ -26,6 +27,7 @@ class XyoLocationCurrent {
                         .addOnSuccessListener { location: Location? ->
                             if (location != null) {
                                 Log.w("xyoClient", "Location was found")
+                                Log.w("xyoClient", "lat: ${location.latitude}, long: ${location.longitude}")
                                 coordinates = setCoordinatesFromLocation(location)
                                 // countDown to zero to lift the latch
                                 latch.countDown()
@@ -54,7 +56,9 @@ class XyoLocationCurrent {
         }
 
         private fun setCoordinatesFromLocation(location: Location): Coordinates {
-            return Coordinates(
+            Log.i("xyoClient", "Inside setCoordinatesFromLocation")
+
+            val coordinates = Coordinates(
                 location.accuracy,
                 location.altitude,
                 null,
@@ -63,6 +67,9 @@ class XyoLocationCurrent {
                 location.longitude,
                 location.speed
             )
+            val serialized = XyoSerializable.toJson(coordinates)
+            Log.i("xyoClient", "serialized: ${serialized}")
+            return coordinates
         }
     }
 }
