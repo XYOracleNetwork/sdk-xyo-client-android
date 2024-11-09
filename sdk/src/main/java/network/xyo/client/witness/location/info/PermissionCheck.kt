@@ -18,7 +18,7 @@ class LocationPermissions {
 
             if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
-                Log.e("xyoClient", "ACCESS_FINE_LOCATION permission not allowed")
+                Log.e("xyoClient", "ACCESS_COARSE_LOCATION permission not allowed")
                 return false
             }
             return true
