@@ -41,7 +41,7 @@ class XyoLocationCurrent {
                             Log.e("xyoClient","Failed to get location: ${it.message}")
                         }
                     // Wait for up to 5 seconds for the location
-                    latch.await(5, TimeUnit.SECONDS)
+                    latch.await(15, TimeUnit.SECONDS)
 
                     if (coordinates == null) {
                         return null
