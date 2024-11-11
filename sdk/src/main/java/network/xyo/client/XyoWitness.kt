@@ -6,20 +6,35 @@ import androidx.annotation.RequiresApi
 import network.xyo.client.address.XyoAccount
 import network.xyo.client.payload.XyoPayload
 
+abstract class DeferredObserver<out T: XyoPayload> {
+    suspend abstract fun deferredDetect(context: Context, previousHash: String?): T?
+}
+
 @RequiresApi(Build.VERSION_CODES.M)
 open class XyoWitness<out T: XyoPayload> (
     val address: XyoAccount = XyoAccount(),
     private val observer: ((context: Context, previousHash: String) -> T?)? = null,
-    var previousHash: String = ""
+    var previousHash: String = "",
+    val deferredObserver: DeferredObserver<T>? = null
 ) {
 
     constructor(
         observer: ((context: Context, previousHash: String) -> T?)?,
         previousHash: String = "",
         account: XyoAccount = XyoAccount()
-    ): this(account, observer, previousHash)
+    ): this(account, observer, previousHash, null)
 
-    open fun observe(context: Context): T? {
+    constructor(
+        observer: DeferredObserver<T>?,
+        previousHash: String = "",
+        account: XyoAccount = XyoAccount()
+    ): this(account, null, previousHash, observer)
+
+    open suspend fun observe(context: Context): T? {
+        if (deferredObserver !== null) {
+            val payload = deferredObserver.deferredDetect(context, previousHash)
+            return payload
+        }
         observer?.let {
             val payload = it(context, previousHash)
             payload?.let {
