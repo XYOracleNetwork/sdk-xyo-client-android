@@ -4,55 +4,36 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.location.Location
 import android.util.Log
+import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
 import com.squareup.moshi.JsonClass
+import kotlinx.coroutines.suspendCancellableCoroutine
 import network.xyo.client.XyoSerializable
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import kotlin.coroutines.resumeWithException
 
 @JsonClass(generateAdapter = true)
 class XyoLocationCurrent {
     companion object {
 
         @SuppressLint("MissingPermission")
-        fun detect(context: Context): CurrentLocation? {
+        suspend fun detect(context: Context): CurrentLocation? {
             if (LocationPermissions.check((context)) && LocationPermissions.checkGooglePlayServices(context)) {
-                val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
-                var coordinates: Coordinates? = null
-
-                try {
-                    val latch = CountDownLatch(1)
-
-                    fusedLocationClient.lastLocation
-                        .addOnSuccessListener { location: Location? ->
-                            if (location != null) {
-                                Log.w("xyoClient", "Location was found")
-                                Log.w("xyoClient", "lat: ${location.latitude}, long: ${location.longitude}")
-                                coordinates = setCoordinatesFromLocation(location)
-                                // countDown to zero to lift the latch
-                                latch.countDown()
-                            } else {
-                                // countDown to zero to lift the latch
-//                                latch.countDown()
-                                Log.e("xyoClient","Location not available")
-                            }
+                val fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
+                return suspendCancellableCoroutine { continuation ->
+                    fusedLocationProviderClient.lastLocation
+                        .addOnSuccessListener { location ->
+                            val coordinates = setCoordinatesFromLocation(location)
+                            val currentLocation = CurrentLocation(coordinates, System.currentTimeMillis())
+                            // Resume the coroutine with the retrieved location
+                            continuation.resumeWith(Result.success(currentLocation))
                         }
-                        .addOnFailureListener {
-                            Log.e("xyoClient","Failed to get location: ${it.message}")
+                        .addOnFailureListener { exception ->
+                            // Resume the coroutine with an exception if the task fails
+                            continuation.resumeWithException(exception)
                         }
-                    // Wait for up to 5 seconds for the location
-                    latch.await(15, TimeUnit.SECONDS)
-
-                    if (coordinates == null) {
-                        return null
-                    } else {
-                        val currentLocation = CurrentLocation(coordinates!!, System.currentTimeMillis())
-                        val serialized = XyoSerializable.toJson(currentLocation)
-                        Log.i("xyoClient", "serialized currentLocation: ${serialized}")
-                        return currentLocation
-                    }
-                } catch (e: InterruptedException) {
-                    e.printStackTrace()
                 }
             }
             return null
