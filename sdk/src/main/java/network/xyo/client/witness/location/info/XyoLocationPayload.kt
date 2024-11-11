@@ -33,7 +33,7 @@ class XyoLocationPayload (
     companion object {
 
         @SuppressLint("MissingPermission")
-        fun detect(context: Context): XyoLocationPayload? {
+        suspend fun detect(context: Context): XyoLocationPayload? {
             return XyoLocationPayload(
                 XyoLocationCurrent.detect(context)
             )
