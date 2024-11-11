@@ -2,6 +2,9 @@ package network.xyo.client
 
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import network.xyo.client.witness.system.info.XyoSystemInfoPayload
 import network.xyo.client.witness.system.info.XyoSystemInfoWitness
 import org.junit.Test
@@ -13,12 +16,14 @@ class SystemInfoWitnessTest {
         // Get the application context
         val context = ApplicationProvider.getApplicationContext<Context>()
 
-        val witness = XyoSystemInfoWitness()
-        val payload = witness.observe(context)
+        CoroutineScope(Dispatchers.Main).launch {
+            val witness = XyoSystemInfoWitness()
+            val payload = witness.observe(context)
 
-        assertInstanceOf<XyoSystemInfoPayload>(payload)
-        assert(payload.os != null)
-        assert(payload.device != null)
-        assert(payload.network != null)
+            assertInstanceOf<XyoSystemInfoPayload>(payload)
+            assert(payload.os != null)
+            assert(payload.device != null)
+            assert(payload.network != null)
+        }
     }
 }
