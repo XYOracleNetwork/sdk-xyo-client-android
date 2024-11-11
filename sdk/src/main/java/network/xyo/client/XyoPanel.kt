@@ -133,7 +133,7 @@ class XyoPanel(val context: Context, private val archivists: List<XyoArchivistAp
         }
     }
 
-    private fun generateBoundWitnessJson(adhocWitnesses: List<XyoWitness<XyoPayload>> = emptyList()): XyoBoundWitnessJson {
+    private suspend fun generateBoundWitnessJson(adhocWitnesses: List<XyoWitness<XyoPayload>> = emptyList()): XyoBoundWitnessJson {
         val witnesses: List<XyoWitness<XyoPayload>> = (this.witnesses ?: emptyList()).plus(adhocWitnesses)
         val payloads = generatePayloads()
         return XyoBoundWitnessBuilder()
@@ -143,7 +143,7 @@ class XyoPanel(val context: Context, private val archivists: List<XyoArchivistAp
     }
 
 
-    private fun generatePayloads(adhocWitnesses: List<XyoWitness<XyoPayload>> = emptyList()): List<XyoPayload> {
+    private suspend fun generatePayloads(adhocWitnesses: List<XyoWitness<XyoPayload>> = emptyList()): List<XyoPayload> {
         val witnesses: List<XyoWitness<XyoPayload>> = (this.witnesses ?: emptyList()).plus(adhocWitnesses)
         val payloads = witnesses.map { witness ->
             witness.observe(context)

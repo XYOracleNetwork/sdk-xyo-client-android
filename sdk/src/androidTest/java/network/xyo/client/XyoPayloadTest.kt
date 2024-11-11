@@ -3,6 +3,9 @@ package network.xyo.client
 import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import network.xyo.client.address.XyoAccount
 import network.xyo.client.boundwitness.XyoBoundWitnessBuilder
 import network.xyo.client.payload.XyoPayload
@@ -93,14 +96,17 @@ class XyoPayloadTest {
         val witness = XyoWitness(address, fun(_: Context, _: String?): XyoPayload {
             return BasicPayload()
         })
-        val response = arrayListOf(witness.observe(appContext))
-        val payloads = response.mapNotNull { payload -> payload }
-        val bwJson = XyoBoundWitnessBuilder()
-            .payloads(payloads)
-            .witnesses(arrayListOf(witness))
-            .build()
-        val bwJsonString = XyoSerializable.toJson(bwJson)
-        val bwMirrored = XyoSerializable.fromJson(bwJsonString, bwJson)
-        assertNotNull(bwMirrored)
+
+        CoroutineScope(Dispatchers.Main).launch {
+            val response = arrayListOf(witness.observe(appContext))
+            val payloads = response.mapNotNull { payload -> payload }
+            val bwJson = XyoBoundWitnessBuilder()
+                .payloads(payloads)
+                .witnesses(arrayListOf(witness))
+                .build()
+            val bwJsonString = XyoSerializable.toJson(bwJson)
+            val bwMirrored = XyoSerializable.fromJson(bwJsonString, bwJson)
+            assertNotNull(bwMirrored)
+        }
     }
 }
