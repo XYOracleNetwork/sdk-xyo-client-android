@@ -20,8 +20,6 @@ import network.xyo.client.payload.XyoPayload
 data class XyoPanelReportResult(val bw: XyoBoundWitnessJson, val apiResults: List<PostBoundWitnessesResult>)
 data class XyoPanelReportQueryResult(val bw: XyoBoundWitnessJson, val apiResults: List<PostQueryResult>?, val payloads: List<XyoPayload>?)
 
-class MissingNodesException(message: String) : Exception(message) {}
-
 @RequiresApi(Build.VERSION_CODES.M)
 class XyoPanel(val context: Context, private val archivists: List<XyoArchivistApiClient>?, private val witnesses: List<XyoWitness<XyoPayload>>?, private val nodeUrlsAndAccounts: ArrayList<Pair<String, XyoAccount?>>?) {
     var previousHash: String? = null
