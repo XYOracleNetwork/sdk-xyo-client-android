@@ -4,11 +4,15 @@ import network.xyo.client.address.XyoAccount
 import network.xyo.client.payload.XyoPayload
 
 class DebugPayload(val nonce: Int) : XyoPayload() {
-    override var schema: String = "network.xyo.debug"
+    override var schema: String
+        get() = "network.xyo.debug"
+        set(value) = Unit
 }
 
 class BasicPayload(): XyoPayload() {
-    override var schema = "network.xyo.basic"
+    override var schema: String
+        get() = "network.xyo.basic"
+        set(value) = Unit
 }
 
 

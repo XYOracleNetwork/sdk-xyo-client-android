@@ -28,7 +28,10 @@ data class CurrentLocation(
 class XyoLocationPayload (
     val currentLocation: CurrentLocation? = null
 ): XyoPayload() {
-    override var schema: String = "network.xyo.location.android"
+    override var schema: String
+        get() = "network.xyo.location.android"
+        set(value) = Unit
+
 
     companion object {
 

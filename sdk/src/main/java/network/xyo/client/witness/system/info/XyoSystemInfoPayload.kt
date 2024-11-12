@@ -12,7 +12,9 @@ class XyoSystemInfoPayload(
     val network: XyoSystemInfoNetwork? = null,
     val os: XyoSystemInfoOs? = null,
     ): XyoPayload () {
-        override var schema: String = "network.xyo.system.info.android"
+        override var schema: String
+            get() = "network.xyo.system.info.android"
+            set(value) = Unit
 
         companion object {
 
