@@ -10,6 +10,7 @@ import kotlinx.coroutines.runBlocking
 import network.xyo.client.address.XyoAccount
 import network.xyo.client.boundwitness.XyoBoundWitnessJson
 import network.xyo.client.datastore.XyoAccountPrefsRepository
+import network.xyo.client.datastore.defaults
 import network.xyo.client.payload.XyoPayload
 import network.xyo.client.witness.location.info.LocationActivity
 import network.xyo.client.witness.location.info.XyoLocationWitness
@@ -128,7 +129,7 @@ class XyoPanelTest {
     @Test
     fun testAccountPersistence() {
         runBlocking {
-            val prefsRepository = XyoAccountPrefsRepository(appContext)
+            val prefsRepository = XyoAccountPrefsRepository(appContext, defaults.accountPreferences)
             prefsRepository.clearSavedAccountKey()
 
             val panel = XyoPanel(appContext, arrayListOf(Pair(apiDomainBeta, null)), listOf(XyoSystemInfoWitness()))

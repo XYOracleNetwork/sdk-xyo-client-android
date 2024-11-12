@@ -8,20 +8,22 @@ import network.xyo.data.PrefsDataStoreProtos.PrefsDataStore
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import network.xyo.client.address.XyoAccount
+import network.xyo.client.settings.AccountPreferences
 import network.xyo.client.xyoScope
 
-class XyoAccountPrefsRepository(context: Context) {
-    private val prefsDataStore: DataStore<PrefsDataStore>
+class XyoAccountPrefsRepository(context: Context, accountPreferences: AccountPreferences?) {
+    constructor(context: Context): this(context, null)
 
-    init {
-        this.prefsDataStore = context.xyoAccountDataStore
-    }
+    private val prefsDataStore: DataStore<PrefsDataStore> = context.xyoAccountDataStore(
+        accountPreferences?.fileName, accountPreferences?.storagePath
+    )
 
     @RequiresApi(Build.VERSION_CODES.M)
     suspend fun getAccount(): XyoAccount {
         val savedKeyBytes = getAccountKey().encodeToByteArray()
         return XyoAccount(savedKeyBytes)
     }
+
     @RequiresApi(Build.VERSION_CODES.M)
     private suspend fun getAccountKey(): String {
         val savedKey = prefsDataStore.data.first().accountKey
