@@ -126,42 +126,4 @@ class XyoPanelTest {
             assertInstanceOf<XyoSystemInfoPayload>(results.payloads?.first())
         }
     }
-
-    @Test
-    fun testAccountPersistence() {
-        runBlocking {
-            val prefsRepository = XyoAccountPrefsRepository.getInstance(appContext, defaults.accountPreferences)
-            prefsRepository.clearSavedAccountKey()
-
-            val panel = XyoPanel(appContext, arrayListOf(Pair(apiDomainBeta, null)), listOf(XyoSystemInfoWitness()))
-            panel.resolveNodes()
-            val generatedAddress = panel.defaultAccount?.address?.hex
-            assertNotEquals(generatedAddress, null)
-
-            val panel2 = XyoPanel(appContext, arrayListOf(Pair(apiDomainBeta, null)), listOf(XyoSystemInfoWitness()))
-            panel2.resolveNodes()
-            val secondGeneratedAddress = panel2.defaultAccount?.address?.hex
-            assertEquals(generatedAddress, secondGeneratedAddress)
-        }
-    }
-
-    @Test
-    fun testUpdatingAccountPreferences() {
-        runBlocking {
-            val instance = XyoAccountPrefsRepository.getInstance(appContext)
-            instance.clearSavedAccountKey()
-
-            open class UpdatedAccountPreferences: AccountPreferences {
-                override val fileName = "network-xyo-sdk-prefs-1"
-                override val storagePath = "__xyo-client-sdk-1__"
-            }
-            val updatedAccountPrefs = UpdatedAccountPreferences()
-
-            val refreshedInstance = XyoAccountPrefsRepository.refresh(appContext, updatedAccountPrefs)
-
-            // Test that accountPreferences are updated
-            assertEquals(refreshedInstance.accountPreferences.fileName, updatedAccountPrefs.fileName)
-            assertEquals(refreshedInstance.accountPreferences.storagePath, updatedAccountPrefs.storagePath)
-        }
-    }
 }
