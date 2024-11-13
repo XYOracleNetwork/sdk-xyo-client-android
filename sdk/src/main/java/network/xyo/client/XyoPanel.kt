@@ -77,7 +77,7 @@ class XyoPanel(val context: Context, private val archivists: List<XyoArchivistAp
 
     suspend fun resolveNodes(resetNodes: Boolean = false) {
         if (resetNodes) nodes = null
-        this.defaultAccount = XyoAccountPrefsRepository(context).getAccount()
+        this.defaultAccount = XyoAccountPrefsRepository.getInstance(context).getAccount()
         if (nodeUrlsAndAccounts?.isNotEmpty() == true) {
             nodes = mutableListOf<NodeClient>().let {
                 this@XyoPanel.nodeUrlsAndAccounts?.forEach { pair ->

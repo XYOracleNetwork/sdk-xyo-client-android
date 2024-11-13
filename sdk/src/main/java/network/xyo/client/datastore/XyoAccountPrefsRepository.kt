@@ -14,7 +14,8 @@ import network.xyo.client.xyoScope
 class XyoAccountPrefsRepository(context: Context, accountPreferences: AccountPreferences?) {
     constructor(context: Context): this(context, null)
 
-    private val prefsDataStore: DataStore<PrefsDataStore> = context.xyoAccountDataStore(
+    @Volatile
+    private var prefsDataStore: DataStore<PrefsDataStore> = context.xyoAccountDataStore(
         accountPreferences?.fileName, accountPreferences?.storagePath
     )
 
@@ -58,5 +59,18 @@ class XyoAccountPrefsRepository(context: Context, accountPreferences: AccountPre
         }
         job.join()
         return prefsDataStore
+    }
+
+    // Define the singleton instance within a companion object
+    companion object {
+        @Volatile
+        private var INSTANCE: XyoAccountPrefsRepository? = null
+
+        // Method to retrieve the singleton instance
+        fun getInstance(context: Context, accountPreferences: AccountPreferences? = null): XyoAccountPrefsRepository {
+            return INSTANCE ?: synchronized(this) {
+                INSTANCE ?: XyoAccountPrefsRepository(context, accountPreferences).also { INSTANCE = it }
+            }
+        }
     }
 }

@@ -129,7 +129,7 @@ class XyoPanelTest {
     @Test
     fun testAccountPersistence() {
         runBlocking {
-            val prefsRepository = XyoAccountPrefsRepository(appContext, defaults.accountPreferences)
+            val prefsRepository = XyoAccountPrefsRepository.getInstance(appContext, defaults.accountPreferences)
             prefsRepository.clearSavedAccountKey()
 
             val panel = XyoPanel(appContext, arrayListOf(Pair(apiDomainBeta, null)), listOf(XyoSystemInfoWitness()))
