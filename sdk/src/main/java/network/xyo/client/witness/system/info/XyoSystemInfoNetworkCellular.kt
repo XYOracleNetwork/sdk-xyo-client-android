@@ -1,13 +1,11 @@
 package network.xyo.client.witness.system.info
 
-import android.Manifest
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
 import android.telephony.TelephonyManager
 import com.squareup.moshi.JsonClass
-import network.xyo.client.hasPermission
 import java.net.NetworkInterface
 
 @JsonClass(generateAdapter = true)

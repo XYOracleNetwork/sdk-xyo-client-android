@@ -3,7 +3,6 @@ package network.xyo.client.archivist.wrapper
 import android.os.Build
 import androidx.annotation.RequiresApi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import network.xyo.client.XyoSerializable
 import network.xyo.client.node.client.NodeClient
 import network.xyo.client.node.client.PostQueryResult
 import network.xyo.client.payload.XyoPayload

@@ -4,14 +4,10 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.location.Location
 import android.util.Log
-import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
-import com.google.android.gms.location.Priority
 import com.squareup.moshi.JsonClass
 import kotlinx.coroutines.suspendCancellableCoroutine
 import network.xyo.client.XyoSerializable
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
 import kotlin.coroutines.resumeWithException
 
 @JsonClass(generateAdapter = true)

@@ -4,7 +4,6 @@ import java.math.BigInteger
 import java.security.spec.ECFieldFp
 import java.security.spec.ECParameterSpec
 
-
 /**
  * A cryptographic elliptical curve to preform cryptography on.
  */

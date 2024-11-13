@@ -3,7 +3,6 @@ package network.xyo.client.witness.system.info
 import android.content.Context
 import android.os.Build
 import com.squareup.moshi.JsonClass
-import java.io.UnsupportedEncodingException
 import java.net.URLEncoder
 
 @JsonClass(generateAdapter = true)

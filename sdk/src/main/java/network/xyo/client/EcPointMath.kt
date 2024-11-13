@@ -2,7 +2,6 @@ package network.xyo.client
 
 import java.math.BigInteger
 
-
 /**
  * A helper object to do point arithmetic in a prime field.
  */

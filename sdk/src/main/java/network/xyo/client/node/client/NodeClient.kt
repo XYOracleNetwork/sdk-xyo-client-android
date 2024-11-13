@@ -20,8 +20,6 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.io.IOException
 
-
-
 @RequiresApi(Build.VERSION_CODES.M)
 class NodeClient(private val url: String, private val accountToUse: XyoAccount?) {
 
