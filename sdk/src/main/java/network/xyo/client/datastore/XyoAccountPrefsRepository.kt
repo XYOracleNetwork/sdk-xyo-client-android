@@ -84,5 +84,9 @@ class XyoAccountPrefsRepository(context: Context, private val _accountPreference
             }
             return INSTANCE!! // Return the updated instance
         }
+
+        fun resetInstance() {
+            INSTANCE = null
+        }
     }
 }
