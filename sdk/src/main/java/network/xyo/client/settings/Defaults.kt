@@ -7,7 +7,7 @@ import network.xyo.client.address.XyoAccount
 import network.xyo.client.datastore.XyoAccountPrefsRepository
 
 open class DefaultXyoSdkSettings: SettingsInterface {
-    override val accountPreferences = DefaultAccountPreferences()
+    override val accountPreferences: AccountPreferences = DefaultAccountPreferences()
 
     @RequiresApi(Build.VERSION_CODES.M)
     override suspend fun getAccount(context: Context): XyoAccount? {
