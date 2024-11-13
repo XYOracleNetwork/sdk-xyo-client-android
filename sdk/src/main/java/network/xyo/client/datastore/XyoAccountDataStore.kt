@@ -12,8 +12,11 @@ import java.io.File
 
 val defaults = DefaultXyoSdkSettings()
 
-fun Context.xyoAccountDataStore(name: String? = defaults.accountPreferences.fileName, path: String? = defaults.accountPreferences.storagePath): DataStore<PrefsDataStore> {
-    val dataStoreFile = File(filesDir, "$path/$name")
+fun Context.xyoAccountDataStore(name: String?, path: String?): DataStore<PrefsDataStore> {
+    val resolvedName = name ?: defaults.accountPreferences.fileName
+    val resolvedPath = path ?: defaults.accountPreferences.storagePath
+
+    val dataStoreFile = File(filesDir, "$resolvedPath/$resolvedName")
 
     return MultiProcessDataStoreFactory.create(
         serializer = PrefsDataStoreSerializer,
