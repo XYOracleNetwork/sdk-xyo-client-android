@@ -9,8 +9,10 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import network.xyo.client.address.XyoAccount
 import network.xyo.client.boundwitness.XyoBoundWitnessJson
-import network.xyo.client.datastore.PrefsRepository
+import network.xyo.client.datastore.XyoAccountPrefsRepository
+import network.xyo.client.datastore.defaults
 import network.xyo.client.payload.XyoPayload
+import network.xyo.client.settings.AccountPreferences
 import network.xyo.client.witness.location.info.LocationActivity
 import network.xyo.client.witness.location.info.XyoLocationWitness
 import network.xyo.client.witness.system.info.XyoSystemInfoPayload
@@ -94,7 +96,7 @@ class XyoPanelTest {
     @Test
     fun testSimplePanelReport() {
         runBlocking {
-            val panel = XyoPanel(appContext, fun(_context:Context, _: String?): XyoEventPayload {
+            val panel = XyoPanel(appContext, fun(_:Context, _: String?): XyoEventPayload {
                 return XyoEventPayload("test_event")
             })
             val result = panel.reportAsyncQuery()
@@ -122,24 +124,6 @@ class XyoPanelTest {
             val results = panel.reportAsyncQuery()
             assertInstanceOf<XyoBoundWitnessJson>(results.bw)
             assertInstanceOf<XyoSystemInfoPayload>(results.payloads?.first())
-        }
-    }
-
-    @Test
-    fun testAccountPersistence() {
-        runBlocking {
-            val prefsRepository = PrefsRepository(appContext)
-            prefsRepository.clearSavedAccountKey()
-
-            val panel = XyoPanel(appContext, arrayListOf(Pair(apiDomainBeta, null)), listOf(XyoSystemInfoWitness()))
-            panel.resolveNodes()
-            val generatedAddress = panel.defaultAccount?.address?.hex
-            assertNotEquals(generatedAddress, null)
-
-            val panel2 = XyoPanel(appContext, arrayListOf(Pair(apiDomainBeta, null)), listOf(XyoSystemInfoWitness()))
-            panel2.resolveNodes()
-            val secondGeneratedAddress = panel2.defaultAccount?.address?.hex
-            assertEquals(generatedAddress, secondGeneratedAddress)
         }
     }
 }

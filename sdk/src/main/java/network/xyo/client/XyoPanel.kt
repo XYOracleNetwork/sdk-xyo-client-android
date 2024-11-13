@@ -12,7 +12,7 @@ import network.xyo.client.archivist.api.XyoArchivistApiConfig
 import network.xyo.client.archivist.wrapper.ArchivistWrapper
 import network.xyo.client.boundwitness.XyoBoundWitnessBuilder
 import network.xyo.client.boundwitness.XyoBoundWitnessJson
-import network.xyo.client.datastore.PrefsRepository
+import network.xyo.client.datastore.XyoAccountPrefsRepository
 import network.xyo.client.node.client.NodeClient
 import network.xyo.client.node.client.PostQueryResult
 import network.xyo.client.payload.XyoPayload
@@ -77,7 +77,7 @@ class XyoPanel(val context: Context, private val archivists: List<XyoArchivistAp
 
     suspend fun resolveNodes(resetNodes: Boolean = false) {
         if (resetNodes) nodes = null
-        this.defaultAccount = PrefsRepository(context).getAccount()
+        this.defaultAccount = XyoAccountPrefsRepository.getInstance(context).getAccount()
         if (nodeUrlsAndAccounts?.isNotEmpty() == true) {
             nodes = mutableListOf<NodeClient>().let {
                 this@XyoPanel.nodeUrlsAndAccounts?.forEach { pair ->
