@@ -2,7 +2,6 @@ package network.xyo.client.datastore
 
 import android.content.Context
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.datastore.core.DataStore
 import network.xyo.data.PrefsDataStoreProtos.PrefsDataStore
@@ -11,16 +10,18 @@ import kotlinx.coroutines.launch
 import network.xyo.client.address.XyoAccount
 import network.xyo.client.settings.AccountPreferences
 import network.xyo.client.xyoScope
-import java.io.File
-import java.nio.file.Files
-import java.nio.file.Paths
-import java.nio.file.StandardCopyOption
 
-class XyoAccountPrefsRepository(context: Context, private val accountPreferences: AccountPreferences = defaults.accountPreferences) {
+
+class XyoAccountPrefsRepository(context: Context, private val _accountPreferences: AccountPreferences = defaults.accountPreferences) {
+    // This should set the proper paths for the prefs datastore each time the the class is instantiated
     @Volatile
     private var prefsDataStore: DataStore<PrefsDataStore> = context.xyoAccountDataStore(
         accountPreferences.fileName, accountPreferences.storagePath
     )
+
+    // Exposing as a getter so path/filename preferences can be fetched from a separate location if needed.
+    val accountPreferences: AccountPreferences
+        get() = _accountPreferences
 
     @RequiresApi(Build.VERSION_CODES.M)
     suspend fun getAccount(): XyoAccount {
@@ -64,59 +65,6 @@ class XyoAccountPrefsRepository(context: Context, private val accountPreferences
         return prefsDataStore
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    suspend fun prefsFileAtPath(path: String, context: Context): File? {
-        var existingFile: File? = null
-        val job = xyoScope.launch {
-            val existingFilePath = Paths.get(context.filesDir.toString(), path)
-            if (Files.exists(existingFilePath)) {
-                existingFile = File(context.filesDir.toString(), path)
-            } else {
-                Log.w("xyoClient", "Unable to locate prefs at $existingFilePath")
-                existingFile = null
-            }
-        }
-        job.join()
-        return existingFile
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    suspend fun migrate(context: Context, accountPreferences: AccountPreferences) {
-        val existingAccountPreferences = this@XyoAccountPrefsRepository.accountPreferences
-        val existingPath = "${existingAccountPreferences.storagePath}/${existingAccountPreferences.fileName}"
-        val updatedPath = "${accountPreferences.storagePath}/${accountPreferences.fileName}"
-        if (existingPath !== updatedPath) {
-            migrateAccountToNewLocation(context, accountPreferences, existingPath, updatedPath)
-        }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    private suspend fun migrateAccountToNewLocation(context: Context, accountPreferences: AccountPreferences, existingPath: String, updatedPath: String) {
-        val job = xyoScope.launch {
-            val existingFile = prefsFileAtPath(existingPath, context)
-            if (existingFile == null) {
-                Log.e("xyoClient", "Unable to locate existing prefs: $existingPath ")
-            } else {
-                try {
-                    val sourcePath = existingFile.toPath()
-                    val destinationPath = File(context.filesDir, updatedPath).toPath()
-
-                    // Move the existing file to the new location
-                    Files.move(sourcePath, destinationPath, StandardCopyOption.REPLACE_EXISTING)
-
-                    synchronized(this) {
-                        val newInstance = getInstance(context, accountPreferences)
-                        newInstance.also { INSTANCE = it }
-                    }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    Log.e("xyoClient", "Error Moving File: ${e.message}")
-                }
-            }
-        }
-        job.join()
-    }
-
     // Define the singleton instance within a companion object
     companion object {
         @Volatile
@@ -124,16 +72,17 @@ class XyoAccountPrefsRepository(context: Context, private val accountPreferences
 
         // Method to retrieve the singleton instance
         fun getInstance(context: Context, accountPreferences: AccountPreferences = defaults.accountPreferences): XyoAccountPrefsRepository {
-            return INSTANCE ?: synchronized(this) {
+            val newInstance = INSTANCE ?: synchronized(this) {
                 INSTANCE ?: XyoAccountPrefsRepository(context, accountPreferences).also { INSTANCE = it }
             }
+            return newInstance
         }
 
         fun refresh(context: Context, accountPreferences: AccountPreferences): XyoAccountPrefsRepository {
-            return synchronized(this) {
-                val newInstance = getInstance(context, accountPreferences)
-                newInstance.also { INSTANCE = it }
+            synchronized(this) {
+                INSTANCE = XyoAccountPrefsRepository(context, accountPreferences)
             }
+            return INSTANCE!! // Return the updated instance
         }
     }
 }

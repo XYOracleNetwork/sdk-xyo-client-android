@@ -12,6 +12,7 @@ import network.xyo.client.boundwitness.XyoBoundWitnessJson
 import network.xyo.client.datastore.XyoAccountPrefsRepository
 import network.xyo.client.datastore.defaults
 import network.xyo.client.payload.XyoPayload
+import network.xyo.client.settings.AccountPreferences
 import network.xyo.client.witness.location.info.LocationActivity
 import network.xyo.client.witness.location.info.XyoLocationWitness
 import network.xyo.client.witness.system.info.XyoSystemInfoPayload
@@ -95,7 +96,7 @@ class XyoPanelTest {
     @Test
     fun testSimplePanelReport() {
         runBlocking {
-            val panel = XyoPanel(appContext, fun(_context:Context, _: String?): XyoEventPayload {
+            val panel = XyoPanel(appContext, fun(_:Context, _: String?): XyoEventPayload {
                 return XyoEventPayload("test_event")
             })
             val result = panel.reportAsyncQuery()
@@ -141,6 +142,26 @@ class XyoPanelTest {
             panel2.resolveNodes()
             val secondGeneratedAddress = panel2.defaultAccount?.address?.hex
             assertEquals(generatedAddress, secondGeneratedAddress)
+        }
+    }
+
+    @Test
+    fun testUpdatingAccountPreferences() {
+        runBlocking {
+            val instance = XyoAccountPrefsRepository.getInstance(appContext)
+            instance.clearSavedAccountKey()
+
+            open class UpdatedAccountPreferences: AccountPreferences {
+                override val fileName = "network-xyo-sdk-prefs-1"
+                override val storagePath = "__xyo-client-sdk-1__"
+            }
+            val updatedAccountPrefs = UpdatedAccountPreferences()
+
+            val refreshedInstance = XyoAccountPrefsRepository.refresh(appContext, updatedAccountPrefs)
+
+            // Test that accountPreferences are updated
+            assertEquals(refreshedInstance.accountPreferences.fileName, updatedAccountPrefs.fileName)
+            assertEquals(refreshedInstance.accountPreferences.storagePath, updatedAccountPrefs.storagePath)
         }
     }
 }
