@@ -109,4 +109,10 @@ class XyoPayloadTest {
             assertNotNull(bwMirrored)
         }
     }
+
+    @Test
+    fun testHashing() {
+        val payload = TestConstants.debugPayload
+        assertEquals(payload.hash(), TestConstants.debugPayloadHash)
+    }
 }

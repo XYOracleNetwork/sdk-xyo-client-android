@@ -20,4 +20,8 @@ open class XyoPayload(): Payload, XyoSerializable() {
             throw XyoInvalidSchemaException(schema)
         }
     }
+
+    open fun hash(): String {
+        return sha256String(this)
+    }
 }
