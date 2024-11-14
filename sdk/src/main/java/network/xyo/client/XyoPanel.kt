@@ -166,6 +166,7 @@ class XyoPanel(val context: Context, private val archivists: List<XyoArchivistAp
     suspend fun reportAsyncQuery(adhocWitnesses: List<XyoWitness<XyoPayload>> = emptyList()): XyoPanelReportQueryResult {
         if (nodes == null) resolveNodes()
         val bw = generateBoundWitnessJson()
+        previousHash = bw._hash
         val payloads = generatePayloads(adhocWitnesses)
         val results = mutableListOf<PostQueryResult>()
 
