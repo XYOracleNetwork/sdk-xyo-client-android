@@ -70,7 +70,7 @@ class XyoAccountPrefsRepositoryTest {
             val instance = XyoAccountPrefsRepository.getInstance(appContext)
             val originalAddress = instance.getAccount().private.hex
 
-            open class UpdatedAccountPreferences : AccountPreferences {
+            class UpdatedAccountPreferences : AccountPreferences {
                 override val fileName = "network-xyo-sdk-prefs-1"
                 override val storagePath = "__xyo-client-sdk-1__"
             }
