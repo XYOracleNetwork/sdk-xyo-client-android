@@ -7,6 +7,7 @@ import androidx.datastore.core.DataStore
 import network.xyo.data.PrefsDataStoreProtos.PrefsDataStore
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import network.xyo.client.account.hexStringToByteArray
 import network.xyo.client.address.XyoAccount
 import network.xyo.client.settings.AccountPreferences
 import network.xyo.client.xyoScope
@@ -25,8 +26,8 @@ class XyoAccountPrefsRepository(context: Context, private val _accountPreference
 
     @RequiresApi(Build.VERSION_CODES.M)
     suspend fun getAccount(): XyoAccount {
-        val savedKeyBytes = getAccountKey().encodeToByteArray()
-        return XyoAccount(savedKeyBytes)
+        val saveKeyHex = getAccountKey()
+        return XyoAccount(hexStringToByteArray(saveKeyHex))
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
