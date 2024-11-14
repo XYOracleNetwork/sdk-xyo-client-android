@@ -3,6 +3,8 @@ package network.xyo.client
 import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
 import kotlinx.coroutines.runBlocking
+import network.xyo.client.address.XyoAccount
+import network.xyo.client.boundwitness.XyoBoundWitnessBuilder
 import network.xyo.client.datastore.XyoAccountPrefsRepository
 import network.xyo.client.settings.AccountPreferences
 import network.xyo.client.witness.system.info.XyoSystemInfoWitness
@@ -93,6 +95,37 @@ class XyoAccountPrefsRepositoryTest {
             val refreshedAddress = refreshedInstance.getAccount().private.hex
 
             assert(originalAddress !== refreshedAddress)
+        }
+    }
+
+    @Test
+    fun testAccountDeserialization() {
+        runBlocking {
+            val testAccount = XyoAccount()
+            val instance = XyoAccountPrefsRepository.getInstance(appContext)
+            // Clear previously saved accounts
+            instance.clearSavedAccountKey()
+            // Serialize the test account
+            instance.initializeAccount(testAccount)
+
+            // Deserialize the test account
+            val firstAccount = instance.getAccount()
+            assertEquals(firstAccount.private.hex, testAccount.private.hex)
+
+            // Sign with the test account
+            val firstBw = XyoBoundWitnessBuilder().witness(firstAccount, null).payloads(listOf(TestConstants.debugPayload)).build()
+            val firstAddress = firstBw.addresses.first()
+
+            // Deserialize the test account (Ideally we would refresh the singleton but in tests this seems to cause errors with multiple instances of the prefs DataStore)
+            val secondInstance = XyoAccountPrefsRepository.getInstance(appContext)
+            val secondAccount = secondInstance.getAccount()
+
+            // Sign with the test account
+            val secondBw = XyoBoundWitnessBuilder().witness(secondAccount, null).payloads(listOf(TestConstants.debugPayload)).build()
+            val secondAddress = secondBw.addresses.first()
+
+            // check that addresses have not changed and no errors occurred during signing
+            assertEquals(firstAddress, secondAddress)
         }
     }
 }

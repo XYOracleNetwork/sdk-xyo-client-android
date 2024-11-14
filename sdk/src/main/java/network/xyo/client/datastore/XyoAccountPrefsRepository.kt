@@ -2,6 +2,7 @@ package network.xyo.client.datastore
 
 import android.content.Context
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.datastore.core.DataStore
 import network.xyo.data.PrefsDataStoreProtos.PrefsDataStore
@@ -28,6 +29,28 @@ class XyoAccountPrefsRepository(context: Context, private val _accountPreference
     suspend fun getAccount(): XyoAccount {
         val saveKeyHex = getAccountKey()
         return XyoAccount(hexStringToByteArray(saveKeyHex))
+    }
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    suspend fun initializeAccount(account: XyoAccount): XyoAccount? {
+        var updatedKey: String? = null
+        val job = xyoScope.launch {
+            val savedKey = prefsDataStore.data.first().accountKey
+            if (savedKey.isNullOrEmpty()) {
+                // no saved key so save the passed in one
+                updatedKey = null
+                setAccountKey(account.private.hex)
+            } else {
+                updatedKey = null
+                Log.w("xyoClient", "Key already exists.  Clear it first before initializing prefs with new account")
+            }
+        }
+        job.join()
+        return if (updatedKey !== null) {
+            account
+        } else {
+            null
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
@@ -82,12 +105,14 @@ class XyoAccountPrefsRepository(context: Context, private val _accountPreference
         fun refresh(context: Context, accountPreferences: AccountPreferences): XyoAccountPrefsRepository {
             synchronized(this) {
                 INSTANCE = XyoAccountPrefsRepository(context, accountPreferences)
+                return INSTANCE!!
             }
-            return INSTANCE!! // Return the updated instance
         }
 
         fun resetInstance() {
-            INSTANCE = null
+            synchronized(this) {
+                INSTANCE = null
+            }
         }
     }
 }
