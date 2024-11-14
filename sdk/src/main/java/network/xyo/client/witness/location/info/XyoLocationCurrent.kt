@@ -21,6 +21,9 @@ class XyoLocationCurrent {
                 return suspendCancellableCoroutine { continuation ->
                     fusedLocationProviderClient.lastLocation
                         .addOnSuccessListener { location ->
+                            if (location === null) {
+                                continuation.resumeWith(Result.success(null))
+                            }
                             val coordinates = setCoordinatesFromLocation(location)
                             val currentLocation = CurrentLocation(coordinates, System.currentTimeMillis())
                             // Resume the coroutine with the retrieved location

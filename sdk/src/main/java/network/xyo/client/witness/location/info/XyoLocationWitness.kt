@@ -2,6 +2,7 @@ package network.xyo.client.witness.location.info
 
 import android.content.Context
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import network.xyo.client.DeferredObserver
 import network.xyo.client.XyoWitness
@@ -12,7 +13,12 @@ class DeferredLocationObserver : DeferredObserver<XyoLocationPayload>() {
         context: Context,
         previousHash: String?
     ): XyoLocationPayload? {
-        return XyoLocationPayload.detect(context)
+        try {
+            return XyoLocationPayload.detect(context)
+        } catch (e: Exception) {
+            Log.e("xyoClient", "Error building location payload: ${e.toString() + e.stackTraceToString()}")
+            return null
+        }
     }
 }
 
