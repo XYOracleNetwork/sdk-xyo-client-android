@@ -1,52 +1,92 @@
 package network.xyo.client.account
 
+import network.xyo.client.XyoSerializable
 import network.xyo.client.account.model.AccountInstance
 import network.xyo.client.account.model.AccountStatic
 import network.xyo.client.account.model.PreviousHashStore
+import network.xyo.client.address.XyoData.Companion.copyByteArrayWithLeadingPaddingOrTrim
+import network.xyo.client.address.XyoEllipticKey.Companion.CURVE
+import org.spongycastle.crypto.digests.SHA256Digest
+import org.spongycastle.crypto.params.ECPrivateKeyParameters
+import org.spongycastle.crypto.signers.ECDSASigner
+import org.spongycastle.crypto.signers.HMacDSAKCalculator
+import org.spongycastle.jcajce.provider.digest.Keccak
 import tech.figure.hdwallet.ec.PrivateKey
+import tech.figure.hdwallet.ec.extensions.toBytesPadded
 import tech.figure.hdwallet.ec.secp256k1Curve
 import tech.figure.hdwallet.signer.ASN1Signature
 import tech.figure.hdwallet.signer.BCECSigner
+import tech.figure.hdwallet.signer.BTCSignature
 import tech.figure.hdwallet.signer.ECDSASignature
-import tech.figure.hdwallet.wallet.Account as TFAccount
+import java.math.BigInteger
+import java.security.SecureRandom
 
-open class Account(private val _account: TFAccount, private var _previousHash: ByteArray? = null): AccountInstance {
+open class Account(private val _privateKey: PrivateKey, private var _previousHash: ByteArray? = null): AccountInstance {
 
-    constructor(privateKey: PrivateKey, previousHash: ByteArray? = null) : this(TFAccount.fromBip32("", toBase58(privateKey.key)), previousHash) {}
-    constructor(privateKey: ByteArray, previousHash: ByteArray? = null) : this(TFAccount.fromBip32("", toBase58(privateKey)), previousHash) {}
+    constructor(privateKey: ByteArray, previousHash: ByteArray? = null) : this(PrivateKey.fromBytes(privateKey, secp256k1Curve), previousHash) {}
+    constructor(privateKey: BigInteger, previousHash: ByteArray? = null) : this(privateKey.toByteArray(), previousHash) {}
 
-    private val _address = hexStringToByteArray(_account.keyPair.publicKey.address("").value)
+    private val _address = addressFromPublicKey(publicKey)
 
-    override val address: ByteArray
+    final override val address: ByteArray
         get() = _address
-    override val previousHash: ByteArray?
+    final override val previousHash: ByteArray?
         get() = _previousHash
-    override val privateKey: ByteArray
-        get() = _account.keyPair.privateKey.key.toByteArray()
-    override val publicKey: ByteArray
-        get() = _account.keyPair.publicKey.key.toByteArray()
+    final override val privateKey: ByteArray
+        get() = _privateKey.key.toBytesPadded(32)
+    final override val publicKey: ByteArray
+        get() = publicKeyFromPrivateKey(BigInteger(privateKey))
 
     override fun sign(hash: ByteArray): ByteArray {
-        val result = BCECSigner().sign(_account.keyPair.privateKey, hash)
+        val result = BCECSigner().sign(_privateKey, hash)
         _previousHash = hash
-        return result.encodeAsASN1DER().toByteArray()
+        return result.encodeAsBTC().toByteArray()
     }
 
     override fun verify(msg: ByteArray, signature: ByteArray): Boolean {
-        return BCECSigner().verify(_account.keyPair.publicKey, msg, ECDSASignature.Companion.decode(
-            ASN1Signature.fromByteArray(signature)))
+        return BCECSigner().verify(_privateKey.toPublicKey(), msg, ECDSASignature.Companion.decode(
+            BTCSignature.fromByteArray(signature)))
     }
 
     companion object: AccountStatic<AccountInstance> {
         override var previousHashStore: PreviousHashStore? = null
 
-        @OptIn(ExperimentalStdlibApi::class)
         override fun fromPrivateKey(key: ByteArray): AccountInstance {
-            return Account(PrivateKey.fromBytes(key, secp256k1Curve))
+            return Account(key)
         }
 
         override fun random(): AccountInstance {
-            TODO("Not yet implemented")
+            return fromPrivateKey(generatePrivateKeyBytes())
+        }
+
+        fun addressFromPublicKey(key: ByteArray): ByteArray {
+            val publicKeyHash = toKeccak(key.copyOfRange(1, key.size))
+            return publicKeyHash.copyOfRange(12, publicKeyHash.size)
+        }
+
+        private fun toKeccak(bytes: ByteArray): ByteArray {
+            val keccak = Keccak.Digest256()
+            keccak.update(bytes)
+            return keccak.digest()
+        }
+
+        private fun generatePrivateKeyBytes(): ByteArray {
+            val secureRandom = SecureRandom()
+            val private = ByteArray(32)
+            secureRandom.nextBytes(private)
+            //this line is to make sure the key is below n
+            while(BigInteger(private) > secp256k1Curve.n) {
+                secureRandom.nextBytes(private)
+            }
+            return private
+        }
+
+        fun publicKeyFromPrivateKey(private: BigInteger): ByteArray {
+            return secp256k1Curve.g.mul(private).encoded(false)
+        }
+
+        fun bytesToBigInteger(bb: ByteArray): BigInteger {
+            return if (bb.isEmpty()) BigInteger.ZERO else BigInteger(1, bb)
         }
     }
 }
