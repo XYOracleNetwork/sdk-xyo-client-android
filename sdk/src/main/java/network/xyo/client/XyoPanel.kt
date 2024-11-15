@@ -5,8 +5,8 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import kotlinx.coroutines.launch
+import network.xyo.client.account.Account
 import network.xyo.client.account.model.AccountInstance
-import network.xyo.client.address.XyoAccount
 import network.xyo.client.archivist.api.PostBoundWitnessesResult
 import network.xyo.client.archivist.api.XyoArchivistApiClient
 import network.xyo.client.archivist.api.XyoArchivistApiConfig
@@ -72,7 +72,7 @@ class XyoPanel(val context: Context, private val archivists: List<XyoArchivistAp
         observe: ((context: Context, previousHash: String?) -> XyoEventPayload?)?
     ): this(
         context,
-        arrayListOf(Pair("$DefaultApiDomain/Archivist", XyoAccount())),
+        arrayListOf(Pair("$DefaultApiDomain/Archivist", Account.random())),
         listOf(XyoWitness(observe)),
     )
 

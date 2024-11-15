@@ -6,7 +6,6 @@ import network.xyo.client.XyoSerializable
 import network.xyo.client.XyoWitness
 import network.xyo.client.account.hexStringToByteArray
 import network.xyo.client.account.model.AccountInstance
-import network.xyo.client.address.XyoAccount
 import network.xyo.client.payload.XyoPayload
 import network.xyo.client.payload.XyoValidationException
 

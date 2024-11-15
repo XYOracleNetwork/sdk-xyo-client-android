@@ -11,7 +11,6 @@ import network.xyo.app.xyo.sample.application.witness.WitnessHandlerInterface
 import network.xyo.app.xyo.sample.application.witness.WitnessResult
 import network.xyo.client.XyoPanel
 import network.xyo.client.account.model.AccountInstance
-import network.xyo.client.address.XyoAccount
 import network.xyo.client.payload.XyoPayload
 
 open class WitnessLocationHandler : WitnessHandlerInterface<List<XyoPayload?>> {

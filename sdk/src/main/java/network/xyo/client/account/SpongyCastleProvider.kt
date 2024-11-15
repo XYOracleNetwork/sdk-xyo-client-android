@@ -1,4 +1,4 @@
-package network.xyo.client.address
+package network.xyo.client.account
 
 import org.spongycastle.jce.provider.BouncyCastleProvider
 import java.security.Provider

@@ -5,7 +5,6 @@ import androidx.annotation.RequiresApi
 import network.xyo.client.XyoSerializable
 import network.xyo.client.XyoWitness
 import network.xyo.client.account.model.AccountInstance
-import network.xyo.client.address.XyoAccount
 import network.xyo.client.payload.XyoPayload
 
 

@@ -5,7 +5,6 @@ import androidx.annotation.RequiresApi
 import network.xyo.client.account.model.PreviousHashStore
 import network.xyo.client.account.model.WalletInstance
 import network.xyo.client.account.model.WalletStatic
-import network.xyo.client.address.XyoAccount
 import tech.figure.hdwallet.bip32.ExtKey
 import tech.figure.hdwallet.bip32.toRootKey
 import tech.figure.hdwallet.bip39.DeterministicSeed

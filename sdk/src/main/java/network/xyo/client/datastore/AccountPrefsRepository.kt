@@ -8,9 +8,9 @@ import androidx.datastore.core.DataStore
 import network.xyo.data.PrefsDataStoreProtos.PrefsDataStore
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import network.xyo.client.account.Account
 import network.xyo.client.account.hexStringToByteArray
 import network.xyo.client.account.model.AccountInstance
-import network.xyo.client.address.XyoAccount
 import network.xyo.client.settings.AccountPreferences
 import network.xyo.client.xyoScope
 
@@ -29,7 +29,7 @@ class AccountPrefsRepository(context: Context, private val _accountPreferences: 
     @RequiresApi(Build.VERSION_CODES.M)
     suspend fun getAccount(): AccountInstance {
         val saveKeyHex = getAccountKey()
-        return XyoAccount(hexStringToByteArray(saveKeyHex))
+        return Account.fromPrivateKey(saveKeyHex)
     }
 
     @OptIn(ExperimentalStdlibApi::class)
@@ -60,7 +60,7 @@ class AccountPrefsRepository(context: Context, private val _accountPreferences: 
     private suspend fun getAccountKey(): String {
         val savedKey = prefsDataStore.data.first().accountKey
         return if (savedKey.isEmpty()) {
-            val newAccount: AccountInstance = XyoAccount()
+            val newAccount: AccountInstance = Account.random()
             setAccountKey(newAccount.privateKey.toHexString())
             newAccount.privateKey.toHexString()
         } else {
