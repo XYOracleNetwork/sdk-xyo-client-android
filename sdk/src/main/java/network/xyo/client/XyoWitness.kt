@@ -8,7 +8,7 @@ import network.xyo.client.account.model.AccountInstance
 import network.xyo.client.payload.XyoPayload
 
 abstract class DeferredObserver<out T: XyoPayload> {
-    suspend abstract fun deferredDetect(context: Context, previousHash: String?): T?
+    abstract suspend fun deferredDetect(context: Context, previousHash: String?): T?
 }
 
 @RequiresApi(Build.VERSION_CODES.M)
