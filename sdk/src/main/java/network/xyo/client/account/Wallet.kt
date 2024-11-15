@@ -1,14 +1,20 @@
 package network.xyo.client.account
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import network.xyo.client.account.model.PreviousHashStore
 import network.xyo.client.account.model.WalletInstance
 import network.xyo.client.account.model.WalletStatic
+import network.xyo.client.address.XyoAccount
 import tech.figure.hdwallet.bip32.ExtKey
 import tech.figure.hdwallet.bip32.toRootKey
 import tech.figure.hdwallet.bip39.DeterministicSeed
 import tech.figure.hdwallet.bip39.MnemonicWords
+import tech.figure.hdwallet.ec.extensions.toBytesPadded
 
-open class Wallet(private val _extKey: ExtKey, previousHash: ByteArray? = null) : Account(_extKey.keyPair.privateKey, previousHash), WalletInstance {
+@RequiresApi(Build.VERSION_CODES.M)
+open class Wallet(private val _extKey: ExtKey, previousHash: ByteArray? = null):
+    Account(_extKey.keyPair.privateKey.key.toBytesPadded(32), previousHash), WalletInstance {
 
     override fun derivePath(path: String): WalletInstance {
         return Wallet(_extKey.childKey(path))
