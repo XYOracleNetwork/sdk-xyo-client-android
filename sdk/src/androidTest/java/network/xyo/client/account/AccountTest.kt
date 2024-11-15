@@ -17,11 +17,7 @@ class AccountTest {
     @Test
     fun testRandomAccount()  {
         val account = Account.random()
-        Log.i("account.privateKey", account.privateKey.toHexString())
-        Log.i("account.privateKey.count()", account.privateKey.count().toString())
         assert(account.privateKey.count() == 32)
-        Log.i("account.publicKey", account.publicKey.toHexString())
-        Log.i("account.publicKey.count()", account.publicKey.count().toString())
         assert(account.publicKey.count() == 65)
     }
 
@@ -31,14 +27,9 @@ class AccountTest {
         val account = Account.fromPrivateKey(hexStringToByteArray(testVectorPrivateKey))
         assert(account.privateKey.count() == 32)
         assert(account.publicKey.count() == 64)
-        Log.i("publicKey", account.publicKey.toHexString())
-        Log.i("publicKeyVector", testVectorPublicKey)
-        Log.i("address", account.address.toHexString())
-        Log.i("addressVector", testVectorAddress)
+        assert(account.publicKey.toHexString() == testVectorPublicKey)
         assert(account.address.toHexString() == testVectorAddress)
         val signature = account.sign(hexStringToByteArray(testVectorHash))
-        Log.i("signature", signature.toHexString())
-        Log.i("signatureVector", testVectorSignature)
         assert(signature.toHexString() == testVectorSignature)
         assert(account.verify(hexStringToByteArray(testVectorHash), signature))
     }
