@@ -6,6 +6,7 @@ import androidx.test.rule.GrantPermissionRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import network.xyo.client.account.Account
+import network.xyo.client.boundwitness.XyoBoundWitnessBuilder
 import network.xyo.client.node.client.NodeClient
 import network.xyo.client.payload.XyoPayload
 import org.junit.Before
@@ -60,5 +61,16 @@ class XyoBoundWitnessTest {
     @Test
     fun testSendQueryBWSendBeta() {
         testSendQueryBW(apiDomainBeta)
+    }
+
+    @Test
+    fun testBoundWitnessHash() {
+        runBlocking {
+            val bw = XyoBoundWitnessBuilder().witness(Account.random(), null).payloads(listOf(TestPayload1())).build()
+            val hashableFields = bw.getBodyJson()
+            assert(bw._hash !== null)
+            assert(bw._hash!! == XyoSerializable.sha256String(hashableFields))
+            assert(bw._hash!! == hashableFields.hash())
+        }
     }
 }
