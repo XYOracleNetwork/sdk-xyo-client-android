@@ -2,15 +2,15 @@ package network.xyo.client.witness.location.info
 
 import android.content.Context
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.withContext
-import network.xyo.app.xyo.sample.application.witness.WitnessHandlerInterface
-import network.xyo.app.xyo.sample.application.witness.WitnessResult
+import network.xyo.client.witness.types.WitnessHandlerInterface
+import network.xyo.client.witness.types.WitnessResult
 import network.xyo.client.XyoPanel
 import network.xyo.client.account.model.AccountInstance
+import network.xyo.client.boundwitness.XyoBoundWitnessBodyJson
 import network.xyo.client.payload.XyoPayload
 
 open class WitnessLocationHandler : WitnessHandlerInterface<List<XyoPayload?>> {
@@ -27,24 +27,24 @@ open class WitnessLocationHandler : WitnessHandlerInterface<List<XyoPayload?>> {
     private suspend fun getLocation(panel: XyoPanel): WitnessResult<List<XyoPayload?>> {
         return withContext(Dispatchers.IO) {
             var locationPayload: XyoPayload? = null
-            var bw: XyoPayload? = null
+            var bw: XyoBoundWitnessBodyJson? = null
             val errors: MutableList<Error> = mutableListOf()
             panel.let {
-                it.reportAsyncQuery().apiResults?.forEach { action ->
-                    if (action.response !== null) {
-                        val payloads = action.response!!.payloads
-                        if (payloads?.get(0)?.schema.equals("network.xyo.boundwitness")) {
-                            bw = payloads?.get(0)
-                        }
-                        if (payloads?.get(1)?.schema.equals("network.xyo.location.android")) {
-                            locationPayload = payloads?.get(1)
+                it.reportAsyncQuery().let { result ->
+                    val actualPayloads = result.payloads
+                    actualPayloads?.forEach { payload ->
+                        if (payload.schema === "network.xyo.location.android") {
+                            locationPayload = payload
                         }
                     }
-                    if (action.errors !== null) {
-                        action.errors.forEach { error ->
-                            Log.e("xyoSampleApp", error.message ?: error.toString())
-                            errors.add(error)
-                        }
+
+                    // target the first result because we are only looking at a single location witness
+                    val apiResult = result.apiResults?.first()
+                    if (apiResult?.response?.bw !== null) {
+                        bw = apiResult.response.bw
+                    }
+                    if (apiResult?.errors?.size!! > 0) {
+                        apiResult.errors.forEach { error -> errors.add(error)}
                     }
                 }
             }
