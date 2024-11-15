@@ -8,7 +8,6 @@ import network.xyo.client.account.model.PreviousHashStore
 import org.spongycastle.jcajce.provider.digest.Keccak
 import tech.figure.hdwallet.ec.CurvePoint
 import tech.figure.hdwallet.ec.PrivateKey
-import tech.figure.hdwallet.ec.PublicKey
 import tech.figure.hdwallet.ec.extensions.toBytesPadded
 import tech.figure.hdwallet.ec.secp256k1Curve
 import tech.figure.hdwallet.signer.BCECSigner
@@ -39,19 +38,11 @@ open class Account(private val _privateKey: PrivateKey, private var _previousHas
         return result.encodeAsBTC().toByteArray()
     }
 
-    @OptIn(ExperimentalStdlibApi::class)
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun verify(msg: ByteArray, signature: ByteArray): Boolean {
-        val recoveredPublicKey = recoverPublicKey(msg, signature)
-        val recoveredPublicKeyHex = recoveredPublicKey?.toHexString()
-        val recoveredAddress = if (recoveredPublicKey == null) null else publicKeyToAddress(recoveredPublicKey)
-        val recoveredAddressHex = recoveredAddress?.toHexString()
-        val expectedAddress = address.toHexString()
-        val expectedPublicKeyHex = publicKey.toHexString()
-        val publicKey = if (recoveredPublicKey == null) null else PublicKey.fromBytes(byteArrayOf(4.toByte()) + recoveredPublicKey)
-        return recoveredPublicKey != null && publicKey != null && BCECSigner().verify(publicKey, msg, ECDSASignature.Companion.decode(
-            BTCSignature.fromByteArray(signature))) &&
-                recoveredAddressHex == expectedAddress
+        val recoveredPublicKey = recoverPublicKey(msg, signature) ?: return false
+        val recoveredAddress = publicKeyToAddress(recoveredPublicKey)
+        return recoveredAddress.contentEquals(address)
     }
 
     companion object: AccountStatic<AccountInstance> {
