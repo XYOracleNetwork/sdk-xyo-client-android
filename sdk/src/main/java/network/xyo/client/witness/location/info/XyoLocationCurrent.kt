@@ -23,6 +23,7 @@ class XyoLocationCurrent {
                         .addOnSuccessListener { location ->
                             if (location === null) {
                                 continuation.resumeWith(Result.success(null))
+                                return@addOnSuccessListener
                             }
                             val coordinates = setCoordinatesFromLocation(location)
                             val currentLocation = CurrentLocation(coordinates, System.currentTimeMillis())
