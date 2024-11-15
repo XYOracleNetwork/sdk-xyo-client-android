@@ -15,6 +15,9 @@ open class QueryResponseWrapper(private val rawResponse: String) {
     val moshi: Moshi = Moshi.Builder().addLast(KotlinJsonAdapterFactory()).build()
     var bwHash: String? = null
     var bw: XyoBoundWitnessBodyJson? = null
+    /** The bound witness that was first in the list of payloads */
+    var panelBoundWitnessBodyJson: XyoBoundWitnessBodyJson? = null
+    var panelBoundWitnessHash: String? = null
     var payloads: List<XyoPayload>? = null
 
     private fun unwrap() {
@@ -24,18 +27,29 @@ open class QueryResponseWrapper(private val rawResponse: String) {
     }
 
     private fun splitTuple(tuple: JSONArray) {
-        val bwString = tuple[0].toString()
+        val wrapperBwString = tuple[0].toString()
+        val wrapperBw = parseBW(wrapperBwString)
+        if (wrapperBw !== null) {
+            bwHash = wrapperBw.hash()
+            bw = wrapperBw
+        }
+
         val payloadsString = tuple[1].toString()
-        bw = parseBW(bwString)
+        val payloadsArray = JSONArray(payloadsString)
+        // grab the first payload and see if it is a boundwitness
+        val bwJson = payloadsArray.get(0) as JSONObject
+        if (bwJson.get("schema") !== "network.xyo.boundwitness") {
+            val panelBw = parseBW(bwJson.toString())
+            panelBoundWitnessBodyJson = panelBw
+            panelBoundWitnessHash = panelBw?.hash()
+
+        }
         payloads = parsePayloads(payloadsString)
     }
 
     protected open fun parseBW(bwString: String): XyoBoundWitnessBodyJson? {
         val bwAdapter = moshi.adapter(XyoBoundWitnessBodyJson::class.java)
         val bw = bwAdapter.fromJson(bwString)
-        if (bw !== null) {
-            bwHash = XyoSerializable.sha256String(bw)
-        }
         return bw
     }
 

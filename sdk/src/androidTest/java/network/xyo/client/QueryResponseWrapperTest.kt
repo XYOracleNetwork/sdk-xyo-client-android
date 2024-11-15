@@ -10,6 +10,10 @@ class QueryResponseWrapperTest {
         val queryResponseWrapper = QueryResponseWrapper.parse(TestConstants.queryResponseJson)
         assertNotEquals(queryResponseWrapper?.bw, null)
         assertEquals(queryResponseWrapper?.bwHash, TestConstants.queryResponseBWHash)
+
+        assertNotEquals(queryResponseWrapper?.panelBoundWitnessBodyJson, null)
+        assertEquals(queryResponseWrapper?.panelBoundWitnessHash, TestConstants.panelBwHash)
+
         assertNotEquals(queryResponseWrapper?.payloads?.size, 2)
     }
 }
