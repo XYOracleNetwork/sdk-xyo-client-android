@@ -1,6 +1,5 @@
 package network.xyo.client.account
 
-import android.util.Log
 import org.junit.Test
 
 class AccountTest {
@@ -13,7 +12,6 @@ class AccountTest {
     val testVectorSignature
     = "b61dad551e910e2793b4f9f880125b5799086510ce102fad0222c1b093c60a6b38aa35ef56f97f86537269e8be95832aaa37d3b64d86b67f0cda467ac7cb5b3e"
 
-    @OptIn(ExperimentalStdlibApi::class)
     @Test
     fun testRandomAccount()  {
         val account = Account.random()
