@@ -52,6 +52,10 @@ open class Account private constructor (private val _privateKey: PrivateKey, pri
             return Account(key)
         }
 
+        override fun fromPrivateKey(key: String): AccountInstance {
+            return fromPrivateKey(hexStringToByteArray(key))
+        }
+
         override fun random(): AccountInstance {
             return fromPrivateKey(generatePrivateKeyBytes())
         }

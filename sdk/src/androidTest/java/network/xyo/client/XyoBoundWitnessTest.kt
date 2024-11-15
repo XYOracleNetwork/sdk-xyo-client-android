@@ -5,7 +5,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
-import network.xyo.client.address.XyoAccount
+import network.xyo.client.account.Account
 import network.xyo.client.node.client.NodeClient
 import network.xyo.client.payload.XyoPayload
 import org.junit.Before
@@ -34,7 +34,7 @@ class XyoBoundWitnessTest {
     }
 
     fun generateQuery(nodeUrl: String): RequestDependencies {
-        val account = XyoAccount()
+        val account = Account.random()
         val client = NodeClient(nodeUrl, account)
         val query = DiscoverPayload()
         val payloads = mutableListOf<XyoPayload>()

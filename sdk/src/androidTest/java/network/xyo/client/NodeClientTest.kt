@@ -2,7 +2,7 @@ package network.xyo.client
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
-import network.xyo.client.address.XyoAccount
+import network.xyo.client.account.Account
 import network.xyo.client.archivist.wrapper.ArchivistWrapper
 import network.xyo.client.node.client.NodeClient
 import network.xyo.client.payload.XyoPayload
@@ -19,7 +19,7 @@ class NodeClientTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun discoverTestBeta() {
-        val account = XyoAccount()
+        val account = Account.random()
         val client = NodeClient(TestConstants.nodeUrlBeta, account)
         val query = DiscoverPayload()
 
@@ -33,7 +33,7 @@ class NodeClientTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun discoverTestLocal() {
-        val account = XyoAccount()
+        val account = Account.random()
         val client = NodeClient(TestConstants.nodeUrlBeta, account)
         val query = XyoPayload("network.xyo.query.module.discover")
 

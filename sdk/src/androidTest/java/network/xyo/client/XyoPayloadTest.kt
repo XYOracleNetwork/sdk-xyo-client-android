@@ -6,7 +6,7 @@ import androidx.test.rule.GrantPermissionRule
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import network.xyo.client.address.XyoAccount
+import network.xyo.client.account.Account
 import network.xyo.client.boundwitness.XyoBoundWitnessBuilder
 import network.xyo.client.payload.XyoPayload
 import org.junit.Before
@@ -49,7 +49,7 @@ class TestInvalidSchemaPayload: TestSubjectPayload() {
     var string_field = "there"
 }
 
-val knownAddress = XyoAccount(ByteArray(32) {index -> index.toByte()})
+val knownAddress = Account.fromPrivateKey(ByteArray(32) {index -> index.toByte()})
 const val knownHash = "6e173bbfc0577ebde66b44b090316eca5ecad8ecdb5c51886211d805c769d2ea"
 
 class XyoPayloadTest {
@@ -92,7 +92,7 @@ class XyoPayloadTest {
 
     @Test
     fun testRoundTripPanel() {
-        val address = XyoAccount(XyoSerializable.hexToBytes("5a95531488b4d0d3645aea49678297ae9e2034879ce0389b80eb788e8b533592"))
+        val address = Account.fromPrivateKey("5a95531488b4d0d3645aea49678297ae9e2034879ce0389b80eb788e8b533592")
         val witness = XyoWitness(address, fun(_: Context, _: String?): XyoPayload {
             return BasicPayload()
         })

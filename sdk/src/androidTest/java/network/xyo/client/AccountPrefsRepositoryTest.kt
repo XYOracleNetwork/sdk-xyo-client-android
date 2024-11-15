@@ -3,7 +3,7 @@ package network.xyo.client
 import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
 import kotlinx.coroutines.runBlocking
-import network.xyo.client.address.XyoAccount
+import network.xyo.client.account.Account
 import network.xyo.client.boundwitness.XyoBoundWitnessBuilder
 import network.xyo.client.datastore.AccountPrefsRepository
 import network.xyo.client.settings.AccountPreferences
@@ -13,7 +13,7 @@ import org.junit.Test
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotEquals
 
-class XyoAccountPrefsRepositoryTest {
+class AccountPrefsRepositoryTest {
 
     private lateinit var appContext: Context
 
@@ -105,7 +105,7 @@ class XyoAccountPrefsRepositoryTest {
     @Test
     fun testAccountDeserialization() {
         runBlocking {
-            val testAccount = XyoAccount()
+            val testAccount = Account.random()
             val instance = AccountPrefsRepository.getInstance(appContext)
             // Clear previously saved accounts
             instance.clearSavedAccountKey()
@@ -114,7 +114,7 @@ class XyoAccountPrefsRepositoryTest {
 
             // Deserialize the test account
             val firstAccount = instance.getAccount()
-            assertEquals(firstAccount.privateKey.toHexString(), testAccount.private.hex)
+            assertEquals(firstAccount.privateKey.toHexString(), testAccount.privateKey.toHexString())
 
             // Sign with the test account
             val firstBw = XyoBoundWitnessBuilder().witness(firstAccount, null).payloads(listOf(TestConstants.debugPayload)).build()

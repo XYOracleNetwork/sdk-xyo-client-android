@@ -7,7 +7,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
-import network.xyo.client.address.XyoAccount
+import network.xyo.client.account.Account
 import network.xyo.client.boundwitness.XyoBoundWitnessJson
 import network.xyo.client.payload.XyoPayload
 import network.xyo.client.witness.location.info.LocationActivity
@@ -45,8 +45,8 @@ class XyoPanelTest {
     }
 
     private fun testCreatePanel(nodeUrl: String) {
-        val witness = XyoWitness<XyoPayload>(XyoAccount())
-        val panel = XyoPanel(appContext, arrayListOf(Pair(nodeUrl, XyoAccount())), listOf(witness))
+        val witness = XyoWitness<XyoPayload>(Account.random())
+        val panel = XyoPanel(appContext, arrayListOf(Pair(nodeUrl, Account.random())), listOf(witness))
         assertNotNull(panel)
     }
 
@@ -63,12 +63,12 @@ class XyoPanelTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     fun testPanelReport(nodeUrl: String) {
         runBlocking {
-            val witnessAccount = XyoAccount(XyoSerializable.hexToBytes("9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"))
-            val witness2Account = XyoAccount(XyoSerializable.hexToBytes("5a95531488b4d0d3645aea49678297ae9e2034879ce0389b80eb788e8b533592"))
+            val witnessAccount = Account.fromPrivateKey("9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08")
+            val witness2Account = Account.fromPrivateKey("5a95531488b4d0d3645aea49678297ae9e2034879ce0389b80eb788e8b533592")
             val witness = XyoWitness(witnessAccount, fun(_: Context, _: String?): XyoPayload {
                 return BasicPayload()
             })
-            val panel = XyoPanel(appContext, arrayListOf(Pair(nodeUrl, XyoAccount())), listOf(witness, XyoSystemInfoWitness(witness2Account), XyoLocationWitness()))
+            val panel = XyoPanel(appContext, arrayListOf(Pair(nodeUrl, Account.random())), listOf(witness, XyoSystemInfoWitness(witness2Account), XyoLocationWitness()))
             val result = panel.reportAsyncQuery()
             if (result.apiResults === null) throw NullPointerException("apiResults should not be null")
             result.apiResults?.forEach {
@@ -106,7 +106,7 @@ class XyoPanelTest {
     @Test
     fun testReportEvent() {
         runBlocking {
-            val panel = XyoPanel(appContext, arrayListOf(Pair(apiDomainBeta, XyoAccount())), listOf(XyoSystemInfoWitness()))
+            val panel = XyoPanel(appContext, arrayListOf(Pair(apiDomainBeta, Account.random())), listOf(XyoSystemInfoWitness()))
             val result = panel.reportAsyncQuery()
             if (result.apiResults === null) throw Error()
             result.apiResults?.forEach { assertEquals(it.errors, null) }
