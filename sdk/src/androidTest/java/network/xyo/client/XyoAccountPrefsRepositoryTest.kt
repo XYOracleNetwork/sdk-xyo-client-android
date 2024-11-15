@@ -25,6 +25,7 @@ class XyoAccountPrefsRepositoryTest {
         this.appContext = InstrumentationRegistry.getInstrumentation().targetContext
     }
 
+    @OptIn(ExperimentalStdlibApi::class)
     @Test
     fun testAccountPersistence() {
         runBlocking {
@@ -38,7 +39,7 @@ class XyoAccountPrefsRepositoryTest {
                 )
             )
             panel.resolveNodes()
-            val generatedAddress = panel.defaultAccount?.address?.hex
+            val generatedAddress = panel.defaultAccount?.address?.toHexString()
             assertNotEquals(generatedAddress, null)
 
             val panel2 = XyoPanel(
@@ -47,7 +48,7 @@ class XyoAccountPrefsRepositoryTest {
                 )
             )
             panel2.resolveNodes()
-            val secondGeneratedAddress = panel2.defaultAccount?.address?.hex
+            val secondGeneratedAddress = panel2.defaultAccount?.address?.toHexString()
             assertEquals(generatedAddress, secondGeneratedAddress)
         }
     }

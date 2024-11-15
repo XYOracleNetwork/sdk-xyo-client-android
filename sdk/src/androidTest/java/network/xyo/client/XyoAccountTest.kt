@@ -13,6 +13,7 @@ class XyoAccountTest {
     val testVectorAddressKeccakHash = "0889fa0b3d5bb98e749c7bf75e7a847447e7fec41011ae7d32d768f86605ba03"
     val testVectorAddress = "5e7a847447e7fec41011ae7d32d768f86605ba03"
 
+    @OptIn(ExperimentalStdlibApi::class)
     @Test
     fun testAddress() {
         val account = XyoAccount(XyoSerializable.hexToBytes(testVectorPrivate))
@@ -20,7 +21,7 @@ class XyoAccountTest {
         assertEquals(testVectorPrivate, account.private.hex)
         assertEquals(testVectorPublic, account.public.hex)
         assertEquals(testVectorAddressKeccakHash, account.public.keccak256.hex)
-        assertEquals(testVectorAddress, account.address.hex)
+        assertEquals(testVectorAddress, account.address.toHexString())
         assertEquals(testVectorSignature, signature)
     }
 
@@ -31,12 +32,13 @@ class XyoAccountTest {
         assertEquals(testVectorPrivate, privateHex)
     }
 
+    @OptIn(ExperimentalStdlibApi::class)
     @Test
     fun testInitWithGenerate() {
         val account = XyoAccount()
         val privateHex = account.private.hex
         val publicHex = account.public.hex
-        val addressHex = account.address.hex
+        val addressHex = account.address.toHexString()
         assertNotNull(privateHex)
         assertNotNull(publicHex)
         assertNotNull(addressHex)

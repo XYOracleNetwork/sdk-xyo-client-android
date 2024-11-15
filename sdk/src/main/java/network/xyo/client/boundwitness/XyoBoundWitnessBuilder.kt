@@ -19,8 +19,9 @@ open class XyoBoundWitnessBuilder {
 
     var _timestamp: Long? = null
 
+    @OptIn(ExperimentalStdlibApi::class)
     val addresses: List<String>
-        get() = _witnesses.map { witness -> witness.address.hex }
+        get() = _witnesses.map { witness -> witness.address.toHexString() }
 
     open fun witness(account: XyoAccount, previousHash: String?): XyoBoundWitnessBuilder {
         _witnesses.add(account)
