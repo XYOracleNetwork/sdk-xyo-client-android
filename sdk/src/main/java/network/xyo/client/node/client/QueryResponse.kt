@@ -1,5 +1,6 @@
 package network.xyo.client.node.client
 
+import android.util.Log
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -37,12 +38,16 @@ open class QueryResponseWrapper(private val rawResponse: String) {
         val payloadsString = tuple[1].toString()
         val payloadsArray = JSONArray(payloadsString)
         // grab the first payload and see if it is a boundwitness
-        val bwJson = payloadsArray.get(0) as JSONObject
-        if (bwJson.get("schema") !== "network.xyo.boundwitness") {
-            val panelBw = parseBW(bwJson.toString())
-            panelBoundWitnessBodyJson = panelBw
-            panelBoundWitnessHash = panelBw?.hash()
+        try {
+            val bwJson = payloadsArray.get(0) as JSONObject
+            if (bwJson.get("schema") !== "network.xyo.boundwitness") {
+                val panelBw = parseBW(bwJson.toString())
+                panelBoundWitnessBodyJson = panelBw
+                panelBoundWitnessHash = panelBw?.hash()
 
+            }
+        } catch (e: Exception) {
+            Log.i("xyoClient", "skipping bw parsing from payloads")
         }
         payloads = parsePayloads(payloadsString)
     }
