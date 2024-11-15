@@ -4,19 +4,20 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import org.spongycastle.jcajce.provider.digest.Keccak
 import java.math.BigInteger
-import kotlin.experimental.xor
 
-// Secp256k1 curve parameters
-val P = BigInteger("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F", 16)
-val A = BigInteger.ZERO
-val B = BigInteger.valueOf(7)
-val N = BigInteger("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141", 16)
-val Gx = BigInteger("79BE667EF9DCBBAC55A06295CE870B07029BFCDB2DCE28D959F2815B16F81798", 16)
-val Gy = BigInteger("483ADA7726A3C4655DA4FBFC0E1108A8FD17B448A68554199C47D08FFB10D4B8", 16)
-
-// Elliptic curve point structure
 data class Point(val x: BigInteger, val y: BigInteger) {
     fun isAtInfinity() = x == BigInteger.ZERO && y == BigInteger.ZERO
+}
+
+object Secp256k1CurveConstants {
+    val p: BigInteger = BigInteger("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F", 16)
+    val a: BigInteger = BigInteger.ZERO
+    val b: BigInteger = BigInteger.valueOf(7)
+    val n: BigInteger = BigInteger("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141", 16)
+    val g: Point = Point(
+        BigInteger("79BE667EF9DCBBAC55A06295CE870B07029BFCDB2DCE28D959F2815B16F81798", 16),
+        BigInteger("483ADA7726A3C4655DA4FBFC0E1108A8FD17B448A68554199C47D08FFB10D4B8", 16)
+    )
 }
 
 fun ByteArray.padStart(targetLength: Int, padValue: Byte = 0): ByteArray {
@@ -50,14 +51,14 @@ fun pointAdd(p: Point, q: Point): Point {
     if (q.isAtInfinity()) return p
 
     val slope = if (p.x == q.x) {
-        if ((p.y + q.y).mod(P) == BigInteger.ZERO) return Point(BigInteger.ZERO, BigInteger.ZERO)
-        (BigInteger.valueOf(3) * p.x.pow(2) + A).mod(P) * (BigInteger.TWO * p.y).modInverse(P)
+        if ((p.y + q.y).mod(Secp256k1CurveConstants.p) == BigInteger.ZERO) return Point(BigInteger.ZERO, BigInteger.ZERO)
+        (BigInteger.valueOf(3) * p.x.pow(2) + Secp256k1CurveConstants.a).mod(Secp256k1CurveConstants.p) * (BigInteger.TWO * p.y).modInverse(Secp256k1CurveConstants.p)
     } else {
-        (q.y - p.y).mod(P) * (q.x - p.x).modInverse(P)
-    }.mod(P)
+        (q.y - p.y).mod(Secp256k1CurveConstants.p) * (q.x - p.x).modInverse(Secp256k1CurveConstants.p)
+    }.mod(Secp256k1CurveConstants.p)
 
-    val xR = (slope.pow(2) - p.x - q.x).mod(P)
-    val yR = (slope * (p.x - xR) - p.y).mod(P)
+    val xR = (slope.pow(2) - p.x - q.x).mod(Secp256k1CurveConstants.p)
+    val yR = (slope * (p.x - xR) - p.y).mod(Secp256k1CurveConstants.p)
 
     return Point(xR, yR)
 }
@@ -70,26 +71,26 @@ fun pointDouble(p: Point): Point = pointAdd(p, p)
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 fun recoverPublicKey(messageHash: BigInteger, r: BigInteger, s: BigInteger, v: Int): Point? {
     val isYEven = (v % 2 == 0)
-    val x = r.add(N.multiply(BigInteger.valueOf((v / 2).toLong())))
+    val x = r.add(Secp256k1CurveConstants.n.multiply(BigInteger.valueOf((v / 2).toLong())))
 
-    if (x >= P) return null
+    if (x >= Secp256k1CurveConstants.p) return null
 
     // Calculate y-coordinate
-    val alpha = (x.pow(3) + A * x + B).mod(P)
-    val beta = alpha.modPow((P + BigInteger.ONE).shiftRight(2), P)
-    val y = if (beta.testBit(0) == isYEven) beta else P - beta
+    val alpha = (x.pow(3) + Secp256k1CurveConstants.a * x + Secp256k1CurveConstants.b).mod(Secp256k1CurveConstants.p)
+    val beta = alpha.modPow((Secp256k1CurveConstants.p + BigInteger.ONE).shiftRight(2), Secp256k1CurveConstants.p)
+    val y = if (beta.testBit(0) == isYEven) beta else Secp256k1CurveConstants.p - beta
 
     val rPoint = Point(x, y)
 
     // Calculate e and r^-1
     val e = messageHash
-    val rInv = r.modInverse(N)
+    val rInv = r.modInverse(Secp256k1CurveConstants.n)
 
     // Public key Q = r^-1 * (s * R - e * G)
     val sR = pointMultiply(s, rPoint)
-    val eG = pointMultiply(e, Point(Gx, Gy))
+    val eG = pointMultiply(e, Secp256k1CurveConstants.g)
 
-    return pointMultiply(rInv, pointAdd(sR, Point(eG.x, P - eG.y)))
+    return pointMultiply(rInv, pointAdd(sR, Point(eG.x, Secp256k1CurveConstants.p - eG.y)))
 }
 
 private fun toKeccak(bytes: ByteArray): ByteArray {
@@ -111,11 +112,10 @@ fun recoverPublicKey(messageHash: ByteArray, signature: ByteArray): ByteArray? {
 
     val r = BigInteger(1, signature.copyOfRange(0, 32))
     val s = BigInteger(1, signature.copyOfRange(32, 64))
-    val v = 0
 
     val messageHashBI = BigInteger(1, messageHash)
 
-    val publicPoint = recoverPublicKey(messageHashBI, r, s, v) ?: return null
+    val publicPoint = recoverPublicKey(messageHashBI, r, s, 0) ?: recoverPublicKey(messageHashBI, r, s, 1) ?: return null
     val uncompressedKey =
             publicPoint.x.toByteArray().padStart(32, 0) +
             publicPoint.y.toByteArray().padStart(32, 0)
