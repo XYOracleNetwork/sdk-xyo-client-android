@@ -1,4 +1,4 @@
-package network.xyo.app.xyo.sample.application.witness
+package network.xyo.client.witness.types
 
 import android.content.Context
 import network.xyo.client.account.model.AccountInstance

@@ -2,12 +2,11 @@ package network.xyo.client
 
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import network.xyo.client.account.hexStringToByteArray
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.Serializable
-import java.security.InvalidParameterException
 import java.security.MessageDigest
-import kotlin.experimental.or
 
 abstract class XyoSerializable: Serializable  {
 
@@ -110,37 +109,9 @@ abstract class XyoSerializable: Serializable  {
             }
             return String(hexChars)
         }
-
-        fun hexToByte(hex: Char): Byte {
-            return when(hex) {
-                '0' -> 0
-                '1' -> 1
-                '2' -> 2
-                '3' -> 3
-                '4' -> 4
-                '5' -> 5
-                '6' -> 6
-                '7' -> 7
-                '8' -> 8
-                '9' -> 9
-                'a' -> 10
-                'b' -> 11
-                'c' -> 12
-                'd' -> 13
-                'e' -> 14
-                'f' -> 15
-                else -> throw(InvalidParameterException())
-            }
-        }
-
-        fun hexToBytes(hex: String): ByteArray {
-            val hexToConvert = hex.padStart(hex.length.mod(2), '0').lowercase()
-            val byteCount = hexToConvert.length / 2
-            val result = ByteArray(byteCount)
-            for (i in 0 until byteCount) {
-                result[i] = hexToByte(hexToConvert[i * 2]).rotateLeft(4) or hexToByte(hexToConvert[i * 2 + 1])
-            }
-            return result
-        }
     }
+}
+
+fun String.hexToBytes(): ByteArray {
+    return hexStringToByteArray(this)
 }

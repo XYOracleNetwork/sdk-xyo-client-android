@@ -1,4 +1,4 @@
-package network.xyo.app.xyo.sample.application.witness
+package network.xyo.client.witness.types
 
 sealed class WitnessResult<out R> {
     data class Success<out T>(val data: T) : WitnessResult<T>()

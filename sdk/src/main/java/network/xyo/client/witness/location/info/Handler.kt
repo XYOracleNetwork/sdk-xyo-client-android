@@ -7,8 +7,8 @@ import androidx.annotation.RequiresApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.withContext
-import network.xyo.app.xyo.sample.application.witness.WitnessHandlerInterface
-import network.xyo.app.xyo.sample.application.witness.WitnessResult
+import network.xyo.client.witness.types.WitnessHandlerInterface
+import network.xyo.client.witness.types.WitnessResult
 import network.xyo.client.XyoPanel
 import network.xyo.client.account.model.AccountInstance
 import network.xyo.client.payload.XyoPayload

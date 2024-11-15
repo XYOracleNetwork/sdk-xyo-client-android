@@ -81,7 +81,7 @@ class XyoPanel(val context: Context, private val archivists: List<XyoArchivistAp
         this.defaultAccount = AccountPrefsRepository.getInstance(context).getAccount()
         if (nodeUrlsAndAccounts?.isNotEmpty() == true) {
             nodes = mutableListOf<NodeClient>().let {
-                this@XyoPanel.nodeUrlsAndAccounts?.forEach { pair ->
+                this@XyoPanel.nodeUrlsAndAccounts.forEach { pair ->
                     val nodeUrl = pair.first
                     val account = pair.second ?: defaultAccount
                     it.add(NodeClient(nodeUrl, account))
