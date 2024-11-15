@@ -64,12 +64,19 @@ open class XyoArchivistApiClient(private val config: XyoArchivistApiConfig) {
                                 )
                             ) { cause, _, _ -> null?.let { it(cause) } }
                         } else {
-                            continuation.resume(PostBoundWitnessesResult(1), null)
+                            continuation.resume(PostBoundWitnessesResult(1)) { cause, _, _ ->
+                                Log.w("postBoundWitnessesAsync", cause)
+                            }
                         }
                     }
                 } catch (ex: IOException) {
                     Log.e("xyoClient", ex.message ?: ex.toString())
-                    continuation.resume(PostBoundWitnessesResult(0, arrayListOf(Error(ex.message))), null)
+                    continuation.resume(
+                        PostBoundWitnessesResult(
+                            0,
+                            arrayListOf(Error(ex.message))
+                        )
+                    ) { cause, _, _ -> Log.w("postBoundWitnessesAsync", cause) }
                 }
             }
         }
