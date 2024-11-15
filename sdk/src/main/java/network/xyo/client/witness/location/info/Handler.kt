@@ -40,12 +40,11 @@ open class WitnessLocationHandler : WitnessHandlerInterface<List<XyoPayload?>> {
 
                     // target the first result because we are only looking at a single location witness
                     val apiResult = result.apiResults?.first()
-                    if (apiResult?.response?.bw !== null) {
-                        bw = apiResult.response.bw
-                    }
                     if (apiResult?.errors?.size !== null && apiResult.errors.size > 0) {
                         apiResult.errors.forEach { error -> errors.add(error)}
                     }
+
+                    bw = result.bw
                 }
             }
             if (errors.size > 0) return@withContext WitnessResult.Error(errors)
