@@ -9,6 +9,7 @@ import network.xyo.data.PrefsDataStoreProtos.PrefsDataStore
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import network.xyo.client.account.hexStringToByteArray
+import network.xyo.client.account.model.AccountInstance
 import network.xyo.client.address.XyoAccount
 import network.xyo.client.settings.AccountPreferences
 import network.xyo.client.xyoScope
@@ -26,20 +27,21 @@ class XyoAccountPrefsRepository(context: Context, private val _accountPreference
         get() = _accountPreferences
 
     @RequiresApi(Build.VERSION_CODES.M)
-    suspend fun getAccount(): XyoAccount {
+    suspend fun getAccount(): AccountInstance {
         val saveKeyHex = getAccountKey()
         return XyoAccount(hexStringToByteArray(saveKeyHex))
     }
 
+    @OptIn(ExperimentalStdlibApi::class)
     @RequiresApi(Build.VERSION_CODES.M)
-    suspend fun initializeAccount(account: XyoAccount): XyoAccount? {
+    suspend fun initializeAccount(account: AccountInstance): AccountInstance? {
         var updatedKey: String? = null
         val job = xyoScope.launch {
             val savedKey = prefsDataStore.data.first().accountKey
             if (savedKey.isNullOrEmpty()) {
                 // no saved key so save the passed in one
                 updatedKey = null
-                setAccountKey(account.private.hex)
+                setAccountKey(account.privateKey.toHexString())
             } else {
                 updatedKey = null
                 Log.w("xyoClient", "Key already exists.  Clear it first before initializing prefs with new account")
@@ -53,13 +55,14 @@ class XyoAccountPrefsRepository(context: Context, private val _accountPreference
         }
     }
 
+    @OptIn(ExperimentalStdlibApi::class)
     @RequiresApi(Build.VERSION_CODES.M)
     private suspend fun getAccountKey(): String {
         val savedKey = prefsDataStore.data.first().accountKey
         return if (savedKey.isEmpty()) {
-            val newAccount = XyoAccount()
-            setAccountKey(newAccount.private.hex)
-            newAccount.private.hex
+            val newAccount: AccountInstance = XyoAccount()
+            setAccountKey(newAccount.privateKey.toHexString())
+            newAccount.privateKey.toHexString()
         } else {
             return savedKey
         }

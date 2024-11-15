@@ -18,7 +18,7 @@ class AccountTest {
     fun testRandomAccount()  {
         val account = Account.random()
         assert(account.privateKey.count() == 32)
-        assert(account.publicKey.count() == 65)
+        assert(account.publicKey.count() == 64)
     }
 
     @OptIn(ExperimentalStdlibApi::class)

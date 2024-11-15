@@ -5,6 +5,7 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import kotlinx.coroutines.launch
+import network.xyo.client.account.model.AccountInstance
 import network.xyo.client.address.XyoAccount
 import network.xyo.client.archivist.api.PostBoundWitnessesResult
 import network.xyo.client.archivist.api.XyoArchivistApiClient
@@ -21,10 +22,10 @@ data class XyoPanelReportResult(val bw: XyoBoundWitnessJson, val apiResults: Lis
 data class XyoPanelReportQueryResult(val bw: XyoBoundWitnessJson, val apiResults: List<PostQueryResult>?, val payloads: List<XyoPayload>?)
 
 @RequiresApi(Build.VERSION_CODES.M)
-class XyoPanel(val context: Context, private val archivists: List<XyoArchivistApiClient>?, private val witnesses: List<XyoWitness<XyoPayload>>?, private val nodeUrlsAndAccounts: ArrayList<Pair<String, XyoAccount?>>?) {
+class XyoPanel(val context: Context, private val archivists: List<XyoArchivistApiClient>?, private val witnesses: List<XyoWitness<XyoPayload>>?, private val nodeUrlsAndAccounts: ArrayList<Pair<String, AccountInstance?>>?) {
     var previousHash: String? = null
     private var nodes: MutableList<NodeClient>? = null
-    var defaultAccount: XyoAccount? = null
+    var defaultAccount: AccountInstance? = null
 
     @Deprecated("use constructors without deprecated archive field")
     constructor(
@@ -50,7 +51,7 @@ class XyoPanel(val context: Context, private val archivists: List<XyoArchivistAp
     constructor(
         context: Context,
         // ArrayList to not cause compiler confusion with other class constructor signatures
-        nodeUrlsAndAccounts: ArrayList<Pair<String, XyoAccount?>>,
+        nodeUrlsAndAccounts: ArrayList<Pair<String, AccountInstance?>>,
         witnesses: List<XyoWitness<XyoPayload>>? = null
     ): this(
             context,

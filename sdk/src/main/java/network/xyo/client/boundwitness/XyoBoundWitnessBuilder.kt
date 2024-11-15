@@ -4,13 +4,15 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import network.xyo.client.XyoSerializable
 import network.xyo.client.XyoWitness
+import network.xyo.client.account.hexStringToByteArray
+import network.xyo.client.account.model.AccountInstance
 import network.xyo.client.address.XyoAccount
 import network.xyo.client.payload.XyoPayload
 import network.xyo.client.payload.XyoValidationException
 
 @RequiresApi(Build.VERSION_CODES.M)
 open class XyoBoundWitnessBuilder {
-    protected var _witnesses = mutableListOf<XyoAccount>()
+    protected var _witnesses = mutableListOf<AccountInstance>()
     protected var _previous_hashes = mutableListOf<String?>()
     protected var _payload_hashes = mutableListOf<String>()
     protected var _payload_schemas = mutableListOf<String>()
@@ -23,7 +25,7 @@ open class XyoBoundWitnessBuilder {
     val addresses: List<String>
         get() = _witnesses.map { witness -> witness.address.toHexString() }
 
-    open fun witness(account: XyoAccount, previousHash: String?): XyoBoundWitnessBuilder {
+    open fun witness(account: AccountInstance, previousHash: String?): XyoBoundWitnessBuilder {
         _witnesses.add(account)
         _previous_hashes.add(previousHash)
         return this
@@ -62,7 +64,7 @@ open class XyoBoundWitnessBuilder {
 
     private fun sign(hash: String): List<String> {
         return _witnesses.map {
-            val sig = XyoSerializable.bytesToHex(it.private.sign(hash))
+            val sig = XyoSerializable.bytesToHex(it.sign(hexStringToByteArray(hash)))
             sig
         }
     }

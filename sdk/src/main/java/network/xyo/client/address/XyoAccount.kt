@@ -12,6 +12,7 @@ class ECKeyPair(val private: BCECPrivateKey, val public: ECPoint)
 val SECP256K1N = BigInteger("fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141", 16)
 
 @RequiresApi(Build.VERSION_CODES.M)
+@Deprecated("Use Account instead")
 open class XyoAccount(privateKeyBytes: ByteArray? = null): AccountInstance {
 
     private val keyPair: XyoKeyPair = XyoKeyPair(privateKeyBytes)

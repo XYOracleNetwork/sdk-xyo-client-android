@@ -8,6 +8,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import network.xyo.client.XyoSerializable
+import network.xyo.client.account.model.AccountInstance
 import network.xyo.client.address.XyoAccount
 import network.xyo.client.boundwitness.QueryBoundWitnessBuilder
 import network.xyo.client.boundwitness.QueryBoundWitnessJson
@@ -21,12 +22,12 @@ import org.json.JSONObject
 import java.io.IOException
 
 @RequiresApi(Build.VERSION_CODES.M)
-class NodeClient(private val url: String, private val accountToUse: XyoAccount?) {
+class NodeClient(private val url: String, private val accountToUse: AccountInstance?) {
 
     private val _internalAccount = XyoAccount()
     private val okHttp = OkHttpClient()
 
-    private val account: XyoAccount
+    private val account: AccountInstance
         get() {
             if (this.accountToUse === null) {
                 println("WARNING: Anonymous Queries not allowed, but running anyway.")

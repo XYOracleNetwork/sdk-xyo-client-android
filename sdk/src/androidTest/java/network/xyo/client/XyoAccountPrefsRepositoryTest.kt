@@ -53,25 +53,27 @@ class XyoAccountPrefsRepositoryTest {
         }
     }
 
+    @OptIn(ExperimentalStdlibApi::class)
     @Test
     fun testClearingExistingAccount() {
         runBlocking {
             val instance = XyoAccountPrefsRepository.getInstance(appContext)
-            val originalAddress = instance.getAccount().private.hex
+            val originalAddress = instance.getAccount().privateKey.toHexString()
 
             instance.clearSavedAccountKey()
 
-            val refreshedAddress = instance.getAccount().private.hex
+            val refreshedAddress = instance.getAccount().privateKey.toHexString()
 
             assert(originalAddress !== refreshedAddress)
         }
     }
 
+    @OptIn(ExperimentalStdlibApi::class)
     @Test
     fun testUpdatingAccountPreferences() {
         runBlocking {
             val instance = XyoAccountPrefsRepository.getInstance(appContext)
-            val originalAddress = instance.getAccount().private.hex
+            val originalAddress = instance.getAccount().privateKey.toHexString()
 
             class UpdatedAccountPreferences : AccountPreferences {
                 override val fileName = "network-xyo-sdk-prefs-1"
@@ -93,12 +95,13 @@ class XyoAccountPrefsRepositoryTest {
                 updatedAccountPrefs.storagePath
             )
 
-            val refreshedAddress = refreshedInstance.getAccount().private.hex
+            val refreshedAddress = refreshedInstance.getAccount().privateKey.toHexString()
 
             assert(originalAddress !== refreshedAddress)
         }
     }
 
+    @OptIn(ExperimentalStdlibApi::class)
     @Test
     fun testAccountDeserialization() {
         runBlocking {
@@ -111,7 +114,7 @@ class XyoAccountPrefsRepositoryTest {
 
             // Deserialize the test account
             val firstAccount = instance.getAccount()
-            assertEquals(firstAccount.private.hex, testAccount.private.hex)
+            assertEquals(firstAccount.privateKey.toHexString(), testAccount.private.hex)
 
             // Sign with the test account
             val firstBw = XyoBoundWitnessBuilder().witness(firstAccount, null).payloads(listOf(TestConstants.debugPayload)).build()

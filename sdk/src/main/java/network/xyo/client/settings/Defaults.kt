@@ -3,6 +3,7 @@ package network.xyo.client.settings
 import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
+import network.xyo.client.account.model.AccountInstance
 import network.xyo.client.address.XyoAccount
 import network.xyo.client.datastore.XyoAccountPrefsRepository
 
@@ -10,7 +11,7 @@ open class DefaultXyoSdkSettings: SettingsInterface {
     override val accountPreferences: AccountPreferences = DefaultAccountPreferences()
 
     @RequiresApi(Build.VERSION_CODES.M)
-    override suspend fun getAccount(context: Context): XyoAccount? {
+    override suspend fun getAccount(context: Context): AccountInstance? {
         val repository = XyoAccountPrefsRepository.getInstance(context)
         return repository.getAccount()
     }
