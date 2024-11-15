@@ -9,10 +9,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import network.xyo.client.address.XyoAccount
 import network.xyo.client.boundwitness.XyoBoundWitnessJson
-import network.xyo.client.datastore.XyoAccountPrefsRepository
-import network.xyo.client.datastore.defaults
 import network.xyo.client.payload.XyoPayload
-import network.xyo.client.settings.AccountPreferences
 import network.xyo.client.witness.location.info.LocationActivity
 import network.xyo.client.witness.location.info.XyoLocationWitness
 import network.xyo.client.witness.system.info.XyoSystemInfoPayload

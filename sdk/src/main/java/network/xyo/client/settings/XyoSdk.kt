@@ -1,7 +1,7 @@
 package network.xyo.client.settings
 
 import android.content.Context
-import network.xyo.client.datastore.XyoAccountPrefsRepository
+import network.xyo.client.datastore.AccountPrefsRepository
 
 class XyoSdk(val settings: SettingsInterface) {
     companion object {
@@ -10,7 +10,7 @@ class XyoSdk(val settings: SettingsInterface) {
 
         fun getInstance(context: Context, settings: SettingsInterface = DefaultXyoSdkSettings()): XyoSdk {
             // Initialize the singleton with the users accountPreferences
-            XyoAccountPrefsRepository.getInstance(context, settings.accountPreferences)
+            AccountPrefsRepository.getInstance(context, settings.accountPreferences)
 
             val newInstance = INSTANCE ?: synchronized(this) {
                 INSTANCE ?: XyoSdk(settings).also { INSTANCE = it }
@@ -21,7 +21,7 @@ class XyoSdk(val settings: SettingsInterface) {
         fun refresh(context: Context, settings: SettingsInterface = DefaultXyoSdkSettings()): XyoSdk {
             synchronized(this) {
                 // Initialize the singleton with the users accountPreferences
-                XyoAccountPrefsRepository.getInstance(context, settings.accountPreferences)
+                AccountPrefsRepository.getInstance(context, settings.accountPreferences)
                 INSTANCE = XyoSdk(settings)
             }
             return INSTANCE!!

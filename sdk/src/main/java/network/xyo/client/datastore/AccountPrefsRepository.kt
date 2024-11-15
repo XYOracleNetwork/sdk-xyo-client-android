@@ -15,7 +15,7 @@ import network.xyo.client.settings.AccountPreferences
 import network.xyo.client.xyoScope
 
 
-class XyoAccountPrefsRepository(context: Context, private val _accountPreferences: AccountPreferences = defaults.accountPreferences) {
+class AccountPrefsRepository(context: Context, private val _accountPreferences: AccountPreferences = defaults.accountPreferences) {
     // This should set the proper paths for the prefs datastore each time the the class is instantiated
     @Volatile
     private var prefsDataStore: DataStore<PrefsDataStore> = context.xyoAccountDataStore(
@@ -70,7 +70,7 @@ class XyoAccountPrefsRepository(context: Context, private val _accountPreference
 
     private suspend fun setAccountKey(accountKey: String): DataStore<PrefsDataStore> {
         val job = xyoScope.launch {
-            this@XyoAccountPrefsRepository.prefsDataStore.updateData { currentPrefs ->
+            this@AccountPrefsRepository.prefsDataStore.updateData { currentPrefs ->
                 currentPrefs.toBuilder()
                     .setAccountKey(accountKey)
                     .build()
@@ -82,7 +82,7 @@ class XyoAccountPrefsRepository(context: Context, private val _accountPreference
 
     suspend fun clearSavedAccountKey(): DataStore<PrefsDataStore> {
         val job = xyoScope.launch {
-            this@XyoAccountPrefsRepository.prefsDataStore.updateData { currentPrefs ->
+            this@AccountPrefsRepository.prefsDataStore.updateData { currentPrefs ->
                 currentPrefs.toBuilder()
                     .setAccountKey("")
                     .build()
@@ -95,19 +95,19 @@ class XyoAccountPrefsRepository(context: Context, private val _accountPreference
     // Define the singleton instance within a companion object
     companion object {
         @Volatile
-        private var INSTANCE: XyoAccountPrefsRepository? = null
+        private var INSTANCE: AccountPrefsRepository? = null
 
         // Method to retrieve the singleton instance
-        fun getInstance(context: Context, accountPreferences: AccountPreferences = defaults.accountPreferences): XyoAccountPrefsRepository {
+        fun getInstance(context: Context, accountPreferences: AccountPreferences = defaults.accountPreferences): AccountPrefsRepository {
             val newInstance = INSTANCE ?: synchronized(this) {
-                INSTANCE ?: XyoAccountPrefsRepository(context, accountPreferences).also { INSTANCE = it }
+                INSTANCE ?: AccountPrefsRepository(context, accountPreferences).also { INSTANCE = it }
             }
             return newInstance
         }
 
-        fun refresh(context: Context, accountPreferences: AccountPreferences): XyoAccountPrefsRepository {
+        fun refresh(context: Context, accountPreferences: AccountPreferences): AccountPrefsRepository {
             synchronized(this) {
-                INSTANCE = XyoAccountPrefsRepository(context, accountPreferences)
+                INSTANCE = AccountPrefsRepository(context, accountPreferences)
                 return INSTANCE!!
             }
         }

@@ -5,7 +5,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import kotlinx.coroutines.runBlocking
 import network.xyo.client.address.XyoAccount
 import network.xyo.client.boundwitness.XyoBoundWitnessBuilder
-import network.xyo.client.datastore.XyoAccountPrefsRepository
+import network.xyo.client.datastore.AccountPrefsRepository
 import network.xyo.client.settings.AccountPreferences
 import network.xyo.client.witness.system.info.XyoSystemInfoWitness
 import org.junit.Before
@@ -30,7 +30,7 @@ class XyoAccountPrefsRepositoryTest {
     fun testAccountPersistence() {
         runBlocking {
             val prefsRepository =
-                XyoAccountPrefsRepository.getInstance(appContext)
+                AccountPrefsRepository.getInstance(appContext)
             prefsRepository.clearSavedAccountKey()
 
             val panel = XyoPanel(
@@ -57,7 +57,7 @@ class XyoAccountPrefsRepositoryTest {
     @Test
     fun testClearingExistingAccount() {
         runBlocking {
-            val instance = XyoAccountPrefsRepository.getInstance(appContext)
+            val instance = AccountPrefsRepository.getInstance(appContext)
             val originalAddress = instance.getAccount().privateKey.toHexString()
 
             instance.clearSavedAccountKey()
@@ -72,7 +72,7 @@ class XyoAccountPrefsRepositoryTest {
     @Test
     fun testUpdatingAccountPreferences() {
         runBlocking {
-            val instance = XyoAccountPrefsRepository.getInstance(appContext)
+            val instance = AccountPrefsRepository.getInstance(appContext)
             val originalAddress = instance.getAccount().privateKey.toHexString()
 
             class UpdatedAccountPreferences : AccountPreferences {
@@ -83,7 +83,7 @@ class XyoAccountPrefsRepositoryTest {
             val updatedAccountPrefs = UpdatedAccountPreferences()
 
             val refreshedInstance =
-                XyoAccountPrefsRepository.refresh(appContext, updatedAccountPrefs)
+                AccountPrefsRepository.refresh(appContext, updatedAccountPrefs)
 
             // Test that accountPreferences are updated
             assertEquals(
@@ -106,7 +106,7 @@ class XyoAccountPrefsRepositoryTest {
     fun testAccountDeserialization() {
         runBlocking {
             val testAccount = XyoAccount()
-            val instance = XyoAccountPrefsRepository.getInstance(appContext)
+            val instance = AccountPrefsRepository.getInstance(appContext)
             // Clear previously saved accounts
             instance.clearSavedAccountKey()
             // Serialize the test account
@@ -121,7 +121,7 @@ class XyoAccountPrefsRepositoryTest {
             val firstAddress = firstBw.addresses.first()
 
             // Deserialize the test account (Ideally we would refresh the singleton but in tests this seems to cause errors with multiple instances of the prefs DataStore)
-            val secondInstance = XyoAccountPrefsRepository.getInstance(appContext)
+            val secondInstance = AccountPrefsRepository.getInstance(appContext)
             val secondAccount = secondInstance.getAccount()
 
             // Sign with the test account
