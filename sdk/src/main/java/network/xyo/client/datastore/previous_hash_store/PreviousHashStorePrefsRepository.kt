@@ -44,74 +44,45 @@ class PreviousHashStorePrefsRepository(
         }
     }
 
-    suspend override fun setItem(address: ByteArray, previousHash: ByteArray) {
-        TODO("Not yet implemented")
+    @OptIn(ExperimentalStdlibApi::class)
+    override suspend fun setItem(address: ByteArray, previousHash: ByteArray) {
+        val addressString = address.toHexString()
+        val previousHashString = previousHash.toHexString()
+        val job = xyoScope.launch {
+            this@PreviousHashStorePrefsRepository.previousHashStorePrefsDataStore.updateData { currentPrefs ->
+                currentPrefs.toBuilder()
+                    .putAddressToHash(addressString, previousHashString)
+                    .build()
+            }
+        }
+        job.join()
     }
 
-    suspend override fun removeItem(address: ByteArray) {
-        TODO("Not yet implemented")
+    @OptIn(ExperimentalStdlibApi::class)
+    override suspend fun removeItem(address: ByteArray) {
+        val addressString = address.toHexString()
+        val job = xyoScope.launch {
+            this@PreviousHashStorePrefsRepository.previousHashStorePrefsDataStore.updateData { currentPrefs ->
+                currentPrefs.toBuilder()
+                    .removeAddressToHash(addressString)
+                    .build()
+            }
+        }
+        job.join()
+    }
+
+    suspend fun clearStore() {
+        val job = xyoScope.launch {
+            this@PreviousHashStorePrefsRepository.previousHashStorePrefsDataStore.updateData { currentPrefs ->
+                currentPrefs.toBuilder()
+                    .clearAddressToHash()
+                    .build()
+            }
+        }
+        job.join()
     }
 
 
-//    @OptIn(ExperimentalStdlibApi::class)
-//    @RequiresApi(Build.VERSION_CODES.M)
-//    suspend fun initializeAccount(account: AccountInstance): AccountInstance? {
-//        var updatedKey: String? = null
-//        val job = xyoScope.launch {
-//            val savedKey = accountPrefsDataStore.data.first().accountKey
-//            if (savedKey.isNullOrEmpty()) {
-//                // no saved key so save the passed in one
-//                updatedKey = null
-//                setAccountKey(account.privateKey.toHexString())
-//            } else {
-//                updatedKey = null
-//                Log.w("xyoClient", "Key already exists.  Clear it first before initializing prefs with new account")
-//            }
-//        }
-//        job.join()
-//        return if (updatedKey !== null) {
-//            account
-//        } else {
-//            null
-//        }
-//    }
-
-//    @OptIn(ExperimentalStdlibApi::class)
-//    @RequiresApi(Build.VERSION_CODES.M)
-//    private suspend fun getAccountKey(): String {
-//        val savedKey = accountPrefsDataStore.data.first().accountKey
-//        return if (savedKey.isEmpty()) {
-//            val newAccount: AccountInstance = Account.random()
-//            setAccountKey(newAccount.privateKey.toHexString())
-//            newAccount.privateKey.toHexString()
-//        } else {
-//            return savedKey
-//        }
-//    }
-
-//    private suspend fun setAccountKey(accountKey: String): DataStore<AccountPrefsDataStore> {
-//        val job = xyoScope.launch {
-//            this@PreviousHashStorePrefsRepository.accountPrefsDataStore.updateData { currentPrefs ->
-//                currentPrefs.toBuilder()
-//                    .setAccountKey(accountKey)
-//                    .build()
-//            }
-//        }
-//        job.join()
-//        return accountPrefsDataStore
-//    }
-//
-//    suspend fun clearSavedAccountKey(): DataStore<AccountPrefsDataStore> {
-//        val job = xyoScope.launch {
-//            this@PreviousHashStorePrefsRepository.accountPrefsDataStore.updateData { currentPrefs ->
-//                currentPrefs.toBuilder()
-//                    .setAccountKey("")
-//                    .build()
-//            }
-//        }
-//        job.join()
-//        return accountPrefsDataStore
-//    }
 
     companion object {
         @Volatile
