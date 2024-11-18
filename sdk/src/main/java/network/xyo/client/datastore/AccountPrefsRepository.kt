@@ -9,16 +9,17 @@ import network.xyo.data.PrefsDataStoreProtos.PrefsDataStore
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import network.xyo.client.account.Account
-import network.xyo.client.account.hexStringToByteArray
 import network.xyo.client.account.model.AccountInstance
 import network.xyo.client.settings.AccountPreferences
 import network.xyo.client.xyoScope
 
 
 class AccountPrefsRepository(context: Context, private val _accountPreferences: AccountPreferences = defaults.accountPreferences) {
+    private val appContext = context.applicationContext
+
     // This should set the proper paths for the prefs datastore each time the the class is instantiated
     @Volatile
-    private var prefsDataStore: DataStore<PrefsDataStore> = context.xyoAccountDataStore(
+    private var prefsDataStore: DataStore<PrefsDataStore> = appContext.xyoAccountDataStore(
         accountPreferences.fileName, accountPreferences.storagePath
     )
 
