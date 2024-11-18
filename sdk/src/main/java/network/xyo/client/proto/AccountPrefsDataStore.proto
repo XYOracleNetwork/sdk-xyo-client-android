@@ -5,6 +5,7 @@ package network.xyo.proto;
 option java_package = "network.xyo.data";
 option java_outer_classname = "PrefsDataStoreProtos";
 
-message PrefsDataStore {
+message AccountPrefsDataStore {
   optional string account_key = 1;
+
 }

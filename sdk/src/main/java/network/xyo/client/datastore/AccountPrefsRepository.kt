@@ -5,7 +5,7 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.datastore.core.DataStore
-import network.xyo.data.PrefsDataStoreProtos.PrefsDataStore
+import network.xyo.data.PrefsDataStoreProtos.AccountPrefsDataStore
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import network.xyo.client.account.Account
@@ -19,7 +19,7 @@ class AccountPrefsRepository(context: Context, private val _accountPreferences: 
 
     // This should set the proper paths for the prefs datastore each time the the class is instantiated
     @Volatile
-    private var prefsDataStore: DataStore<PrefsDataStore> = appContext.xyoAccountDataStore(
+    private var accountPrefsDataStore: DataStore<AccountPrefsDataStore> = appContext.xyoAccountDataStore(
         accountPreferences.fileName, accountPreferences.storagePath
     )
 
@@ -38,7 +38,7 @@ class AccountPrefsRepository(context: Context, private val _accountPreferences: 
     suspend fun initializeAccount(account: AccountInstance): AccountInstance? {
         var updatedKey: String? = null
         val job = xyoScope.launch {
-            val savedKey = prefsDataStore.data.first().accountKey
+            val savedKey = accountPrefsDataStore.data.first().accountKey
             if (savedKey.isNullOrEmpty()) {
                 // no saved key so save the passed in one
                 updatedKey = null
@@ -59,7 +59,7 @@ class AccountPrefsRepository(context: Context, private val _accountPreferences: 
     @OptIn(ExperimentalStdlibApi::class)
     @RequiresApi(Build.VERSION_CODES.M)
     private suspend fun getAccountKey(): String {
-        val savedKey = prefsDataStore.data.first().accountKey
+        val savedKey = accountPrefsDataStore.data.first().accountKey
         return if (savedKey.isEmpty()) {
             val newAccount: AccountInstance = Account.random()
             setAccountKey(newAccount.privateKey.toHexString())
@@ -69,31 +69,30 @@ class AccountPrefsRepository(context: Context, private val _accountPreferences: 
         }
     }
 
-    private suspend fun setAccountKey(accountKey: String): DataStore<PrefsDataStore> {
+    private suspend fun setAccountKey(accountKey: String): DataStore<AccountPrefsDataStore> {
         val job = xyoScope.launch {
-            this@AccountPrefsRepository.prefsDataStore.updateData { currentPrefs ->
+            this@AccountPrefsRepository.accountPrefsDataStore.updateData { currentPrefs ->
                 currentPrefs.toBuilder()
                     .setAccountKey(accountKey)
                     .build()
             }
         }
         job.join()
-        return prefsDataStore
+        return accountPrefsDataStore
     }
 
-    suspend fun clearSavedAccountKey(): DataStore<PrefsDataStore> {
+    suspend fun clearSavedAccountKey(): DataStore<AccountPrefsDataStore> {
         val job = xyoScope.launch {
-            this@AccountPrefsRepository.prefsDataStore.updateData { currentPrefs ->
+            this@AccountPrefsRepository.accountPrefsDataStore.updateData { currentPrefs ->
                 currentPrefs.toBuilder()
                     .setAccountKey("")
                     .build()
             }
         }
         job.join()
-        return prefsDataStore
+        return accountPrefsDataStore
     }
 
-    // Define the singleton instance within a companion object
     companion object {
         @Volatile
         private var INSTANCE: AccountPrefsRepository? = null
