@@ -32,7 +32,7 @@ class WitnessLocationHandlerTest {
             // Get the application context
             val context = ApplicationProvider.getApplicationContext<Context>()
 
-            when (val result = WitnessLocationHandler().witness(context, arrayListOf(Pair(apiDomainBeta, Account.random())))) {
+            when (val result = WitnessLocationHandler().witness(context.applicationContext, arrayListOf(Pair(apiDomainBeta, Account.random())))) {
                 is WitnessResult.Success<List<XyoPayload?>> -> {
                     assert(result.data.size == 2)
                     result.data.map { assert(it !== null)}

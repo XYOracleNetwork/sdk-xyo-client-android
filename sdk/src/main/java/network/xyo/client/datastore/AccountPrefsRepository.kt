@@ -100,14 +100,14 @@ class AccountPrefsRepository(context: Context, private val _accountPreferences: 
         // Method to retrieve the singleton instance
         fun getInstance(context: Context, accountPreferences: AccountPreferences = defaults.accountPreferences): AccountPrefsRepository {
             val newInstance = INSTANCE ?: synchronized(this) {
-                INSTANCE ?: AccountPrefsRepository(context, accountPreferences).also { INSTANCE = it }
+                INSTANCE ?: AccountPrefsRepository(context.applicationContext, accountPreferences).also { INSTANCE = it }
             }
             return newInstance
         }
 
         fun refresh(context: Context, accountPreferences: AccountPreferences): AccountPrefsRepository {
             synchronized(this) {
-                INSTANCE = AccountPrefsRepository(context, accountPreferences)
+                INSTANCE = AccountPrefsRepository(context.applicationContext, accountPreferences)
                 return INSTANCE!!
             }
         }

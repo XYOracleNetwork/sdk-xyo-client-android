@@ -7,7 +7,7 @@ import androidx.core.content.ContextCompat
 
 fun hasPermission(context: Context, permission: String, message: String? = null): Boolean {
     val result = ContextCompat.checkSelfPermission(
-        context,
+        context.applicationContext,
         permission
     ) == PackageManager.PERMISSION_GRANTED
     if (!result && message != null) {

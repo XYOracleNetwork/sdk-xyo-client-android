@@ -33,11 +33,11 @@ open class XyoWitness<out T: XyoPayload> (
 
     open suspend fun observe(context: Context): T? {
         if (deferredObserver !== null) {
-            val payload = deferredObserver.deferredDetect(context, previousHash)
+            val payload = deferredObserver.deferredDetect(context.applicationContext, previousHash)
             return payload
         }
         observer?.let {
-            val payload = it(context, previousHash)
+            val payload = it(context.applicationContext, previousHash)
             payload?.let {
                 previousHash = XyoSerializable.sha256String(it)
             }
