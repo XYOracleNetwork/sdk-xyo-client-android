@@ -31,7 +31,7 @@ class LocationWitnessTest {
 
         CoroutineScope(Dispatchers.Main).launch {
             val witness = XyoLocationWitness()
-            val payload = witness.observe(context)
+            val payload = witness.observe(context)?.first()
 
             assertInstanceOf<XyoLocationPayload>(payload)
             assert(payload.schema == "network.xyo.location.android")
