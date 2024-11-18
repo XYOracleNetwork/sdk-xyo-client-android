@@ -1,8 +1,10 @@
-package network.xyo.client
+package network.xyo.client.prefs
 
 import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
 import kotlinx.coroutines.runBlocking
+import network.xyo.client.TestConstants
+import network.xyo.client.XyoPanel
 import network.xyo.client.account.Account
 import network.xyo.client.boundwitness.XyoBoundWitnessBuilder
 import network.xyo.client.datastore.accounts.AccountPrefsRepository
@@ -117,7 +119,9 @@ class AccountPrefsRepositoryTest {
             assertEquals(firstAccount.privateKey.toHexString(), testAccount.privateKey.toHexString())
 
             // Sign with the test account
-            val firstBw = XyoBoundWitnessBuilder().witness(firstAccount, null).payloads(listOf(TestConstants.debugPayload)).build()
+            val firstBw = XyoBoundWitnessBuilder().witness(firstAccount, null).payloads(listOf(
+                TestConstants.debugPayload
+            )).build()
             val firstAddress = firstBw.addresses.first()
 
             // Deserialize the test account (Ideally we would refresh the singleton but in tests this seems to cause errors with multiple instances of the prefs DataStore)
@@ -125,7 +129,9 @@ class AccountPrefsRepositoryTest {
             val secondAccount = secondInstance.getAccount()
 
             // Sign with the test account
-            val secondBw = XyoBoundWitnessBuilder().witness(secondAccount, null).payloads(listOf(TestConstants.debugPayload)).build()
+            val secondBw = XyoBoundWitnessBuilder().witness(secondAccount, null).payloads(listOf(
+                TestConstants.debugPayload
+            )).build()
             val secondAddress = secondBw.addresses.first()
 
             // check that addresses have not changed and no errors occurred during signing
