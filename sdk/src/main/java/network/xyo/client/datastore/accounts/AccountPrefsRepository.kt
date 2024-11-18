@@ -11,10 +11,11 @@ import kotlinx.coroutines.launch
 import network.xyo.client.account.Account
 import network.xyo.client.account.model.AccountInstance
 import network.xyo.client.settings.AccountPreferences
+import network.xyo.client.settings.defaultXyoSdkSettings
 import network.xyo.client.xyoScope
 
 
-class AccountPrefsRepository(context: Context, private val _accountPreferences: AccountPreferences = defaults.accountPreferences) {
+class AccountPrefsRepository(context: Context, private val _accountPreferences: AccountPreferences = defaultXyoSdkSettings.accountPreferences) {
     private val appContext = context.applicationContext
 
     // This should set the proper paths for the prefs datastore each time the the class is instantiated
@@ -98,7 +99,7 @@ class AccountPrefsRepository(context: Context, private val _accountPreferences: 
         private var INSTANCE: AccountPrefsRepository? = null
 
         // Method to retrieve the singleton instance
-        fun getInstance(context: Context, accountPreferences: AccountPreferences = defaults.accountPreferences): AccountPrefsRepository {
+        fun getInstance(context: Context, accountPreferences: AccountPreferences = defaultXyoSdkSettings.accountPreferences): AccountPrefsRepository {
             val newInstance = INSTANCE ?: synchronized(this) {
                 INSTANCE ?: AccountPrefsRepository(context.applicationContext, accountPreferences).also { INSTANCE = it }
             }
