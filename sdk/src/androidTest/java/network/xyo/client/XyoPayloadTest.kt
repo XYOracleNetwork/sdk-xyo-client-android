@@ -93,13 +93,13 @@ class XyoPayloadTest {
     @Test
     fun testRoundTripPanel() {
         val address = Account.fromPrivateKey("5a95531488b4d0d3645aea49678297ae9e2034879ce0389b80eb788e8b533592")
-        val witness = XyoWitness(address, fun(_: Context, _: String?): XyoPayload {
-            return BasicPayload()
+        val witness = XyoWitness(address, fun(_: Context, _: String?): List<XyoPayload> {
+            return listOf(BasicPayload())
         })
 
         CoroutineScope(Dispatchers.Main).launch {
             val response = arrayListOf(witness.observe(appContext))
-            val payloads = response.mapNotNull { payload -> payload }
+            val payloads = response.mapNotNull { payload -> payload }.flatten()
             val bwJson = XyoBoundWitnessBuilder()
                 .payloads(payloads)
                 .witnesses(arrayListOf(witness))

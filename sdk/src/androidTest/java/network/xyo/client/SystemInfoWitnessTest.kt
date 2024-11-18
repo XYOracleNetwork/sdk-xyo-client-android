@@ -18,7 +18,7 @@ class SystemInfoWitnessTest {
 
         CoroutineScope(Dispatchers.Main).launch {
             val witness = XyoSystemInfoWitness()
-            val payload = witness.observe(context)
+            val payload = witness.observe(context)?.first()
 
             assertInstanceOf<XyoSystemInfoPayload>(payload)
             assert(payload.os != null)

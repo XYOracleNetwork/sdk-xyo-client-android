@@ -65,8 +65,8 @@ class XyoPanelTest {
         runBlocking {
             val witnessAccount = Account.fromPrivateKey("9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08")
             val witness2Account = Account.fromPrivateKey("5a95531488b4d0d3645aea49678297ae9e2034879ce0389b80eb788e8b533592")
-            val witness = XyoWitness(witnessAccount, fun(_: Context, _: String?): XyoPayload {
-                return BasicPayload()
+            val witness = XyoWitness(witnessAccount, fun(_: Context, _: String?): List<XyoPayload> {
+                return listOf(BasicPayload())
             })
             val panel = XyoPanel(appContext, arrayListOf(Pair(nodeUrl, Account.random())), listOf(witness, XyoSystemInfoWitness(witness2Account), XyoLocationWitness()))
             val result = panel.reportAsyncQuery()
@@ -94,8 +94,8 @@ class XyoPanelTest {
     @Test
     fun testSimplePanelReport() {
         runBlocking {
-            val panel = XyoPanel(appContext, fun(_:Context, _: String?): XyoEventPayload {
-                return XyoEventPayload("test_event")
+            val panel = XyoPanel(appContext, fun(_:Context, _: String?): List<XyoEventPayload> {
+                return listOf(XyoEventPayload("test_event"))
             })
             val result = panel.reportAsyncQuery()
             if (result.apiResults === null) throw NullPointerException("apiResults should not be null")

@@ -13,9 +13,9 @@ class DeferredLocationObserver : DeferredObserver<XyoLocationPayload>() {
     override suspend fun deferredDetect(
         context: Context,
         previousHash: String?
-    ): XyoLocationPayload? {
+    ): List<XyoLocationPayload>? {
         try {
-            return XyoLocationPayload.detect(context)
+            return listOf(XyoLocationPayload.detect(context))
         } catch (e: Exception) {
             Log.e("xyoClient", "Error building location payload: ${e.toString() + e.stackTraceToString()}")
             return null

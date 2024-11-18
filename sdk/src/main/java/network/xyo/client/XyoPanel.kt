@@ -74,7 +74,7 @@ class XyoPanel(
 
     constructor(
         context: Context,
-        observe: ((context: Context, previousHash: String?) -> XyoEventPayload?)?
+        observe: ((context: Context, previousHash: String?) -> List<XyoEventPayload>?)?
     ): this(
         context,
         arrayListOf(Pair("$DefaultApiDomain/Archivist", Account.random())),
@@ -107,7 +107,7 @@ class XyoPanel(
     suspend fun eventAsync(event: String): XyoPanelReportResult {
         val adhocWitnessList = listOf(
             XyoWitness({
-                _, previousHash -> XyoEventPayload(event)
+                _, previousHash -> listOf(XyoEventPayload(event))
             })
         )
         return this.reportAsync(adhocWitnessList)
@@ -117,7 +117,7 @@ class XyoPanel(
     suspend fun eventAsyncQuery(event: String): XyoPanelReportQueryResult {
         val adhocWitnessList = listOf(
             XyoWitness({
-                    _, previousHash -> XyoEventPayload(event)
+                    _, previousHash -> listOf(XyoEventPayload(event))
             })
         )
         return reportAsyncQuery(adhocWitnessList)
@@ -153,7 +153,7 @@ class XyoPanel(
             witness.observe(context)
         }
 
-        return payloads.mapNotNull { payload -> payload }
+        return payloads.mapNotNull { payload -> payload }.flatten()
     }
 
     @Deprecated("use reportAsyncQuery instead")

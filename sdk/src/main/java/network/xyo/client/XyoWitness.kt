@@ -8,19 +8,19 @@ import network.xyo.client.account.model.AccountInstance
 import network.xyo.client.payload.XyoPayload
 
 abstract class DeferredObserver<out T: XyoPayload> {
-    abstract suspend fun deferredDetect(context: Context, previousHash: String?): T?
+    abstract suspend fun deferredDetect(context: Context, previousHash: String?): List<T>?
 }
 
 @RequiresApi(Build.VERSION_CODES.M)
 open class XyoWitness<out T: XyoPayload> (
     val address: AccountInstance = Account.random(),
-    private val observer: ((context: Context, previousHash: String) -> T?)? = null,
+    private val observer: ((context: Context, previousHash: String) -> List<T>?)? = null,
     var previousHash: String = "",
     val deferredObserver: DeferredObserver<T>? = null
 ) {
 
     constructor(
-        observer: ((context: Context, previousHash: String) -> T?)?,
+        observer: ((context: Context, previousHash: String) -> List<T>?)?,
         previousHash: String = "",
         account: AccountInstance = Account.random()
     ): this(account, observer, previousHash, null)
@@ -31,17 +31,15 @@ open class XyoWitness<out T: XyoPayload> (
         account: AccountInstance = Account.random()
     ): this(account, null, previousHash, observer)
 
-    open suspend fun observe(context: Context): T? {
+    open suspend fun observe(context: Context): List<T>? {
+        val appContext = context.applicationContext
         if (deferredObserver !== null) {
-            val payload = deferredObserver.deferredDetect(context.applicationContext, previousHash)
+            val payload = deferredObserver.deferredDetect(appContext, previousHash)
             return payload
         }
         observer?.let {
-            val payload = it(context.applicationContext, previousHash)
-            payload?.let {
-                previousHash = XyoSerializable.sha256String(it)
-            }
-            return payload
+            val payloads = it(appContext, previousHash)
+            return payloads
         }
         return null
     }
