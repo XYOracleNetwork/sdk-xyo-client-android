@@ -4,7 +4,7 @@ import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
 import network.xyo.client.account.model.AccountInstance
-import network.xyo.client.datastore.AccountPrefsRepository
+import network.xyo.client.datastore.accounts.AccountPrefsRepository
 
 class XyoSdk private constructor(context: Context, val settings: SettingsInterface) {
     private val appContext = context.applicationContext

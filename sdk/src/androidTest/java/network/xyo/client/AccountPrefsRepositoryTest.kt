@@ -5,7 +5,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import kotlinx.coroutines.runBlocking
 import network.xyo.client.account.Account
 import network.xyo.client.boundwitness.XyoBoundWitnessBuilder
-import network.xyo.client.datastore.AccountPrefsRepository
+import network.xyo.client.datastore.accounts.AccountPrefsRepository
 import network.xyo.client.settings.AccountPreferences
 import network.xyo.client.witness.system.info.XyoSystemInfoWitness
 import org.junit.Before

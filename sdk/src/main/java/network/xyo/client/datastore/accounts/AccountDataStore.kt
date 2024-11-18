@@ -1,4 +1,4 @@
-package network.xyo.client.datastore
+package network.xyo.client.datastore.accounts
 
 import android.content.Context
 import androidx.datastore.core.DataStore

@@ -1,4 +1,4 @@
-package network.xyo.client.datastore
+package network.xyo.client.datastore.accounts
 
 import androidx.datastore.core.CorruptionException
 import androidx.datastore.core.Serializer
