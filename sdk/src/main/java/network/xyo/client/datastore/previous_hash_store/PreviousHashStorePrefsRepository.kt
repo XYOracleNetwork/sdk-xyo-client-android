@@ -2,15 +2,20 @@ package network.xyo.client.datastore.previous_hash_store
 
 import android.content.Context
 import androidx.datastore.core.DataStore
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import network.xyo.client.account.hexStringToByteArray
+import network.xyo.client.account.model.PreviousHashStore
 import network.xyo.client.settings.PreviousHashStorePreferences
 import network.xyo.client.settings.defaultXyoSdkSettings
+import network.xyo.client.xyoScope
 import network.xyo.data.PreviousHashPrefsDataStoreProtos.PreviousHashPrefsDataStore
 
 
 class PreviousHashStorePrefsRepository(
     context: Context,
     private val _previousHashStorePreferences: PreviousHashStorePreferences = defaultXyoSdkSettings.previousHashStorePreferences
-) {
+): PreviousHashStore {
     private val appContext = context.applicationContext
 
     // This should set the proper paths for the prefs datastore each time the the class is instantiated
@@ -23,11 +28,30 @@ class PreviousHashStorePrefsRepository(
     val previousHashStorePreferences: PreviousHashStorePreferences
         get() = _previousHashStorePreferences
 
-//    @RequiresApi(Build.VERSION_CODES.M)
-//    suspend fun getPreviousHashes(): PreviousHashStore {
-//        val saveKeyHex = getPreviousHashStore()
-//        return
-//    }
+    @OptIn(ExperimentalStdlibApi::class)
+    override suspend fun getItem(address: ByteArray): ByteArray? {
+        var savedPreviousHash: String? = null
+        val job = xyoScope.launch {
+            val savedPreviousHashStore = previousHashStorePrefsDataStore.data.first().addressToHashMap
+            val searchKey = address.toHexString()
+            savedPreviousHash = savedPreviousHashStore[searchKey]
+        }
+        job.join()
+        return if (savedPreviousHash != null) {
+            hexStringToByteArray(savedPreviousHash!!)
+        } else {
+            null
+        }
+    }
+
+    suspend override fun setItem(address: ByteArray, previousHash: ByteArray) {
+        TODO("Not yet implemented")
+    }
+
+    suspend override fun removeItem(address: ByteArray) {
+        TODO("Not yet implemented")
+    }
+
 
 //    @OptIn(ExperimentalStdlibApi::class)
 //    @RequiresApi(Build.VERSION_CODES.M)
