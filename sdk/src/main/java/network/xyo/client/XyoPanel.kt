@@ -22,7 +22,12 @@ data class XyoPanelReportResult(val bw: XyoBoundWitnessJson, val apiResults: Lis
 data class XyoPanelReportQueryResult(val bw: XyoBoundWitnessJson, val apiResults: List<PostQueryResult>?, val payloads: List<XyoPayload>?)
 
 @RequiresApi(Build.VERSION_CODES.M)
-class XyoPanel(val context: Context, private val archivists: List<XyoArchivistApiClient>?, private val witnesses: List<XyoWitness<XyoPayload>>?, private val nodeUrlsAndAccounts: ArrayList<Pair<String, AccountInstance?>>?) {
+class XyoPanel(
+    val context: Context,
+    private val archivists: List<XyoArchivistApiClient>?,
+    private val witnesses: List<XyoWitness<XyoPayload>>?,
+    private val nodeUrlsAndAccounts: ArrayList<Pair<String, AccountInstance?>>?
+) {
     var previousHash: String? = null
     private var nodes: MutableList<NodeClient>? = null
     var defaultAccount: AccountInstance? = null
