@@ -11,13 +11,13 @@ import network.xyo.client.witness.types.WitnessResult
 import network.xyo.client.XyoPanel
 import network.xyo.client.account.model.AccountInstance
 import network.xyo.client.boundwitness.XyoBoundWitnessBodyJson
-import network.xyo.client.datastore.AccountPrefsRepository
 import network.xyo.client.payload.XyoPayload
+import network.xyo.client.settings.XyoSdk
 
 open class WitnessLocationHandler : WitnessHandlerInterface<List<XyoPayload?>> {
     @RequiresApi(Build.VERSION_CODES.M)
     override suspend fun witness(context: Context, nodeUrlsAndAccounts: ArrayList<Pair<String, AccountInstance?>>): WitnessResult<List<XyoPayload?>> {
-        val account = AccountPrefsRepository.getInstance(context).getAccount()
+        val account = XyoSdk.getInstance(context.applicationContext).getAccount()
         val panel = XyoPanel(context, nodeUrlsAndAccounts, listOf(
             XyoLocationWitness(account)
         ))
