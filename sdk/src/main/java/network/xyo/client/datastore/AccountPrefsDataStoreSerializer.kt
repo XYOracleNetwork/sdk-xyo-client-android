@@ -3,7 +3,7 @@ package network.xyo.client.datastore
 import androidx.datastore.core.CorruptionException
 import androidx.datastore.core.Serializer
 import com.google.protobuf.InvalidProtocolBufferException
-import network.xyo.data.PrefsDataStoreProtos.AccountPrefsDataStore
+import network.xyo.data.AccountPrefsDataStoreProtos.AccountPrefsDataStore
 import java.io.InputStream
 import java.io.OutputStream
 

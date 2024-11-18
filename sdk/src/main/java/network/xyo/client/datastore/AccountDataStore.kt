@@ -7,7 +7,7 @@ import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import network.xyo.client.settings.DefaultXyoSdkSettings
-import network.xyo.data.PrefsDataStoreProtos.AccountPrefsDataStore
+import network.xyo.data.AccountPrefsDataStoreProtos.AccountPrefsDataStore
 import java.io.File
 
 val defaults = DefaultXyoSdkSettings()

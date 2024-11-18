@@ -5,7 +5,7 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.datastore.core.DataStore
-import network.xyo.data.PrefsDataStoreProtos.AccountPrefsDataStore
+import network.xyo.data.AccountPrefsDataStoreProtos.AccountPrefsDataStore
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import network.xyo.client.account.Account
