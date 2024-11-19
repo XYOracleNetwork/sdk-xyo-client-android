@@ -28,7 +28,7 @@ class QueryBoundWitnessBuilder : XyoBoundWitnessBuilder() {
         return this
     }
 
-    override fun build(previousHash: String?): QueryBoundWitnessJson {
+    override suspend fun build(previousHash: String?): QueryBoundWitnessJson {
         bw = QueryBoundWitnessJson()
         // override to support additional properties for query bound witnesses
         return bw.let {

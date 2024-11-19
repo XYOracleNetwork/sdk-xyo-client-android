@@ -61,14 +61,14 @@ open class XyoBoundWitnessBuilder {
         return this
     }
 
-    private fun sign(hash: String): List<String> {
+    private suspend fun sign(hash: String): List<String> {
         return _witnesses.map {
             val sig = XyoSerializable.bytesToHex(it.sign(hexStringToByteArray(hash)))
             sig
         }
     }
 
-    protected fun constructFields() {
+    protected suspend fun constructFields() {
         // update json class properties
         bw.payload_hashes = _payload_hashes
         bw.payload_schemas = _payload_schemas
@@ -82,7 +82,7 @@ open class XyoBoundWitnessBuilder {
         constructHashableFieldsFields()
     }
 
-    private fun  constructHashableFieldsFields() {
+    private suspend fun constructHashableFieldsFields() {
         // Note: Once fields are hashed, do not update class properties that are expected
         // in the serialized version of the bw because they will invalidate the hash
         val hashable = hashableFields()
@@ -91,7 +91,7 @@ open class XyoBoundWitnessBuilder {
         bw._hash = hash
     }
 
-    open fun build(previousHash: String? = null): XyoBoundWitnessJson {
+    open suspend fun build(previousHash: String? = null): XyoBoundWitnessJson {
         return bw.let{
             // store the previous hash on the class
             it._previous_hash = previousHash

@@ -1,12 +1,16 @@
-package network.xyo.client
+package network.xyo.client.prefs
 
 import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
 import kotlinx.coroutines.runBlocking
+import network.xyo.client.TestConstants
+import network.xyo.client.XyoPanel
 import network.xyo.client.account.Account
 import network.xyo.client.boundwitness.XyoBoundWitnessBuilder
-import network.xyo.client.datastore.AccountPrefsRepository
+import network.xyo.client.datastore.accounts.AccountPrefsRepository
 import network.xyo.client.settings.AccountPreferences
+import network.xyo.client.settings.PreviousHashStorePreferences
+import network.xyo.client.settings.SettingsInterface
 import network.xyo.client.witness.system.info.XyoSystemInfoWitness
 import org.junit.Before
 import org.junit.Test
@@ -80,19 +84,29 @@ class AccountPrefsRepositoryTest {
                 override val storagePath = "__xyo-client-sdk-1__"
             }
 
-            val updatedAccountPrefs = UpdatedAccountPreferences()
+            class UpdatedPreviousHashShorePreferences : PreviousHashStorePreferences {
+                override val fileName = "network-xyo-sdk-prefs-2"
+                override val storagePath = "__xyo-client-sdk-1__"
+            }
+
+            class Settings: SettingsInterface {
+                override val accountPreferences = UpdatedAccountPreferences()
+                override val previousHashStorePreferences = UpdatedPreviousHashShorePreferences()
+            }
+
+            val updatedSettings = Settings()
 
             val refreshedInstance =
-                AccountPrefsRepository.refresh(appContext, updatedAccountPrefs)
+                AccountPrefsRepository.refresh(appContext, updatedSettings)
 
             // Test that accountPreferences are updated
             assertEquals(
                 refreshedInstance.accountPreferences.fileName,
-                updatedAccountPrefs.fileName
+                updatedSettings.accountPreferences.fileName
             )
             assertEquals(
                 refreshedInstance.accountPreferences.storagePath,
-                updatedAccountPrefs.storagePath
+                updatedSettings.accountPreferences.storagePath
             )
 
             val refreshedAddress = refreshedInstance.getAccount().privateKey.toHexString()
@@ -117,7 +131,9 @@ class AccountPrefsRepositoryTest {
             assertEquals(firstAccount.privateKey.toHexString(), testAccount.privateKey.toHexString())
 
             // Sign with the test account
-            val firstBw = XyoBoundWitnessBuilder().witness(firstAccount, null).payloads(listOf(TestConstants.debugPayload)).build()
+            val firstBw = XyoBoundWitnessBuilder().witness(firstAccount, null).payloads(listOf(
+                TestConstants.debugPayload
+            )).build()
             val firstAddress = firstBw.addresses.first()
 
             // Deserialize the test account (Ideally we would refresh the singleton but in tests this seems to cause errors with multiple instances of the prefs DataStore)
@@ -125,7 +141,9 @@ class AccountPrefsRepositoryTest {
             val secondAccount = secondInstance.getAccount()
 
             // Sign with the test account
-            val secondBw = XyoBoundWitnessBuilder().witness(secondAccount, null).payloads(listOf(TestConstants.debugPayload)).build()
+            val secondBw = XyoBoundWitnessBuilder().witness(secondAccount, null).payloads(listOf(
+                TestConstants.debugPayload
+            )).build()
             val secondAddress = secondBw.addresses.first()
 
             // check that addresses have not changed and no errors occurred during signing

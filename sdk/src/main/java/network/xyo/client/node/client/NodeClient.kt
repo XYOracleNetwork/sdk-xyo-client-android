@@ -81,7 +81,7 @@ class NodeClient(private val url: String, private val accountToUse: AccountInsta
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
-    private fun buildQuery(query: XyoPayload, payloads: List<XyoPayload>?, previousHash: String?): String {
+    private suspend fun buildQuery(query: XyoPayload, payloads: List<XyoPayload>?, previousHash: String?): String {
         val builtQuery = queryBuilder(query, payloads, previousHash)
         val queryPayloads = buildQueryPayloads(query, payloads)
         val queryPayloadsJsonArray = queryPayloadsJsonArray(queryPayloads)
@@ -89,7 +89,7 @@ class NodeClient(private val url: String, private val accountToUse: AccountInsta
         return builtQueryTuple.joinToString(",", "[", "]")
     }
 
-    private fun queryBuilder(query: XyoPayload, payloads: List<XyoPayload>?, previousHash: String?): QueryBoundWitnessJson {
+    private suspend fun queryBuilder(query: XyoPayload, payloads: List<XyoPayload>?, previousHash: String?): QueryBoundWitnessJson {
         return QueryBoundWitnessBuilder().let {
             payloads?.let { payload ->
                 it.payloads(payload)

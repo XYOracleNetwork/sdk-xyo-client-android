@@ -3,8 +3,10 @@ package network.xyo.client.settings
 import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
+import network.xyo.client.account.Account
 import network.xyo.client.account.model.AccountInstance
-import network.xyo.client.datastore.AccountPrefsRepository
+import network.xyo.client.datastore.accounts.AccountPrefsRepository
+import network.xyo.client.datastore.previous_hash_store.PreviousHashStorePrefsRepository
 
 class XyoSdk private constructor(context: Context, val settings: SettingsInterface) {
     private val appContext = context.applicationContext
@@ -31,8 +33,10 @@ class XyoSdk private constructor(context: Context, val settings: SettingsInterfa
         private var INSTANCE: XyoSdk? = null
 
         fun getInstance(context: Context, settings: SettingsInterface = DefaultXyoSdkSettings()): XyoSdk {
-            // Initialize the singleton with the users accountPreferences
-            AccountPrefsRepository.getInstance(context.applicationContext, settings.accountPreferences)
+            // Initialize the global AccountPrefs DataStore
+            AccountPrefsRepository.getInstance(context.applicationContext, settings)
+            // Initialize the global Account object with the previous hash store DataStore
+            Account.previousHashStore = PreviousHashStorePrefsRepository.getInstance(context.applicationContext)
 
             val newInstance = INSTANCE ?: synchronized(this) {
                 INSTANCE ?: XyoSdk(context.applicationContext, settings).also { INSTANCE = it }
@@ -43,7 +47,7 @@ class XyoSdk private constructor(context: Context, val settings: SettingsInterfa
         fun refresh(context: Context, settings: SettingsInterface = DefaultXyoSdkSettings()): XyoSdk {
             synchronized(this) {
                 // Initialize the singleton with the users accountPreferences
-                AccountPrefsRepository.getInstance(context.applicationContext, settings.accountPreferences)
+                AccountPrefsRepository.getInstance(context.applicationContext, settings)
                 INSTANCE = XyoSdk(context.applicationContext, settings)
             }
             return INSTANCE!!
