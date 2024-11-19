@@ -2,7 +2,10 @@ package network.xyo.client.settings
 
 import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
+import network.xyo.client.XyoEventPayload
+import network.xyo.client.XyoPanel
 import network.xyo.client.account.model.AccountInstance
 import org.junit.Before
 import org.junit.Test
@@ -56,6 +59,24 @@ class XyoSdkTest {
             val instance = XyoSdk.getInstance(appContext)
             val account = instance.getAccount()
             assertInstanceOf<AccountInstance>(account)
+        }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun testValidChainOnInit() {
+        runBlocking {
+            val instance = XyoSdk.getInstance(appContext)
+
+            val testAccount = instance.getAccount()
+            val panel = XyoPanel(appContext, testAccount, fun(_:Context): List<XyoEventPayload> {
+                return listOf(XyoEventPayload("test_event"))
+            })
+            val result = panel.reportAsyncQuery()
+            val bw = result.bw
+
+            val result2 = panel.reportAsyncQuery()
+            assert(result2.bw.previous_hashes.contains(bw._hash))
         }
     }
 }
