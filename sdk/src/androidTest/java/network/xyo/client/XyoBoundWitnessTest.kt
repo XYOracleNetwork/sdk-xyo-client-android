@@ -31,7 +31,6 @@ class XyoBoundWitnessTest {
 
     @Before
     fun useAppContext() {
-        // Context of the app under test.
         this.appContext = InstrumentationRegistry.getInstrumentation().targetContext
     }
 
@@ -86,7 +85,7 @@ class XyoBoundWitnessTest {
             val testAccount = Account.random()
             val bw = XyoBoundWitnessBuilder(appContext).signer(testAccount).payloads(listOf(TestPayload1())).build()
             val bw2 = XyoBoundWitnessBuilder(appContext).signer(testAccount).payloads(listOf(TestPayload1())).build()
-            assert(bw2.previous_hashes.contains(bw._hash))
+            assert(bw2.previous_hashes.first() == bw._hash)
         }
     }
 }
