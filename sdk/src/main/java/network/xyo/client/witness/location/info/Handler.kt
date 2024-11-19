@@ -18,7 +18,7 @@ open class WitnessLocationHandler : WitnessHandlerInterface<List<XyoPayload?>> {
     @RequiresApi(Build.VERSION_CODES.M)
     override suspend fun witness(context: Context, nodeUrlsAndAccounts: ArrayList<Pair<String, AccountInstance?>>): WitnessResult<List<XyoPayload?>> {
         val account = XyoSdk.getInstance(context.applicationContext).getAccount()
-        val panel = XyoPanel(context, nodeUrlsAndAccounts, listOf(
+        val panel = XyoPanel(context, account, nodeUrlsAndAccounts, listOf(
             XyoLocationWitness(account)
         ))
         return getLocation(panel)

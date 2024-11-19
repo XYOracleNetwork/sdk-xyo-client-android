@@ -102,7 +102,7 @@ class XyoPayloadTest {
             val payloads = response.mapNotNull { payload -> payload }.flatten()
             val bwJson = XyoBoundWitnessBuilder()
                 .payloads(payloads)
-                .witnesses(arrayListOf(witness))
+                .signer(Account.random())
                 .build()
             val bwJsonString = XyoSerializable.toJson(bwJson)
             val bwMirrored = XyoSerializable.fromJson(bwJsonString, bwJson)

@@ -3,7 +3,6 @@ package network.xyo.client.boundwitness
 import android.os.Build
 import androidx.annotation.RequiresApi
 import network.xyo.client.XyoSerializable
-import network.xyo.client.XyoWitness
 import network.xyo.client.account.hexStringToByteArray
 import network.xyo.client.account.model.AccountInstance
 import network.xyo.client.payload.XyoPayload
@@ -11,8 +10,7 @@ import network.xyo.client.payload.XyoValidationException
 
 @RequiresApi(Build.VERSION_CODES.M)
 open class XyoBoundWitnessBuilder {
-    protected var _witnesses = mutableListOf<AccountInstance>()
-    protected var _previous_hashes = mutableListOf<String?>()
+    protected var _signers = mutableListOf<AccountInstance>()
     protected var _payload_hashes = mutableListOf<String>()
     protected var _payload_schemas = mutableListOf<String>()
     protected var _payloads = mutableListOf<XyoPayload>()
@@ -22,17 +20,15 @@ open class XyoBoundWitnessBuilder {
 
     @OptIn(ExperimentalStdlibApi::class)
     val addresses: List<String>
-        get() = _witnesses.map { witness -> witness.address.toHexString() }
+        get() = _signers.map { witness -> witness.address.toHexString() }
 
-    open fun witness(account: AccountInstance, previousHash: String?): XyoBoundWitnessBuilder {
-        _witnesses.add(account)
-        _previous_hashes.add(previousHash)
+    open fun signers(accounts: List<AccountInstance>): XyoBoundWitnessBuilder {
+        accounts.forEach { account -> signer(account) }
         return this
     }
 
-    open fun witnesses(witnesses: List<XyoWitness<XyoPayload>>): XyoBoundWitnessBuilder {
-        witnesses.forEach { witness -> _witnesses.add(witness.address) }
-        witnesses.forEach { witness -> _previous_hashes.add(witness.previousHash) }
+    open fun signer(account: AccountInstance): XyoBoundWitnessBuilder {
+        _signers.add(account)
         return this
     }
 
@@ -62,17 +58,18 @@ open class XyoBoundWitnessBuilder {
     }
 
     private suspend fun sign(hash: String): List<String> {
-        return _witnesses.map {
+        return _signers.map {
             val sig = XyoSerializable.bytesToHex(it.sign(hexStringToByteArray(hash)))
             sig
         }
     }
 
+    @OptIn(ExperimentalStdlibApi::class)
     protected suspend fun constructFields() {
         // update json class properties
         bw.payload_hashes = _payload_hashes
         bw.payload_schemas = _payload_schemas
-        bw.previous_hashes = _previous_hashes
+        bw.previous_hashes = _signers.map {account -> account.previousHash?.toHexString()}
         bw.addresses = addresses
 
         // update underscore fields

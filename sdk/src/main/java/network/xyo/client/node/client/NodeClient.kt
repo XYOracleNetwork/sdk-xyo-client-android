@@ -94,7 +94,7 @@ class NodeClient(private val url: String, private val accountToUse: AccountInsta
             payloads?.let { payload ->
                 it.payloads(payload)
             }
-            it.witness(this.account, previousHash).query(query).build(previousHash)
+            it.signer(this.account).query(query).build(previousHash)
 
         }
     }

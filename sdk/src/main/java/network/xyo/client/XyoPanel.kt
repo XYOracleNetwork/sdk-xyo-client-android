@@ -24,6 +24,7 @@ data class XyoPanelReportQueryResult(val bw: XyoBoundWitnessJson, val apiResults
 @RequiresApi(Build.VERSION_CODES.M)
 class XyoPanel(
     val context: Context,
+    val account: AccountInstance,
     private val archivists: List<XyoArchivistApiClient>?,
     private val witnesses: List<XyoWitness<XyoPayload>>?,
     private val nodeUrlsAndAccounts: ArrayList<Pair<String, AccountInstance?>>?
@@ -35,12 +36,14 @@ class XyoPanel(
     @Deprecated("use constructors without deprecated archive field")
     constructor(
         context: Context,
+        account: AccountInstance,
         archive: String? = null,
         apiDomain: String? = null,
         witnesses: List<XyoWitness<XyoPayload>>? = null
     ) :
             this(
                 context,
+                account,
                 listOf(
                     XyoArchivistApiClient.get(
                         XyoArchivistApiConfig(
@@ -55,11 +58,13 @@ class XyoPanel(
 
     constructor(
         context: Context,
+        account: AccountInstance,
         // ArrayList to not cause compiler confusion with other class constructor signatures
         nodeUrlsAndAccounts: ArrayList<Pair<String, AccountInstance?>>,
         witnesses: List<XyoWitness<XyoPayload>>? = null
     ): this(
             context,
+            account,
             listOf(
                 XyoArchivistApiClient.get(
                     XyoArchivistApiConfig(
@@ -74,9 +79,11 @@ class XyoPanel(
 
     constructor(
         context: Context,
+        account: AccountInstance,
         observe: ((context: Context, previousHash: String?) -> List<XyoEventPayload>?)?
     ): this(
         context,
+        account,
         arrayListOf(Pair("$DefaultApiDomain/Archivist", Account.random())),
         listOf(XyoWitness(observe)),
     )
@@ -142,7 +149,7 @@ class XyoPanel(
         val payloads = generatePayloads()
         return XyoBoundWitnessBuilder()
             .payloads(payloads)
-            .witnesses(witnesses)
+            .signer(account)
             .build(previousHash)
     }
 

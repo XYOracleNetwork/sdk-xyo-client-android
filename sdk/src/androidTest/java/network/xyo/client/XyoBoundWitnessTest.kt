@@ -66,7 +66,7 @@ class XyoBoundWitnessTest {
     @Test
     fun testBoundWitnessHash() {
         runBlocking {
-            val bw = XyoBoundWitnessBuilder().witness(Account.random(), null).payloads(listOf(TestPayload1())).build()
+            val bw = XyoBoundWitnessBuilder().signer(Account.random()).payloads(listOf(TestPayload1())).build()
             val hashableFields = bw.getBodyJson()
             assert(bw._hash !== null)
             assert(bw._hash!! == XyoSerializable.sha256String(hashableFields))

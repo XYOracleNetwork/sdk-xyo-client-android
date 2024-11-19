@@ -38,7 +38,7 @@ class AccountPrefsRepositoryTest {
             prefsRepository.clearSavedAccountKey()
 
             val panel = XyoPanel(
-                appContext, arrayListOf(Pair(apiDomainBeta, null)), listOf(
+                appContext, Account.random(), arrayListOf(Pair(apiDomainBeta, null)), listOf(
                     XyoSystemInfoWitness()
                 )
             )
@@ -47,7 +47,7 @@ class AccountPrefsRepositoryTest {
             assertNotEquals(generatedAddress, null)
 
             val panel2 = XyoPanel(
-                appContext, arrayListOf(Pair(apiDomainBeta, null)), listOf(
+                appContext, Account.random(), arrayListOf(Pair(apiDomainBeta, null)), listOf(
                     XyoSystemInfoWitness()
                 )
             )
@@ -131,7 +131,7 @@ class AccountPrefsRepositoryTest {
             assertEquals(firstAccount.privateKey.toHexString(), testAccount.privateKey.toHexString())
 
             // Sign with the test account
-            val firstBw = XyoBoundWitnessBuilder().witness(firstAccount, null).payloads(listOf(
+            val firstBw = XyoBoundWitnessBuilder().signer(firstAccount).payloads(listOf(
                 TestConstants.debugPayload
             )).build()
             val firstAddress = firstBw.addresses.first()
@@ -141,7 +141,7 @@ class AccountPrefsRepositoryTest {
             val secondAccount = secondInstance.getAccount()
 
             // Sign with the test account
-            val secondBw = XyoBoundWitnessBuilder().witness(secondAccount, null).payloads(listOf(
+            val secondBw = XyoBoundWitnessBuilder().signer(secondAccount).payloads(listOf(
                 TestConstants.debugPayload
             )).build()
             val secondAddress = secondBw.addresses.first()

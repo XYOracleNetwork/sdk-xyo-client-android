@@ -46,7 +46,7 @@ class XyoPanelTest {
 
     private fun testCreatePanel(nodeUrl: String) {
         val witness = XyoWitness<XyoPayload>(Account.random())
-        val panel = XyoPanel(appContext, arrayListOf(Pair(nodeUrl, Account.random())), listOf(witness))
+        val panel = XyoPanel(appContext, Account.random(), arrayListOf(Pair(nodeUrl, Account.random())), listOf(witness))
         assertNotNull(panel)
     }
 
@@ -68,7 +68,7 @@ class XyoPanelTest {
             val witness = XyoWitness(witnessAccount, fun(_: Context, _: String?): List<XyoPayload> {
                 return listOf(BasicPayload())
             })
-            val panel = XyoPanel(appContext, arrayListOf(Pair(nodeUrl, Account.random())), listOf(witness, XyoSystemInfoWitness(witness2Account), XyoLocationWitness()))
+            val panel = XyoPanel(appContext, Account.random(), arrayListOf(Pair(nodeUrl, Account.random())), listOf(witness, XyoSystemInfoWitness(witness2Account), XyoLocationWitness()))
             val result = panel.reportAsyncQuery()
             if (result.apiResults === null) throw NullPointerException("apiResults should not be null")
             assert(result.payloads?.size == 3)
@@ -94,7 +94,7 @@ class XyoPanelTest {
     @Test
     fun testSimplePanelReport() {
         runBlocking {
-            val panel = XyoPanel(appContext, fun(_:Context, _: String?): List<XyoEventPayload> {
+            val panel = XyoPanel(appContext, Account.random(), fun(_:Context, _: String?): List<XyoEventPayload> {
                 return listOf(XyoEventPayload("test_event"))
             })
             val result = panel.reportAsyncQuery()
@@ -107,7 +107,7 @@ class XyoPanelTest {
     @Test
     fun testReportEvent() {
         runBlocking {
-            val panel = XyoPanel(appContext, arrayListOf(Pair(apiDomainBeta, Account.random())), listOf(XyoSystemInfoWitness()))
+            val panel = XyoPanel(appContext, Account.random(), arrayListOf(Pair(apiDomainBeta, Account.random())), listOf(XyoSystemInfoWitness()))
             val result = panel.reportAsyncQuery()
             if (result.apiResults === null) throw Error()
             result.apiResults?.forEach { assertEquals(it.errors, null) }
@@ -118,7 +118,7 @@ class XyoPanelTest {
     @Test
     fun testMissingNodes() {
         runBlocking {
-            val panel = XyoPanel(appContext, arrayListOf(), listOf(XyoSystemInfoWitness()))
+            val panel = XyoPanel(appContext, Account.random(), arrayListOf(), listOf(XyoSystemInfoWitness()))
             val results = panel.reportAsyncQuery()
             assertInstanceOf<XyoBoundWitnessJson>(results.bw)
             assertInstanceOf<XyoSystemInfoPayload>(results.payloads?.first())
