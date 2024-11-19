@@ -1,11 +1,8 @@
-package network.xyo.client
+package network.xyo.client.settings
 
 import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
 import kotlinx.coroutines.runBlocking
-import network.xyo.client.settings.AccountPreferences
-import network.xyo.client.settings.DefaultXyoSdkSettings
-import network.xyo.client.settings.XyoSdk
 import org.junit.Before
 import org.junit.Test
 import org.junit.jupiter.api.Assertions.assertEquals
