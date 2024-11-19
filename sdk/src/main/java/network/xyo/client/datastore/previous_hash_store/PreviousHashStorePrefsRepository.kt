@@ -87,7 +87,7 @@ class PreviousHashStorePrefsRepository(
         private var INSTANCE: PreviousHashStorePrefsRepository? = null
 
         // Method to retrieve the singleton instance
-        fun getInstance(context: Context, settings: SettingsInterface): PreviousHashStorePrefsRepository {
+        fun getInstance(context: Context, settings: SettingsInterface = defaultXyoSdkSettings): PreviousHashStorePrefsRepository {
             val newInstance = INSTANCE ?: synchronized(this) {
                 INSTANCE ?: PreviousHashStorePrefsRepository(context.applicationContext, settings).also { INSTANCE = it }
             }

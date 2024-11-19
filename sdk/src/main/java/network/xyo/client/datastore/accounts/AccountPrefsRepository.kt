@@ -18,7 +18,7 @@ import network.xyo.client.xyoScope
 
 class AccountPrefsRepository(context: Context, settings: SettingsInterface = defaultXyoSdkSettings) {
     private val appContext = context.applicationContext
-    private val accountPreferences: AccountPreferences = settings.accountPreferences
+    val accountPreferences: AccountPreferences = settings.accountPreferences
 
     // This should set the proper paths for the prefs datastore each time the the class is instantiated
     @Volatile
