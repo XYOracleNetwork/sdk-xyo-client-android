@@ -65,7 +65,7 @@ class XyoPanelTest {
         runBlocking {
             val witnessAccount = Account.fromPrivateKey("9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08")
             val witness2Account = Account.fromPrivateKey("5a95531488b4d0d3645aea49678297ae9e2034879ce0389b80eb788e8b533592")
-            val witness = XyoWitness(witnessAccount, fun(_: Context, _: String?): List<XyoPayload> {
+            val witness = XyoWitness(witnessAccount, fun(_: Context): List<XyoPayload> {
                 return listOf(BasicPayload())
             })
             val panel = XyoPanel(appContext, Account.random(), arrayListOf(Pair(nodeUrl, Account.random())), listOf(witness, XyoSystemInfoWitness(witness2Account), XyoLocationWitness()))
@@ -94,7 +94,7 @@ class XyoPanelTest {
     @Test
     fun testSimplePanelReport() {
         runBlocking {
-            val panel = XyoPanel(appContext, Account.random(), fun(_:Context, _: String?): List<XyoEventPayload> {
+            val panel = XyoPanel(appContext, Account.random(), fun(_:Context): List<XyoEventPayload> {
                 return listOf(XyoEventPayload("test_event"))
             })
             val result = panel.reportAsyncQuery()
