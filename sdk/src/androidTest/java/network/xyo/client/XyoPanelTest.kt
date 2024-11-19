@@ -9,6 +9,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import network.xyo.client.account.Account
 import network.xyo.client.boundwitness.XyoBoundWitnessJson
+import network.xyo.client.datastore.previous_hash_store.PreviousHashStorePrefsRepository
 import network.xyo.client.payload.XyoPayload
 import network.xyo.client.witness.location.info.LocationActivity
 import network.xyo.client.witness.location.info.XyoLocationWitness
@@ -42,6 +43,11 @@ class XyoPanelTest {
     fun useAppContext() {
         // Context of the app under test.
         this.appContext = InstrumentationRegistry.getInstrumentation().targetContext
+    }
+
+    @Before
+    fun useAccount() {
+        Account.previousHashStore = PreviousHashStorePrefsRepository.getInstance(InstrumentationRegistry.getInstrumentation().targetContext)
     }
 
     private fun testCreatePanel(nodeUrl: String) {
@@ -94,12 +100,17 @@ class XyoPanelTest {
     @Test
     fun testSimplePanelReport() {
         runBlocking {
-            val panel = XyoPanel(appContext, Account.random(), fun(_:Context): List<XyoEventPayload> {
+            val testAccount = Account.random()
+            val panel = XyoPanel(appContext, testAccount, fun(_:Context): List<XyoEventPayload> {
                 return listOf(XyoEventPayload("test_event"))
             })
             val result = panel.reportAsyncQuery()
             if (result.apiResults === null) throw NullPointerException("apiResults should not be null")
             result.apiResults?.forEach { assertEquals(it.errors, null) }
+            val bw = result.bw
+
+            val result2 = panel.reportAsyncQuery()
+            assert(result2.bw.previous_hashes.contains(bw._hash))
         }
     }
 
