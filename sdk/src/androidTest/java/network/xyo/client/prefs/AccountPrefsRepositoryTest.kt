@@ -37,22 +37,24 @@ class AccountPrefsRepositoryTest {
                 AccountPrefsRepository.getInstance(appContext)
             prefsRepository.clearSavedAccountKey()
 
+            val testAccount = Account.random()
+
             val panel = XyoPanel(
-                appContext, Account.random(), arrayListOf(Pair(apiDomainBeta, null)), listOf(
+                appContext, testAccount, arrayListOf(Pair(apiDomainBeta, null)), listOf(
                     XyoSystemInfoWitness()
                 )
             )
             panel.resolveNodes()
-            val generatedAddress = panel.defaultAccount?.address?.toHexString()
+            val generatedAddress = panel.account.address.toHexString()
             assertNotEquals(generatedAddress, null)
 
             val panel2 = XyoPanel(
-                appContext, Account.random(), arrayListOf(Pair(apiDomainBeta, null)), listOf(
+                appContext, testAccount, arrayListOf(Pair(apiDomainBeta, null)), listOf(
                     XyoSystemInfoWitness()
                 )
             )
             panel2.resolveNodes()
-            val secondGeneratedAddress = panel2.defaultAccount?.address?.toHexString()
+            val secondGeneratedAddress = panel2.account.address.toHexString()
             assertEquals(generatedAddress, secondGeneratedAddress)
         }
     }

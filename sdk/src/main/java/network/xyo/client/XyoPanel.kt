@@ -29,7 +29,6 @@ class XyoPanel(
     private val nodeUrlsAndAccounts: ArrayList<Pair<String, AccountInstance?>>?
 ) {
     private var nodes: MutableList<NodeClient>? = null
-    var defaultAccount: AccountInstance? = null
 
     @Deprecated("use constructors without deprecated archive field")
     constructor(
