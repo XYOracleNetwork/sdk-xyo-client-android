@@ -14,9 +14,9 @@ import network.xyo.client.boundwitness.XyoBoundWitnessBodyJson
 import network.xyo.client.payload.XyoPayload
 import network.xyo.client.settings.XyoSdk
 
-open class WitnessLocationHandler : WitnessHandlerInterface<List<XyoPayload?>> {
+open class WitnessLocationHandler : WitnessHandlerInterface<Pair<XyoBoundWitnessBodyJson?, XyoPayload?>> {
     @RequiresApi(Build.VERSION_CODES.M)
-    override suspend fun witness(context: Context, nodeUrlsAndAccounts: ArrayList<Pair<String, AccountInstance?>>): WitnessResult<List<XyoPayload?>> {
+    override suspend fun witness(context: Context, nodeUrlsAndAccounts: ArrayList<Pair<String, AccountInstance?>>): WitnessResult<Pair<XyoBoundWitnessBodyJson?, XyoPayload?>> {
         val account = XyoSdk.getInstance(context.applicationContext).getAccount()
         val panel = XyoPanel(context, account, nodeUrlsAndAccounts, listOf(
             XyoLocationWitness(account)
@@ -26,7 +26,7 @@ open class WitnessLocationHandler : WitnessHandlerInterface<List<XyoPayload?>> {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @RequiresApi(Build.VERSION_CODES.M)
-    private suspend fun getLocation(panel: XyoPanel): WitnessResult<List<XyoPayload?>> {
+    private suspend fun getLocation(panel: XyoPanel): WitnessResult<Pair<XyoBoundWitnessBodyJson?, XyoPayload?>> {
         return withContext(Dispatchers.IO) {
             var locationPayload: XyoPayload? = null
             var bw: XyoBoundWitnessBodyJson? = null
@@ -50,7 +50,7 @@ open class WitnessLocationHandler : WitnessHandlerInterface<List<XyoPayload?>> {
                 }
             }
             if (errors.size > 0) return@withContext WitnessResult.Error(errors)
-            return@withContext WitnessResult.Success(listOf(bw, locationPayload))
+            return@withContext WitnessResult.Success(Pair(bw, locationPayload))
         }
     }
 }
