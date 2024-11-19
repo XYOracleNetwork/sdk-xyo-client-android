@@ -6,6 +6,7 @@ import androidx.annotation.RequiresApi
 import network.xyo.client.XyoSerializable
 import network.xyo.client.account.hexStringToByteArray
 import network.xyo.client.account.model.AccountInstance
+import network.xyo.client.datastore.previous_hash_store.PreviousHashStorePrefsRepository
 import network.xyo.client.payload.XyoPayload
 import network.xyo.client.payload.XyoValidationException
 
@@ -33,9 +34,15 @@ open class XyoBoundWitnessBuilder(private val context: Context) {
         return this
     }
 
-    private fun hashableFields(): XyoBoundWitnessBodyJson {
+    @OptIn(ExperimentalStdlibApi::class)
+    private suspend fun hashableFields(): XyoBoundWitnessBodyJson {
         // if a timestamp is not provided, set one at the time hashable fields are set
         bw.timestamp = _timestamp ?: System.currentTimeMillis()
+
+        bw.previous_hashes = addresses.map {
+            val store = PreviousHashStorePrefsRepository.getInstance(context)
+            store.getItem(hexStringToByteArray(it))?.toHexString()
+        }
 
         // return the body with hashable fields
         return bw.getBodyJson()

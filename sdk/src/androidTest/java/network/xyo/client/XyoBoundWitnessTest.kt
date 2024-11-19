@@ -7,6 +7,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import network.xyo.client.account.Account
 import network.xyo.client.boundwitness.XyoBoundWitnessBuilder
+import network.xyo.client.datastore.previous_hash_store.PreviousHashStorePrefsRepository
 import network.xyo.client.node.client.NodeClient
 import network.xyo.client.payload.XyoPayload
 import org.junit.Before
@@ -32,6 +33,11 @@ class XyoBoundWitnessTest {
     fun useAppContext() {
         // Context of the app under test.
         this.appContext = InstrumentationRegistry.getInstrumentation().targetContext
+    }
+
+    @Before
+    fun setupAccount() {
+        Account.previousHashStore = PreviousHashStorePrefsRepository.getInstance(InstrumentationRegistry.getInstrumentation().targetContext)
     }
 
     fun generateQuery(nodeUrl: String): RequestDependencies {
@@ -71,6 +77,16 @@ class XyoBoundWitnessTest {
             assert(bw._hash !== null)
             assert(bw._hash!! == XyoSerializable.sha256String(hashableFields))
             assert(bw._hash!! == hashableFields.hash())
+        }
+    }
+
+    @Test
+    fun testBoundWitnessPreviousHash() {
+        runBlocking {
+            val testAccount = Account.random()
+            val bw = XyoBoundWitnessBuilder(appContext).signer(testAccount).payloads(listOf(TestPayload1())).build()
+            val bw2 = XyoBoundWitnessBuilder(appContext).signer(testAccount).payloads(listOf(TestPayload1())).build()
+            assert(bw2.previous_hashes.contains(bw._hash))
         }
     }
 }
