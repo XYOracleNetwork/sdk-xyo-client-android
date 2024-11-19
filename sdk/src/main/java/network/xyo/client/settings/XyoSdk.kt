@@ -10,7 +10,7 @@ import network.xyo.client.datastore.previous_hash_store.PreviousHashStorePrefsRe
 
 class XyoSdk private constructor(context: Context, val settings: SettingsInterface) {
     private val appContext = context.applicationContext
-    var _account: AccountInstance? = null
+    private var _account: AccountInstance? = null
 
     @RequiresApi(Build.VERSION_CODES.M)
     suspend fun getAccount(): AccountInstance {

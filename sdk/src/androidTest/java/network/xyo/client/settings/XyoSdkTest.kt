@@ -3,9 +3,11 @@ package network.xyo.client.settings
 import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
 import kotlinx.coroutines.runBlocking
+import network.xyo.client.account.model.AccountInstance
 import org.junit.Before
 import org.junit.Test
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.assertInstanceOf
 
 class XyoSdkTest {
 
@@ -45,6 +47,15 @@ class XyoSdkTest {
             val instance = XyoSdk.getInstance(appContext, updatedSettings)
             assertEquals(instance.settings.accountPreferences.fileName, updatedSettings.accountPreferences.fileName)
             assertEquals(instance.settings.accountPreferences.storagePath, updatedSettings.accountPreferences.storagePath)
+        }
+    }
+
+    @Test
+    fun testGetAccount() {
+        runBlocking {
+            val instance = XyoSdk.getInstance(appContext)
+            val account = instance.getAccount()
+            assertInstanceOf<AccountInstance>(account)
         }
     }
 }
