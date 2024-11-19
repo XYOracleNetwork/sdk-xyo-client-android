@@ -94,7 +94,7 @@ class XyoPanel(
             nodes = mutableListOf<NodeClient>().let {
                 this@XyoPanel.nodeUrlsAndAccounts.forEach { pair ->
                     val nodeUrl = pair.first
-                    val account = pair.second ?: defaultAccount
+                    val account = pair.second
                     it.add(NodeClient(nodeUrl, account, context))
                 }
                 it
