@@ -100,7 +100,7 @@ class XyoPayloadTest {
         CoroutineScope(Dispatchers.Main).launch {
             val response = arrayListOf(witness.observe(appContext))
             val payloads = response.mapNotNull { payload -> payload }.flatten()
-            val bwJson = XyoBoundWitnessBuilder()
+            val bwJson = XyoBoundWitnessBuilder(appContext)
                 .payloads(payloads)
                 .signer(Account.random())
                 .build()

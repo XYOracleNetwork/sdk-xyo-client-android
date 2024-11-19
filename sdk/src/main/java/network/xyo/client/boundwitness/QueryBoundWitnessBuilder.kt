@@ -1,5 +1,6 @@
 package network.xyo.client.boundwitness
 
+import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
 import network.xyo.client.XyoSerializable
@@ -8,7 +9,7 @@ import network.xyo.client.payload.XyoPayload
 
 
 @RequiresApi(Build.VERSION_CODES.M)
-class QueryBoundWitnessBuilder : XyoBoundWitnessBuilder() {
+class QueryBoundWitnessBuilder(context: Context) : XyoBoundWitnessBuilder(context) {
     private lateinit var queryHash: String
 
     fun query(query: XyoPayload): QueryBoundWitnessBuilder {

@@ -1,5 +1,6 @@
 package network.xyo.client.node.client
 
+import android.content.Context
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
@@ -22,8 +23,7 @@ import org.json.JSONObject
 import java.io.IOException
 
 @RequiresApi(Build.VERSION_CODES.M)
-class NodeClient(private val url: String, private val accountToUse: AccountInstance?) {
-
+class NodeClient(private val url: String, private val accountToUse: AccountInstance?, private val context: Context) {
     private val _internalAccount = Account.random()
     private val okHttp = OkHttpClient()
 

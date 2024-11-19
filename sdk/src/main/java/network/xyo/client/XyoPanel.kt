@@ -96,7 +96,7 @@ class XyoPanel(
                 this@XyoPanel.nodeUrlsAndAccounts.forEach { pair ->
                     val nodeUrl = pair.first
                     val account = pair.second ?: defaultAccount
-                    it.add(NodeClient(nodeUrl, account))
+                    it.add(NodeClient(nodeUrl, account, context))
                 }
                 it
             }
@@ -147,10 +147,10 @@ class XyoPanel(
     private suspend fun generateBoundWitnessJson(adhocWitnesses: List<XyoWitness<XyoPayload>> = emptyList()): XyoBoundWitnessJson {
         val witnesses: List<XyoWitness<XyoPayload>> = (this.witnesses ?: emptyList()).plus(adhocWitnesses)
         val payloads = generatePayloads()
-        return XyoBoundWitnessBuilder()
+        return XyoBoundWitnessBuilder(context)
             .payloads(payloads)
             .signer(account)
-            .build(previousHash)
+            .build()
     }
 
 
@@ -190,7 +190,7 @@ class XyoPanel(
         nodes?.forEach { node ->
             val archivist = ArchivistWrapper(node)
             val payloadsWithBoundWitness = payloads.plus(bw)
-            val queryResult = archivist.insert(payloadsWithBoundWitness, previousHash)
+            val queryResult = archivist.insert(payloadsWithBoundWitness)
             results.add(queryResult)
         }
         return XyoPanelReportQueryResult(bw, results, payloads)

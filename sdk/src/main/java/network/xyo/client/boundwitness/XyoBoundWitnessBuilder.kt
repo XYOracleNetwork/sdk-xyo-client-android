@@ -1,5 +1,6 @@
 package network.xyo.client.boundwitness
 
+import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
 import network.xyo.client.XyoSerializable
@@ -9,7 +10,7 @@ import network.xyo.client.payload.XyoPayload
 import network.xyo.client.payload.XyoValidationException
 
 @RequiresApi(Build.VERSION_CODES.M)
-open class XyoBoundWitnessBuilder {
+open class XyoBoundWitnessBuilder(private val context: Context) {
     protected var _signers = mutableListOf<AccountInstance>()
     protected var _payload_hashes = mutableListOf<String>()
     protected var _payload_schemas = mutableListOf<String>()
