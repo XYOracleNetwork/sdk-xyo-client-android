@@ -29,9 +29,10 @@ open class Account private constructor (private val _privateKey: PrivateKey, pri
     final override val publicKey: ByteArray
         get() = _privateKey.toPublicKey().key.toBytesPadded(64)
 
-    override fun sign(hash: ByteArray): ByteArray {
+    override suspend fun sign(hash: ByteArray): ByteArray {
         val result = BCECSigner().sign(_privateKey, hash)
         _previousHash = hash
+        previousHashStore?.setItem(address, hash)
         return result.encodeAsBTC().toByteArray()
     }
 

@@ -100,7 +100,6 @@ class AccountPrefsRepository(context: Context, settings: SettingsInterface = def
         @Volatile
         private var INSTANCE: AccountPrefsRepository? = null
 
-        // Method to retrieve the singleton instance
         fun getInstance(context: Context, settings: SettingsInterface = defaultXyoSdkSettings): AccountPrefsRepository {
             val newInstance = INSTANCE ?: synchronized(this) {
                 INSTANCE ?: AccountPrefsRepository(context.applicationContext, settings).also { INSTANCE = it }

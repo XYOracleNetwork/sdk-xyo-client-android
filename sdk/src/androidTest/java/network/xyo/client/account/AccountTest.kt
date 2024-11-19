@@ -1,5 +1,6 @@
 package network.xyo.client.account
 
+import kotlinx.coroutines.runBlocking
 import org.junit.Test
 
 class AccountTest {
@@ -22,13 +23,15 @@ class AccountTest {
     @OptIn(ExperimentalStdlibApi::class)
     @Test
     fun testKnownPrivateKeyAccount()  {
-        val account = Account.fromPrivateKey(hexStringToByteArray(testVectorPrivateKey))
-        assert(account.privateKey.count() == 32)
-        assert(account.publicKey.count() == 64)
-        assert(account.publicKey.toHexString() == testVectorPublicKey)
-        assert(account.address.toHexString() == testVectorAddress)
-        val signature = account.sign(hexStringToByteArray(testVectorHash))
-        assert(signature.toHexString() == testVectorSignature)
-        assert(account.verify(hexStringToByteArray(testVectorHash), signature))
+        runBlocking {
+            val account = Account.fromPrivateKey(hexStringToByteArray(testVectorPrivateKey))
+            assert(account.privateKey.count() == 32)
+            assert(account.publicKey.count() == 64)
+            assert(account.publicKey.toHexString() == testVectorPublicKey)
+            assert(account.address.toHexString() == testVectorAddress)
+            val signature = account.sign(hexStringToByteArray(testVectorHash))
+            assert(signature.toHexString() == testVectorSignature)
+            assert(account.verify(hexStringToByteArray(testVectorHash), signature))
+        }
     }
 }
