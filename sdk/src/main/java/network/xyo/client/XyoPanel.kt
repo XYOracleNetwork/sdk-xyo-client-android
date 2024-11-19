@@ -29,7 +29,6 @@ class XyoPanel(
     private val witnesses: List<XyoWitness<XyoPayload>>?,
     private val nodeUrlsAndAccounts: ArrayList<Pair<String, AccountInstance?>>?
 ) {
-    var previousHash: String? = null
     private var nodes: MutableList<NodeClient>? = null
     var defaultAccount: AccountInstance? = null
 
@@ -80,7 +79,7 @@ class XyoPanel(
     constructor(
         context: Context,
         account: AccountInstance,
-        observe: ((context: Context, previousHash: String?) -> List<XyoEventPayload>?)?
+        observe: ((context: Context) -> List<XyoEventPayload>?)?
     ): this(
         context,
         account,
@@ -96,7 +95,7 @@ class XyoPanel(
                 this@XyoPanel.nodeUrlsAndAccounts.forEach { pair ->
                     val nodeUrl = pair.first
                     val account = pair.second ?: defaultAccount
-                    it.add(NodeClient(nodeUrl, account))
+                    it.add(NodeClient(nodeUrl, account, context))
                 }
                 it
             }
@@ -114,7 +113,7 @@ class XyoPanel(
     suspend fun eventAsync(event: String): XyoPanelReportResult {
         val adhocWitnessList = listOf(
             XyoWitness({
-                _, previousHash -> listOf(XyoEventPayload(event))
+                _, -> listOf(XyoEventPayload(event))
             })
         )
         return this.reportAsync(adhocWitnessList)
@@ -124,7 +123,7 @@ class XyoPanel(
     suspend fun eventAsyncQuery(event: String): XyoPanelReportQueryResult {
         val adhocWitnessList = listOf(
             XyoWitness({
-                    _, previousHash -> listOf(XyoEventPayload(event))
+                    _, -> listOf(XyoEventPayload(event))
             })
         )
         return reportAsyncQuery(adhocWitnessList)
@@ -147,10 +146,10 @@ class XyoPanel(
     private suspend fun generateBoundWitnessJson(adhocWitnesses: List<XyoWitness<XyoPayload>> = emptyList()): XyoBoundWitnessJson {
         val witnesses: List<XyoWitness<XyoPayload>> = (this.witnesses ?: emptyList()).plus(adhocWitnesses)
         val payloads = generatePayloads()
-        return XyoBoundWitnessBuilder()
+        return XyoBoundWitnessBuilder(context)
             .payloads(payloads)
             .signer(account)
-            .build(previousHash)
+            .build()
     }
 
 
@@ -167,7 +166,6 @@ class XyoPanel(
     @kotlinx.coroutines.ExperimentalCoroutinesApi
     suspend fun reportAsync(adhocWitnesses: List<XyoWitness<XyoPayload>> = emptyList()): XyoPanelReportResult {
         val bw = generateBoundWitnessJson(adhocWitnesses)
-        previousHash = bw._hash
         val results = mutableListOf<PostBoundWitnessesResult>()
         archivists?.forEach { archivist ->
             results.add(archivist.postBoundWitnessAsync(bw))
@@ -179,7 +177,6 @@ class XyoPanel(
     suspend fun reportAsyncQuery(adhocWitnesses: List<XyoWitness<XyoPayload>> = emptyList()): XyoPanelReportQueryResult {
         if (nodes == null) resolveNodes()
         val bw = generateBoundWitnessJson()
-        previousHash = bw._hash
         val payloads = generatePayloads(adhocWitnesses)
         val results = mutableListOf<PostQueryResult>()
 
@@ -190,7 +187,7 @@ class XyoPanel(
         nodes?.forEach { node ->
             val archivist = ArchivistWrapper(node)
             val payloadsWithBoundWitness = payloads.plus(bw)
-            val queryResult = archivist.insert(payloadsWithBoundWitness, previousHash)
+            val queryResult = archivist.insert(payloadsWithBoundWitness)
             results.add(queryResult)
         }
         return XyoPanelReportQueryResult(bw, results, payloads)

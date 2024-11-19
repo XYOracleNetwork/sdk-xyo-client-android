@@ -7,6 +7,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import network.xyo.client.account.Account
 import network.xyo.client.boundwitness.XyoBoundWitnessBuilder
+import network.xyo.client.datastore.previous_hash_store.PreviousHashStorePrefsRepository
 import network.xyo.client.node.client.NodeClient
 import network.xyo.client.payload.XyoPayload
 import org.junit.Before
@@ -34,9 +35,14 @@ class XyoBoundWitnessTest {
         this.appContext = InstrumentationRegistry.getInstrumentation().targetContext
     }
 
+    @Before
+    fun setupAccount() {
+        Account.previousHashStore = PreviousHashStorePrefsRepository.getInstance(InstrumentationRegistry.getInstrumentation().targetContext)
+    }
+
     fun generateQuery(nodeUrl: String): RequestDependencies {
         val account = Account.random()
-        val client = NodeClient(nodeUrl, account)
+        val client = NodeClient(nodeUrl, account, appContext)
         val query = DiscoverPayload()
         val payloads = mutableListOf<XyoPayload>()
         payloads.add(TestPayload1())
@@ -47,7 +53,7 @@ class XyoBoundWitnessTest {
     fun testSendQueryBW(nodeUrl: String) {
         runBlocking {
             val(client, query, payloads) = generateQuery(nodeUrl)
-            val postResult = client.query(query, payloads, null)
+            val postResult = client.query(query, payloads)
             assertEquals(null, postResult.errors)
         }
     }
@@ -66,11 +72,21 @@ class XyoBoundWitnessTest {
     @Test
     fun testBoundWitnessHash() {
         runBlocking {
-            val bw = XyoBoundWitnessBuilder().signer(Account.random()).payloads(listOf(TestPayload1())).build()
+            val bw = XyoBoundWitnessBuilder(appContext).signer(Account.random()).payloads(listOf(TestPayload1())).build()
             val hashableFields = bw.getBodyJson()
             assert(bw._hash !== null)
             assert(bw._hash!! == XyoSerializable.sha256String(hashableFields))
             assert(bw._hash!! == hashableFields.hash())
+        }
+    }
+
+    @Test
+    fun testBoundWitnessPreviousHash() {
+        runBlocking {
+            val testAccount = Account.random()
+            val bw = XyoBoundWitnessBuilder(appContext).signer(testAccount).payloads(listOf(TestPayload1())).build()
+            val bw2 = XyoBoundWitnessBuilder(appContext).signer(testAccount).payloads(listOf(TestPayload1())).build()
+            assert(bw2.previous_hashes.contains(bw._hash))
         }
     }
 }

@@ -12,7 +12,6 @@ import network.xyo.client.account.model.AccountInstance
 class DeferredLocationObserver : DeferredObserver<XyoLocationPayload>() {
     override suspend fun deferredDetect(
         context: Context,
-        previousHash: String?
     ): List<XyoLocationPayload>? {
         try {
             return listOf(XyoLocationPayload.detect(context))
@@ -26,6 +25,5 @@ class DeferredLocationObserver : DeferredObserver<XyoLocationPayload>() {
 @RequiresApi(Build.VERSION_CODES.M)
 class XyoLocationWitness(address: AccountInstance = Account.random()) : XyoWitness<XyoLocationPayload>(
     DeferredLocationObserver(),
-    "",
     address
-    )
+)

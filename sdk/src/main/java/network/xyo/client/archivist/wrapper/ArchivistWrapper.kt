@@ -10,15 +10,15 @@ import network.xyo.client.payload.XyoPayload
 open class ArchivistWrapper(private val nodeClient: NodeClient) {
     @OptIn(ExperimentalCoroutinesApi::class)
     @RequiresApi(Build.VERSION_CODES.M)
-    suspend fun get(hashes: List<String>, previousHash: String?): PostQueryResult {
+    suspend fun get(hashes: List<String>): PostQueryResult {
         val query = ArchivistGetQueryPayload(hashes)
-        return nodeClient.query(query, null, previousHash)
+        return nodeClient.query(query, null)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @RequiresApi(Build.VERSION_CODES.M)
-    suspend fun insert(payloads: List<XyoPayload>, previousHash: String?): PostQueryResult {
+    suspend fun insert(payloads: List<XyoPayload>): PostQueryResult {
         val query = ArchivistInsertQueryPayload()
-        return nodeClient.query(query, payloads, previousHash)
+        return nodeClient.query(query, payloads)
     }
 }

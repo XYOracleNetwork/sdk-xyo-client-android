@@ -1,15 +1,17 @@
 package network.xyo.client.boundwitness
 
+import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
 import network.xyo.client.XyoSerializable
 import network.xyo.client.account.hexStringToByteArray
 import network.xyo.client.account.model.AccountInstance
+import network.xyo.client.datastore.previous_hash_store.PreviousHashStorePrefsRepository
 import network.xyo.client.payload.XyoPayload
 import network.xyo.client.payload.XyoValidationException
 
 @RequiresApi(Build.VERSION_CODES.M)
-open class XyoBoundWitnessBuilder {
+open class XyoBoundWitnessBuilder(private val context: Context) {
     protected var _signers = mutableListOf<AccountInstance>()
     protected var _payload_hashes = mutableListOf<String>()
     protected var _payload_schemas = mutableListOf<String>()
@@ -32,9 +34,15 @@ open class XyoBoundWitnessBuilder {
         return this
     }
 
-    private fun hashableFields(): XyoBoundWitnessBodyJson {
+    @OptIn(ExperimentalStdlibApi::class)
+    private suspend fun hashableFields(): XyoBoundWitnessBodyJson {
         // if a timestamp is not provided, set one at the time hashable fields are set
         bw.timestamp = _timestamp ?: System.currentTimeMillis()
+
+        bw.previous_hashes = addresses.map {
+            val store = PreviousHashStorePrefsRepository.getInstance(context)
+            store.getItem(hexStringToByteArray(it))?.toHexString()
+        }
 
         // return the body with hashable fields
         return bw.getBodyJson()
@@ -88,11 +96,8 @@ open class XyoBoundWitnessBuilder {
         bw._hash = hash
     }
 
-    open suspend fun build(previousHash: String? = null): XyoBoundWitnessJson {
+    open suspend fun build(): XyoBoundWitnessJson {
         return bw.let{
-            // store the previous hash on the class
-            it._previous_hash = previousHash
-
             // update fields
             constructFields()
             it

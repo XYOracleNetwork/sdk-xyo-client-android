@@ -9,9 +9,8 @@ import network.xyo.client.account.model.AccountInstance
 
 @RequiresApi(Build.VERSION_CODES.M)
 class XyoSystemInfoWitness(address: AccountInstance = Account.random()) : XyoWitness<XyoSystemInfoPayload>(
-    fun (context: Context, _: String?): List<XyoSystemInfoPayload> {
+    fun (context: Context): List<XyoSystemInfoPayload> {
         return listOf(XyoSystemInfoPayload.detect(context))
     },
-    "",
     address
 )

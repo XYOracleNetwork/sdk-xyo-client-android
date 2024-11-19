@@ -131,7 +131,7 @@ class AccountPrefsRepositoryTest {
             assertEquals(firstAccount.privateKey.toHexString(), testAccount.privateKey.toHexString())
 
             // Sign with the test account
-            val firstBw = XyoBoundWitnessBuilder().signer(firstAccount).payloads(listOf(
+            val firstBw = XyoBoundWitnessBuilder(appContext).signer(firstAccount).payloads(listOf(
                 TestConstants.debugPayload
             )).build()
             val firstAddress = firstBw.addresses.first()
@@ -141,7 +141,7 @@ class AccountPrefsRepositoryTest {
             val secondAccount = secondInstance.getAccount()
 
             // Sign with the test account
-            val secondBw = XyoBoundWitnessBuilder().signer(secondAccount).payloads(listOf(
+            val secondBw = XyoBoundWitnessBuilder(appContext).signer(secondAccount).payloads(listOf(
                 TestConstants.debugPayload
             )).build()
             val secondAddress = secondBw.addresses.first()

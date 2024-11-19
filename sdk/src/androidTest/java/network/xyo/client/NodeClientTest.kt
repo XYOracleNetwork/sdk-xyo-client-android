@@ -1,11 +1,14 @@
 package network.xyo.client
 
+import android.content.Context
+import androidx.test.platform.app.InstrumentationRegistry
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import network.xyo.client.account.Account
 import network.xyo.client.archivist.wrapper.ArchivistWrapper
 import network.xyo.client.node.client.NodeClient
 import network.xyo.client.payload.XyoPayload
+import org.junit.Before
 import org.junit.Test
 import org.junit.jupiter.api.Assertions.*
 
@@ -16,15 +19,23 @@ class DiscoverPayload(): XyoPayload() {
 class NodeClientTest {
     private val apiDomainBeta = "${TestConstants.nodeUrlBeta}/Archivist"
 
+    private lateinit var appContext: Context
+
+    @Before
+    fun useAppContext() {
+        // Context of the app under test.
+        this.appContext = InstrumentationRegistry.getInstrumentation().targetContext
+    }
+
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun discoverTestBeta() {
         val account = Account.random()
-        val client = NodeClient(TestConstants.nodeUrlBeta, account)
+        val client = NodeClient(TestConstants.nodeUrlBeta, account, appContext)
         val query = DiscoverPayload()
 
         runBlocking {
-            val postResult = client.query(query, null, null)
+            val postResult = client.query(query, null)
             assertEquals(null, postResult.errors)
         }
     }
@@ -46,12 +57,12 @@ class NodeClientTest {
 
     @Test
     fun archivistInsertTest() {
-        val archivist = ArchivistWrapper(NodeClient(apiDomainBeta, TestConstants.TestAccount))
+        val archivist = ArchivistWrapper(NodeClient(apiDomainBeta, TestConstants.TestAccount, appContext))
 
         val payloads = arrayListOf(TestConstants.debugPayload)
 
         runBlocking {
-            val (response, errors) = archivist.insert(payloads, null)
+            val (response, errors) = archivist.insert(payloads)
             assertNotEquals(response, null)
             assertEquals(errors, null)
 
@@ -63,7 +74,7 @@ class NodeClientTest {
         }
 
         runBlocking {
-            val getResult = archivist.get(arrayListOf(TestConstants.debugPayloadHash), null)
+            val getResult = archivist.get(arrayListOf(TestConstants.debugPayloadHash))
             assertNotEquals(getResult.response, null)
 
             val response = getResult.response
