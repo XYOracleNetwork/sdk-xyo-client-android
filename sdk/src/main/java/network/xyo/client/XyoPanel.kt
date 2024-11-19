@@ -16,7 +16,6 @@ import network.xyo.client.boundwitness.XyoBoundWitnessJson
 import network.xyo.client.node.client.NodeClient
 import network.xyo.client.node.client.PostQueryResult
 import network.xyo.client.payload.XyoPayload
-import network.xyo.client.settings.XyoSdk
 
 data class XyoPanelReportResult(val bw: XyoBoundWitnessJson, val apiResults: List<PostBoundWitnessesResult>)
 data class XyoPanelReportQueryResult(val bw: XyoBoundWitnessJson, val apiResults: List<PostQueryResult>?, val payloads: List<XyoPayload>?)
@@ -87,9 +86,8 @@ class XyoPanel(
         listOf(XyoWitness(observe)),
     )
 
-    suspend fun resolveNodes(resetNodes: Boolean = false) {
+    fun resolveNodes(resetNodes: Boolean = false) {
         if (resetNodes) nodes = null
-        this.defaultAccount = XyoSdk.getInstance(context).getAccount()
         if (nodeUrlsAndAccounts?.isNotEmpty() == true) {
             nodes = mutableListOf<NodeClient>().let {
                 this@XyoPanel.nodeUrlsAndAccounts.forEach { pair ->
@@ -103,20 +101,15 @@ class XyoPanel(
     }
 
     @kotlinx.coroutines.ExperimentalCoroutinesApi
-    fun event(event: String) {
+    fun event() {
         xyoScope.launch {
-            this@XyoPanel.eventAsync(event)
+            this@XyoPanel.eventAsync()
         }
     }
 
     @kotlinx.coroutines.ExperimentalCoroutinesApi
-    suspend fun eventAsync(event: String): XyoPanelReportResult {
-        val adhocWitnessList = listOf(
-            XyoWitness({
-                _, -> listOf(XyoEventPayload(event))
-            })
-        )
-        return this.reportAsync(adhocWitnessList)
+    suspend fun eventAsync(): XyoPanelReportResult {
+        return this.reportAsync()
     }
 
     @kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -130,9 +123,9 @@ class XyoPanel(
     }
 
     @kotlinx.coroutines.ExperimentalCoroutinesApi
-    fun report(adhocWitnesses: List<XyoWitness<XyoPayload>> = emptyList()) {
+    fun report() {
         xyoScope.launch {
-            reportAsync(adhocWitnesses)
+            reportAsync()
         }
     }
 
@@ -143,8 +136,7 @@ class XyoPanel(
         }
     }
 
-    private suspend fun generateBoundWitnessJson(adhocWitnesses: List<XyoWitness<XyoPayload>> = emptyList()): XyoBoundWitnessJson {
-        val witnesses: List<XyoWitness<XyoPayload>> = (this.witnesses ?: emptyList()).plus(adhocWitnesses)
+    private suspend fun generateBoundWitnessJson(): XyoBoundWitnessJson {
         val payloads = generatePayloads()
         return XyoBoundWitnessBuilder(context)
             .payloads(payloads)
@@ -164,8 +156,8 @@ class XyoPanel(
 
     @Deprecated("use reportAsyncQuery instead")
     @kotlinx.coroutines.ExperimentalCoroutinesApi
-    suspend fun reportAsync(adhocWitnesses: List<XyoWitness<XyoPayload>> = emptyList()): XyoPanelReportResult {
-        val bw = generateBoundWitnessJson(adhocWitnesses)
+    suspend fun reportAsync(): XyoPanelReportResult {
+        val bw = generateBoundWitnessJson()
         val results = mutableListOf<PostBoundWitnessesResult>()
         archivists?.forEach { archivist ->
             results.add(archivist.postBoundWitnessAsync(bw))
