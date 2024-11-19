@@ -1,5 +1,7 @@
 package network.xyo.client
 
+import android.content.Context
+import androidx.test.platform.app.InstrumentationRegistry
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import network.xyo.client.account.Account
@@ -33,7 +35,7 @@ class NodeClientTest {
         val query = DiscoverPayload()
 
         runBlocking {
-            val postResult = client.query(query, null, null)
+            val postResult = client.query(query, null)
             assertEquals(null, postResult.errors)
         }
     }
@@ -60,7 +62,7 @@ class NodeClientTest {
         val payloads = arrayListOf(TestConstants.debugPayload)
 
         runBlocking {
-            val (response, errors) = archivist.insert(payloads, null)
+            val (response, errors) = archivist.insert(payloads)
             assertNotEquals(response, null)
             assertEquals(errors, null)
 
@@ -72,7 +74,7 @@ class NodeClientTest {
         }
 
         runBlocking {
-            val getResult = archivist.get(arrayListOf(TestConstants.debugPayloadHash), null)
+            val getResult = archivist.get(arrayListOf(TestConstants.debugPayloadHash))
             assertNotEquals(getResult.response, null)
 
             val response = getResult.response

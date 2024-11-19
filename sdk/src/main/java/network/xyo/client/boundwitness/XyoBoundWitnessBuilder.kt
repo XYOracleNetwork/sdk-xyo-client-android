@@ -89,11 +89,8 @@ open class XyoBoundWitnessBuilder(private val context: Context) {
         bw._hash = hash
     }
 
-    open suspend fun build(previousHash: String? = null): XyoBoundWitnessJson {
+    open suspend fun build(): XyoBoundWitnessJson {
         return bw.let{
-            // store the previous hash on the class
-            it._previous_hash = previousHash
-
             // update fields
             constructFields()
             it

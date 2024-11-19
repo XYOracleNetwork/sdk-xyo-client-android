@@ -36,7 +36,7 @@ class XyoBoundWitnessTest {
 
     fun generateQuery(nodeUrl: String): RequestDependencies {
         val account = Account.random()
-        val client = NodeClient(nodeUrl, account)
+        val client = NodeClient(nodeUrl, account, appContext)
         val query = DiscoverPayload()
         val payloads = mutableListOf<XyoPayload>()
         payloads.add(TestPayload1())
@@ -47,7 +47,7 @@ class XyoBoundWitnessTest {
     fun testSendQueryBW(nodeUrl: String) {
         runBlocking {
             val(client, query, payloads) = generateQuery(nodeUrl)
-            val postResult = client.query(query, payloads, null)
+            val postResult = client.query(query, payloads)
             assertEquals(null, postResult.errors)
         }
     }
@@ -66,7 +66,7 @@ class XyoBoundWitnessTest {
     @Test
     fun testBoundWitnessHash() {
         runBlocking {
-            val bw = XyoBoundWitnessBuilder().signer(Account.random()).payloads(listOf(TestPayload1())).build()
+            val bw = XyoBoundWitnessBuilder(appContext).signer(Account.random()).payloads(listOf(TestPayload1())).build()
             val hashableFields = bw.getBodyJson()
             assert(bw._hash !== null)
             assert(bw._hash!! == XyoSerializable.sha256String(hashableFields))

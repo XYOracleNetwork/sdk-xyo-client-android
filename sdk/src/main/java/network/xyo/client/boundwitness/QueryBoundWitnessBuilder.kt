@@ -28,13 +28,12 @@ class QueryBoundWitnessBuilder(context: Context) : XyoBoundWitnessBuilder(contex
         return this
     }
 
-    override suspend fun build(previousHash: String?): QueryBoundWitnessJson {
+    override suspend fun build(): QueryBoundWitnessJson {
         bw = QueryBoundWitnessJson()
         // override to support additional properties for query bound witnesses
         return bw.let {
             val qbw = it as QueryBoundWitnessJson
             qbw.query = this.queryHash
-            qbw._previous_hash = previousHash
             constructFields()
             it
         }

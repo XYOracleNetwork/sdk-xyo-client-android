@@ -39,8 +39,8 @@ class NodeClient(private val url: String, private val accountToUse: AccountInsta
 
     @ExperimentalCoroutinesApi
     @RequiresApi(Build.VERSION_CODES.M)
-    suspend fun query(query: XyoPayload, payloads: List<XyoPayload>?, previousHash: String?): PostQueryResult {
-        val bodyString = buildQuery(query, payloads, previousHash)
+    suspend fun query(query: XyoPayload, payloads: List<XyoPayload>?): PostQueryResult {
+        val bodyString = buildQuery(query, payloads)
         val postBody = bodyString.toRequestBody(MEDIA_TYPE_JSON)
         val request = Request.Builder()
             .url(url)
@@ -81,20 +81,20 @@ class NodeClient(private val url: String, private val accountToUse: AccountInsta
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
-    private suspend fun buildQuery(query: XyoPayload, payloads: List<XyoPayload>?, previousHash: String?): String {
-        val builtQuery = queryBuilder(query, payloads, previousHash)
+    private suspend fun buildQuery(query: XyoPayload, payloads: List<XyoPayload>?): String {
+        val builtQuery = queryBuilder(query, payloads)
         val queryPayloads = buildQueryPayloads(query, payloads)
         val queryPayloadsJsonArray = queryPayloadsJsonArray(queryPayloads)
         val builtQueryTuple = arrayListOf(XyoSerializable.toJson((builtQuery)), queryPayloadsJsonArray.toString())
         return builtQueryTuple.joinToString(",", "[", "]")
     }
 
-    private suspend fun queryBuilder(query: XyoPayload, payloads: List<XyoPayload>?, previousHash: String?): QueryBoundWitnessJson {
-        return QueryBoundWitnessBuilder().let {
+    private suspend fun queryBuilder(query: XyoPayload, payloads: List<XyoPayload>?): QueryBoundWitnessJson {
+        return QueryBoundWitnessBuilder(context).let {
             payloads?.let { payload ->
                 it.payloads(payload)
             }
-            it.signer(this.account).query(query).build(previousHash)
+            it.signer(this.account).query(query).build()
 
         }
     }
