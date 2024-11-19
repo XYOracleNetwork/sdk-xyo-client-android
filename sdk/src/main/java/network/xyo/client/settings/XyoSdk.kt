@@ -32,7 +32,7 @@ class XyoSdk private constructor(context: Context, val settings: SettingsInterfa
 
         fun getInstance(context: Context, settings: SettingsInterface = DefaultXyoSdkSettings()): XyoSdk {
             // Initialize the singleton with the users accountPreferences
-            AccountPrefsRepository.getInstance(context.applicationContext, settings.accountPreferences)
+            AccountPrefsRepository.getInstance(context.applicationContext, settings)
 
             val newInstance = INSTANCE ?: synchronized(this) {
                 INSTANCE ?: XyoSdk(context.applicationContext, settings).also { INSTANCE = it }
@@ -43,7 +43,7 @@ class XyoSdk private constructor(context: Context, val settings: SettingsInterfa
         fun refresh(context: Context, settings: SettingsInterface = DefaultXyoSdkSettings()): XyoSdk {
             synchronized(this) {
                 // Initialize the singleton with the users accountPreferences
-                AccountPrefsRepository.getInstance(context.applicationContext, settings.accountPreferences)
+                AccountPrefsRepository.getInstance(context.applicationContext, settings)
                 INSTANCE = XyoSdk(context.applicationContext, settings)
             }
             return INSTANCE!!
