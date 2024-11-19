@@ -94,7 +94,7 @@ class PreviousHashStorePrefsRepository(
             return newInstance
         }
 
-        fun refresh(context: Context, settings: SettingsInterface): PreviousHashStorePrefsRepository {
+        fun refresh(context: Context, settings: SettingsInterface = defaultXyoSdkSettings): PreviousHashStorePrefsRepository {
             synchronized(this) {
                 INSTANCE = PreviousHashStorePrefsRepository(context.applicationContext, settings)
                 return INSTANCE!!
