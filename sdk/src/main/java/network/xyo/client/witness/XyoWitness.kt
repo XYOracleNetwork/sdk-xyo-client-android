@@ -1,4 +1,4 @@
-package network.xyo.client
+package network.xyo.client.witness
 
 import android.content.Context
 import android.os.Build

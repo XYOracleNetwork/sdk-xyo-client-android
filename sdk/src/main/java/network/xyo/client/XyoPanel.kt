@@ -11,6 +11,7 @@ import network.xyo.client.boundwitness.XyoBoundWitnessJson
 import network.xyo.client.node.client.NodeClient
 import network.xyo.client.node.client.PostQueryResult
 import network.xyo.client.payload.XyoPayload
+import network.xyo.client.witness.XyoWitness
 
 data class XyoPanelReportQueryResult(val bw: XyoBoundWitnessJson, val apiResults: List<PostQueryResult>?, val payloads: List<XyoPayload>?)
 

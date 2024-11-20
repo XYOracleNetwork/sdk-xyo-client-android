@@ -9,6 +9,7 @@ import kotlinx.coroutines.launch
 import network.xyo.client.account.Account
 import network.xyo.client.boundwitness.XyoBoundWitnessBuilder
 import network.xyo.client.payload.XyoPayload
+import network.xyo.client.witness.XyoWitness
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test

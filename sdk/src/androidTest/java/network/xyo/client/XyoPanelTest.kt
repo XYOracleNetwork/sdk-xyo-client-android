@@ -11,6 +11,7 @@ import network.xyo.client.account.Account
 import network.xyo.client.boundwitness.XyoBoundWitnessJson
 import network.xyo.client.datastore.previous_hash_store.PreviousHashStorePrefsRepository
 import network.xyo.client.payload.XyoPayload
+import network.xyo.client.witness.XyoWitness
 import network.xyo.client.witness.location.info.LocationActivity
 import network.xyo.client.witness.location.info.XyoLocationWitness
 import network.xyo.client.witness.system.info.XyoSystemInfoPayload
