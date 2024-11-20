@@ -4,8 +4,6 @@ import android.content.Context
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
-import kotlinx.coroutines.launch
-import network.xyo.client.account.Account
 import network.xyo.client.account.model.AccountInstance
 import network.xyo.client.archivist.wrapper.ArchivistWrapper
 import network.xyo.client.boundwitness.XyoBoundWitnessBuilder
@@ -28,7 +26,6 @@ class XyoPanel(
     constructor(
         context: Context,
         account: AccountInstance,
-        // ArrayList to not cause compiler confusion with other class constructor signatures
         nodeUrlsAndAccounts: ArrayList<Pair<String, AccountInstance?>>,
         witnesses: List<XyoWitness<XyoPayload>>? = null
     ): this(
@@ -45,8 +42,8 @@ class XyoPanel(
     ): this(
         context,
         account,
-        arrayListOf(Pair("$DefaultApiDomain/Archivist", Account.random())),
         listOf(XyoWitness(observe)),
+        null,
     )
 
     fun resolveNodes(resetNodes: Boolean = false) {
@@ -60,23 +57,6 @@ class XyoPanel(
                 }
                 it
             }
-        }
-    }
-
-    @kotlinx.coroutines.ExperimentalCoroutinesApi
-    suspend fun eventAsyncQuery(event: String): XyoPanelReportQueryResult {
-        val adhocWitnessList = listOf(
-            XyoWitness({
-                    _, -> listOf(XyoEventPayload(event))
-            })
-        )
-        return reportAsyncQuery(adhocWitnessList)
-    }
-
-    @kotlinx.coroutines.ExperimentalCoroutinesApi
-    fun reportQuery(adhocWitnesses: List<XyoWitness<XyoPayload>> = emptyList()) {
-        xyoScope.launch {
-            reportAsyncQuery(adhocWitnesses)
         }
     }
 
@@ -116,10 +96,5 @@ class XyoPanel(
             results.add(queryResult)
         }
         return XyoPanelReportQueryResult(bw, results, payloads)
-    }
-
-    companion object {
-        const val DefaultApiDomain = "https://api.archivist.xyo.network"
-        const val DefaultArchive = "temp"
     }
 }
