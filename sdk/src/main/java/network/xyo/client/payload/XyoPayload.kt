@@ -1,7 +1,7 @@
 package network.xyo.client.payload
 
 import com.squareup.moshi.JsonClass
-import network.xyo.client.XyoSerializable
+import network.xyo.client.lib.XyoSerializable
 
 open class XyoException(message: String): Throwable(message)
 open class XyoValidationException(message: String): XyoException(message)

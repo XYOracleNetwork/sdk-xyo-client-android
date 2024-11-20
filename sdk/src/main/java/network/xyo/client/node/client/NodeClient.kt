@@ -8,7 +8,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
-import network.xyo.client.XyoSerializable
+import network.xyo.client.lib.XyoSerializable
 import network.xyo.client.account.Account
 import network.xyo.client.account.model.AccountInstance
 import network.xyo.client.boundwitness.QueryBoundWitnessBuilder

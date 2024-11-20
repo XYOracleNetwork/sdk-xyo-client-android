@@ -8,6 +8,7 @@ import kotlinx.coroutines.runBlocking
 import network.xyo.client.account.Account
 import network.xyo.client.boundwitness.XyoBoundWitnessBuilder
 import network.xyo.client.datastore.previous_hash_store.PreviousHashStorePrefsRepository
+import network.xyo.client.lib.XyoSerializable
 import network.xyo.client.node.client.NodeClient
 import network.xyo.client.payload.XyoPayload
 import org.junit.Before

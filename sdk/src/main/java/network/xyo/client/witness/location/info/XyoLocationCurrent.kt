@@ -9,7 +9,7 @@ import androidx.annotation.RequiresApi
 import com.google.android.gms.location.LocationServices
 import com.squareup.moshi.JsonClass
 import kotlinx.coroutines.suspendCancellableCoroutine
-import network.xyo.client.XyoSerializable
+import network.xyo.client.lib.XyoSerializable
 import kotlin.coroutines.resumeWithException
 
 @JsonClass(generateAdapter = true)

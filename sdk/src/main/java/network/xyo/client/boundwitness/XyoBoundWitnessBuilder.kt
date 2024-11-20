@@ -3,7 +3,7 @@ package network.xyo.client.boundwitness
 import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
-import network.xyo.client.XyoSerializable
+import network.xyo.client.lib.XyoSerializable
 import network.xyo.client.account.hexStringToByteArray
 import network.xyo.client.account.model.AccountInstance
 import network.xyo.client.datastore.previous_hash_store.PreviousHashStorePrefsRepository
