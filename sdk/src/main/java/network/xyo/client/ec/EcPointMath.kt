@@ -1,4 +1,4 @@
-package network.xyo.client
+package network.xyo.client.ec
 
 import java.math.BigInteger
 
@@ -39,7 +39,7 @@ object EcPointMath {
      * @return The slope of the tangent line at the point
      */
     fun tangent (point: EcPoint, curve: EcCurve) : BigInteger {
-        return divide(point.affineX * point.affineX*EcConstants.THREE+curve.a, point.affineY * EcConstants.TWO, curve.p)
+        return divide(point.affineX * point.affineX* EcConstants.THREE +curve.a, point.affineY * EcConstants.TWO, curve.p)
     }
 
     /**
