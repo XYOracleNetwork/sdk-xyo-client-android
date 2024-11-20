@@ -17,7 +17,6 @@ import network.xyo.client.node.client.NodeClient
 import network.xyo.client.node.client.PostQueryResult
 import network.xyo.client.payload.XyoPayload
 
-data class XyoPanelReportResult(val bw: XyoBoundWitnessJson, val apiResults: List<PostBoundWitnessesResult>)
 data class XyoPanelReportQueryResult(val bw: XyoBoundWitnessJson, val apiResults: List<PostQueryResult>?, val payloads: List<XyoPayload>?)
 
 @RequiresApi(Build.VERSION_CODES.M)
@@ -100,18 +99,6 @@ class XyoPanel(
     }
 
     @kotlinx.coroutines.ExperimentalCoroutinesApi
-    fun event() {
-        xyoScope.launch {
-            this@XyoPanel.eventAsync()
-        }
-    }
-
-    @kotlinx.coroutines.ExperimentalCoroutinesApi
-    suspend fun eventAsync(): XyoPanelReportResult {
-        return this.reportAsync()
-    }
-
-    @kotlinx.coroutines.ExperimentalCoroutinesApi
     suspend fun eventAsyncQuery(event: String): XyoPanelReportQueryResult {
         val adhocWitnessList = listOf(
             XyoWitness({
@@ -119,13 +106,6 @@ class XyoPanel(
             })
         )
         return reportAsyncQuery(adhocWitnessList)
-    }
-
-    @kotlinx.coroutines.ExperimentalCoroutinesApi
-    fun report() {
-        xyoScope.launch {
-            reportAsync()
-        }
     }
 
     @kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -151,17 +131,6 @@ class XyoPanel(
         }
 
         return payloads.mapNotNull { payload -> payload }.flatten()
-    }
-
-    @Deprecated("use reportAsyncQuery instead")
-    @kotlinx.coroutines.ExperimentalCoroutinesApi
-    suspend fun reportAsync(): XyoPanelReportResult {
-        val bw = generateBoundWitnessJson()
-        val results = mutableListOf<PostBoundWitnessesResult>()
-        archivists?.forEach { archivist ->
-            results.add(archivist.postBoundWitnessAsync(bw))
-        }
-        return XyoPanelReportResult(bw, results)
     }
 
     @kotlinx.coroutines.ExperimentalCoroutinesApi
