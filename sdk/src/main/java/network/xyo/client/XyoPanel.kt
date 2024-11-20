@@ -7,9 +7,6 @@ import androidx.annotation.RequiresApi
 import kotlinx.coroutines.launch
 import network.xyo.client.account.Account
 import network.xyo.client.account.model.AccountInstance
-import network.xyo.client.archivist.api.PostBoundWitnessesResult
-import network.xyo.client.archivist.api.XyoArchivistApiClient
-import network.xyo.client.archivist.api.XyoArchivistApiConfig
 import network.xyo.client.archivist.wrapper.ArchivistWrapper
 import network.xyo.client.boundwitness.XyoBoundWitnessBuilder
 import network.xyo.client.boundwitness.XyoBoundWitnessJson
@@ -23,34 +20,10 @@ data class XyoPanelReportQueryResult(val bw: XyoBoundWitnessJson, val apiResults
 class XyoPanel(
     val context: Context,
     val account: AccountInstance,
-    private val archivists: List<XyoArchivistApiClient>?,
     private val witnesses: List<XyoWitness<XyoPayload>>?,
     private val nodeUrlsAndAccounts: ArrayList<Pair<String, AccountInstance?>>?
 ) {
     private var nodes: MutableList<NodeClient>? = null
-
-    @Deprecated("use constructors without deprecated archive field")
-    constructor(
-        context: Context,
-        account: AccountInstance,
-        archive: String? = null,
-        apiDomain: String? = null,
-        witnesses: List<XyoWitness<XyoPayload>>? = null
-    ) :
-            this(
-                context,
-                account,
-                listOf(
-                    XyoArchivistApiClient.get(
-                        XyoArchivistApiConfig(
-                            archive ?: DefaultArchive,
-                            apiDomain ?: DefaultApiDomain
-                        )
-                    )
-                ),
-                witnesses,
-                null
-            )
 
     constructor(
         context: Context,
@@ -61,14 +34,6 @@ class XyoPanel(
     ): this(
             context,
             account,
-            listOf(
-                XyoArchivistApiClient.get(
-                    XyoArchivistApiConfig(
-                        DefaultArchive,
-                        DefaultApiDomain
-                    )
-                )
-            ),
             witnesses,
             nodeUrlsAndAccounts
         )
