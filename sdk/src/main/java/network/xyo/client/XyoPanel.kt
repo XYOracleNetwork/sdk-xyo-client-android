@@ -39,7 +39,7 @@ class XyoPanel(
     constructor(
         context: Context,
         account: AccountInstance,
-        observe: ((context: Context) -> List<XyoEventPayload>?)?
+        observe: ((context: Context) -> List<XyoPayload>?)?
     ): this(
         context,
         account,
