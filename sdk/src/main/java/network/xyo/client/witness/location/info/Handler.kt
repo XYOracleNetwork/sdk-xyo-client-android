@@ -8,7 +8,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.withContext
 import network.xyo.client.witness.types.WitnessHandlerInterface
 import network.xyo.client.witness.types.WitnessResult
-import network.xyo.client.XyoPanel
+import network.xyo.client.witness.XyoPanel
 import network.xyo.client.account.model.AccountInstance
 import network.xyo.client.boundwitness.XyoBoundWitnessBodyJson
 import network.xyo.client.payload.XyoPayload
