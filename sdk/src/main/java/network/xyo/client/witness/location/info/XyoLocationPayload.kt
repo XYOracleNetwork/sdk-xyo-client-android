@@ -1,7 +1,12 @@
 package network.xyo.client.witness.location.info
 
 import com.squareup.moshi.JsonClass
+import network.xyo.client.payload.Payload
 import network.xyo.client.payload.XyoPayload
+
+interface XyoLocationPayloadMetaInterface : Payload {
+    var _sources: List<String>?
+}
 
 @JsonClass(generateAdapter = true)
 data class Coordinates(
@@ -23,7 +28,8 @@ data class CurrentLocation(
 @JsonClass(generateAdapter = true)
 class XyoLocationPayload(
     val currentLocation: CurrentLocation? = null,
-): XyoPayload() {
+    override var _sources: List<String>?
+): XyoPayload(), XyoLocationPayloadMetaInterface {
     override var schema: String
         get() = "network.xyo.location.android"
         set(value) = Unit
@@ -33,8 +39,8 @@ class XyoLocationPayload(
     }
 
     companion object {
-        fun detect(currentLocation: CurrentLocation?): XyoLocationPayload {
-            return XyoLocationPayload(currentLocation)
+        fun detect(currentLocation: CurrentLocation?, _sources: List<String>?): XyoLocationPayload {
+            return XyoLocationPayload(currentLocation, _sources)
         }
     }
 }

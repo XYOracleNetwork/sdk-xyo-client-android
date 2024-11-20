@@ -43,6 +43,8 @@ class LocationWitnessTest {
             val locationRawPayload = witness.observe(context)?.get(1)
             assertInstanceOf<XyoLocationPayloadRaw>(locationRawPayload)
             assert(locationRawPayload.schema == "network.xyo.location.android.raw")
+
+            assert(locationPayload._sources?.first() == locationRawPayload.hash())
         }
     }
 }
