@@ -1,4 +1,4 @@
-package network.xyo.client
+package network.xyo.client.payload
 
 import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
@@ -6,10 +6,11 @@ import androidx.test.rule.GrantPermissionRule
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import network.xyo.client.lib.BasicPayload
+import network.xyo.client.lib.TestConstants
 import network.xyo.client.account.Account
 import network.xyo.client.boundwitness.XyoBoundWitnessBuilder
 import network.xyo.client.lib.XyoSerializable
-import network.xyo.client.payload.XyoPayload
 import network.xyo.client.witness.XyoWitness
 import org.junit.Before
 import org.junit.Rule

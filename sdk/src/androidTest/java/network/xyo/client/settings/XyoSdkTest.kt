@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
-import network.xyo.client.XyoEventPayload
+import network.xyo.client.payload.XyoEventPayload
 import network.xyo.client.witness.XyoPanel
 import network.xyo.client.account.model.AccountInstance
 import org.junit.Before

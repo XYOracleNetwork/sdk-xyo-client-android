@@ -1,4 +1,4 @@
-package network.xyo.client
+package network.xyo.client.lib
 
 import network.xyo.client.account.Account
 import network.xyo.client.payload.XyoPayload
