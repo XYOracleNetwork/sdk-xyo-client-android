@@ -13,7 +13,7 @@ import network.xyo.client.account.model.AccountInstance
 import network.xyo.client.settings.AccountPreferences
 import network.xyo.client.settings.SettingsInterface
 import network.xyo.client.settings.defaultXyoSdkSettings
-import network.xyo.client.xyoScope
+import network.xyo.client.lib.xyoScope
 
 
 class AccountPrefsRepository(context: Context, settings: SettingsInterface = defaultXyoSdkSettings) {

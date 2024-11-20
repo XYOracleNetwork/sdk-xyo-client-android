@@ -1,4 +1,4 @@
-package network.xyo.client
+package network.xyo.client.lib
 
 import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext

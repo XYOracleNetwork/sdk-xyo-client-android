@@ -9,7 +9,7 @@ import network.xyo.client.account.model.PreviousHashStore
 import network.xyo.client.settings.PreviousHashStorePreferences
 import network.xyo.client.settings.SettingsInterface
 import network.xyo.client.settings.defaultXyoSdkSettings
-import network.xyo.client.xyoScope
+import network.xyo.client.lib.xyoScope
 import network.xyo.data.PreviousHashPrefsDataStoreProtos.PreviousHashPrefsDataStore
 
 
