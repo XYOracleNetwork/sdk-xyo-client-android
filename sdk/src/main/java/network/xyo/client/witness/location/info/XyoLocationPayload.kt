@@ -28,6 +28,10 @@ class XyoLocationPayload(
         get() = "network.xyo.location.android"
         set(value) = Unit
 
+    override fun hash(): String {
+        return sha256String(this)
+    }
+
     companion object {
         fun detect(currentLocation: CurrentLocation?): XyoLocationPayload {
             return XyoLocationPayload(currentLocation)

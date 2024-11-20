@@ -42,6 +42,10 @@ open class XyoLocationPayloadRaw(
         get() = "network.xyo.location.android.raw"
         set(value) = Unit
 
+    override fun hash(): String {
+        return sha256String(this)
+    }
+
 
     companion object {
         fun detect(
