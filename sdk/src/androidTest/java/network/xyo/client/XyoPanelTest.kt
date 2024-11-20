@@ -77,7 +77,7 @@ class XyoPanelTest {
             val panel = XyoPanel(appContext, Account.random(), arrayListOf(Pair(nodeUrl, Account.random())), listOf(witness, XyoSystemInfoWitness(witness2Account), XyoLocationWitness()))
             val result = panel.reportAsyncQuery()
             if (result.apiResults === null) throw NullPointerException("apiResults should not be null")
-            assert(result.payloads?.size == 3)
+            assert(result.payloads?.size == 4)
             result.apiResults?.forEach {
                 assertEquals(it.errors, null)
             }

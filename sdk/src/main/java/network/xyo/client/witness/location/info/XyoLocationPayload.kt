@@ -1,9 +1,12 @@
 package network.xyo.client.witness.location.info
 
-import android.annotation.SuppressLint
-import android.content.Context
 import com.squareup.moshi.JsonClass
+import network.xyo.client.payload.Payload
 import network.xyo.client.payload.XyoPayload
+
+interface XyoLocationPayloadMetaInterface : Payload {
+    var _sources: List<String>?
+}
 
 @JsonClass(generateAdapter = true)
 data class Coordinates(
@@ -22,24 +25,22 @@ data class CurrentLocation(
     val timestamp: Long
 )
 
-
-
 @JsonClass(generateAdapter = true)
-class XyoLocationPayload (
-    val currentLocation: CurrentLocation? = null
-): XyoPayload() {
+class XyoLocationPayload(
+    val currentLocation: CurrentLocation? = null,
+    override var _sources: List<String>?
+): XyoPayload(), XyoLocationPayloadMetaInterface {
     override var schema: String
         get() = "network.xyo.location.android"
         set(value) = Unit
 
+    override fun hash(): String {
+        return sha256String(this)
+    }
 
     companion object {
-
-        @SuppressLint("MissingPermission")
-        suspend fun detect(context: Context): XyoLocationPayload {
-            return XyoLocationPayload(
-                XyoLocationCurrent.detect(context)
-            )
+        fun detect(currentLocation: CurrentLocation?, _sources: List<String>?): XyoLocationPayload {
+            return XyoLocationPayload(currentLocation, _sources)
         }
     }
 }

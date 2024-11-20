@@ -14,9 +14,9 @@ import network.xyo.client.boundwitness.XyoBoundWitnessBodyJson
 import network.xyo.client.payload.XyoPayload
 import network.xyo.client.settings.XyoSdk
 
-open class WitnessLocationHandler : WitnessHandlerInterface<Pair<XyoBoundWitnessBodyJson?, XyoPayload?>> {
+open class WitnessLocationHandler : WitnessHandlerInterface<Triple<XyoBoundWitnessBodyJson?, XyoPayload?, XyoPayload?>> {
     @RequiresApi(Build.VERSION_CODES.M)
-    override suspend fun witness(context: Context, nodeUrlsAndAccounts: ArrayList<Pair<String, AccountInstance?>>): WitnessResult<Pair<XyoBoundWitnessBodyJson?, XyoPayload?>> {
+    override suspend fun witness(context: Context, nodeUrlsAndAccounts: ArrayList<Pair<String, AccountInstance?>>): WitnessResult<Triple<XyoBoundWitnessBodyJson?, XyoPayload?, XyoPayload?>> {
         val account = XyoSdk.getInstance(context.applicationContext).getAccount()
         val panel = XyoPanel(context, account, nodeUrlsAndAccounts, listOf(
             XyoLocationWitness(account)
@@ -26,17 +26,19 @@ open class WitnessLocationHandler : WitnessHandlerInterface<Pair<XyoBoundWitness
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @RequiresApi(Build.VERSION_CODES.M)
-    private suspend fun getLocation(panel: XyoPanel): WitnessResult<Pair<XyoBoundWitnessBodyJson?, XyoPayload?>> {
+    private suspend fun getLocation(panel: XyoPanel): WitnessResult<Triple<XyoBoundWitnessBodyJson?, XyoPayload?, XyoPayload?>> {
         return withContext(Dispatchers.IO) {
             var locationPayload: XyoPayload? = null
+            var locationPayloadRaw: XyoPayload? = null
             var bw: XyoBoundWitnessBodyJson? = null
             val errors: MutableList<Error> = mutableListOf()
             panel.let {
                 it.reportAsyncQuery().let { result ->
                     val actualPayloads = result.payloads
                     actualPayloads?.forEach { payload ->
-                        if (payload.schema === "network.xyo.location.android") {
-                            locationPayload = payload
+                        when (payload) {
+                            is XyoLocationPayload -> locationPayload = payload
+                            is XyoLocationPayloadRaw -> locationPayloadRaw = payload
                         }
                     }
 
@@ -50,7 +52,7 @@ open class WitnessLocationHandler : WitnessHandlerInterface<Pair<XyoBoundWitness
                 }
             }
             if (errors.size > 0) return@withContext WitnessResult.Error(errors)
-            return@withContext WitnessResult.Success(Pair(bw, locationPayload))
+            return@withContext WitnessResult.Success(Triple(bw, locationPayload, locationPayloadRaw))
         }
     }
 }

@@ -14,6 +14,8 @@ import network.xyo.client.datastore.previous_hash_store.PreviousHashStorePrefsRe
 import network.xyo.client.witness.types.WitnessResult
 import network.xyo.client.payload.XyoPayload
 import network.xyo.client.witness.location.info.LocationActivity
+import network.xyo.client.witness.location.info.XyoLocationPayload
+import network.xyo.client.witness.location.info.XyoLocationPayloadRaw
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -49,11 +51,11 @@ class WitnessLocationHandlerTest {
             var firstBw: XyoBoundWitnessBodyJson? = null
             val result1 = WitnessLocationHandler().witness(appContext.applicationContext, arrayListOf(Pair(apiDomainBeta, null)))
             when (result1) {
-                is WitnessResult.Success<Pair<XyoBoundWitnessBodyJson?, XyoPayload?>> -> {
+                is WitnessResult.Success<Triple<XyoBoundWitnessBodyJson?, XyoPayload?, XyoPayload?>> -> {
                     firstBw = result1.data.first
                     assertInstanceOf<XyoBoundWitnessBodyJson>(firstBw)
-                    assert(result1.data.first !== null)
-                    assert(result1.data.second !== null)
+                    assertInstanceOf<XyoLocationPayload>(result1.data.second)
+                    assertInstanceOf<XyoLocationPayloadRaw>(result1.data.third)
                 }
                 is WitnessResult.Error -> {
                     assert(result1.exception.size > 0)
@@ -63,11 +65,11 @@ class WitnessLocationHandlerTest {
             var secondBw: XyoBoundWitnessBodyJson? = null
             val result2 = WitnessLocationHandler().witness(appContext.applicationContext, arrayListOf(Pair(apiDomainBeta, null)))
             when (result2) {
-                is WitnessResult.Success<Pair<XyoBoundWitnessBodyJson?, XyoPayload?>> -> {
+                is WitnessResult.Success<Triple<XyoBoundWitnessBodyJson?, XyoPayload?, XyoPayload?>> -> {
                     secondBw = result2.data.first
                     assertInstanceOf<XyoBoundWitnessBodyJson>(secondBw)
-                    assert(result2.data.first !== null)
-                    assert(result2.data.second !== null)
+                    assertInstanceOf<XyoLocationPayload>(result2.data.second)
+                    assertInstanceOf<XyoLocationPayloadRaw>(result2.data.third)
 
                 }
                 is WitnessResult.Error -> {
