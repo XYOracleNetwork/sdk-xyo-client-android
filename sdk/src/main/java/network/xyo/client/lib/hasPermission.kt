@@ -1,4 +1,4 @@
-package network.xyo.client
+package network.xyo.client.lib
 
 import android.content.Context
 import android.content.pm.PackageManager

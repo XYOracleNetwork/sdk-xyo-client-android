@@ -12,7 +12,7 @@ import android.net.wifi.WifiInfo
 import android.os.Build
 import androidx.annotation.RequiresApi
 import com.squareup.moshi.JsonClass
-import network.xyo.client.hasPermission
+import network.xyo.client.lib.hasPermission
 import java.net.NetworkInterface
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
