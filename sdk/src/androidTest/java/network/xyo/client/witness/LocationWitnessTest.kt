@@ -10,6 +10,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import network.xyo.client.witness.location.info.LocationActivity
 import network.xyo.client.witness.location.info.XyoLocationPayload
+import network.xyo.client.witness.location.info.XyoLocationPayloadRaw
 import network.xyo.client.witness.location.info.XyoLocationWitness
 import org.junit.Rule
 import org.junit.Test
@@ -31,13 +32,17 @@ class LocationWitnessTest {
 
         CoroutineScope(Dispatchers.Main).launch {
             val witness = XyoLocationWitness()
-            val payload = witness.observe(context)?.first()
+            val locationPayload = witness.observe(context)?.first()
 
-            assertInstanceOf<XyoLocationPayload>(payload)
-            assert(payload.schema == "network.xyo.location.android")
-            assert((payload.currentLocation) !== null)
-            assert(payload.currentLocation?.coords?.latitude !== null)
-            assert(payload.currentLocation?.coords?.longitude !== null)
+            assertInstanceOf<XyoLocationPayload>(locationPayload)
+            assert(locationPayload.schema == "network.xyo.location.android")
+            assert(locationPayload.currentLocation !== null)
+            assert(locationPayload.currentLocation?.coords?.latitude !== null)
+            assert(locationPayload.currentLocation?.coords?.longitude !== null)
+
+            val locationRawPayload = witness.observe(context)?.get(1)
+            assertInstanceOf<XyoLocationPayloadRaw>(locationRawPayload)
+            assert(locationRawPayload.schema == "network.xyo.location.android.raw")
         }
     }
 }
