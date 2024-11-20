@@ -1,6 +1,6 @@
-package network.xyo.client
+package network.xyo.client.node.client
 
-import network.xyo.client.node.client.QueryResponseWrapper
+import network.xyo.client.lib.TestConstants
 import org.junit.Test
 import org.junit.jupiter.api.Assertions.*
 

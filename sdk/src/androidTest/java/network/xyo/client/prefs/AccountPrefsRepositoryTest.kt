@@ -3,8 +3,8 @@ package network.xyo.client.prefs
 import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
 import kotlinx.coroutines.runBlocking
-import network.xyo.client.TestConstants
-import network.xyo.client.XyoPanel
+import network.xyo.client.lib.TestConstants
+import network.xyo.client.witness.XyoPanel
 import network.xyo.client.account.Account
 import network.xyo.client.boundwitness.XyoBoundWitnessBuilder
 import network.xyo.client.datastore.accounts.AccountPrefsRepository

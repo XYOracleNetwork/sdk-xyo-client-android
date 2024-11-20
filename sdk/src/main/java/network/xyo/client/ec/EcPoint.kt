@@ -1,4 +1,4 @@
-package network.xyo.client
+package network.xyo.client.ec
 
 import java.math.BigInteger
 import java.security.spec.ECPoint

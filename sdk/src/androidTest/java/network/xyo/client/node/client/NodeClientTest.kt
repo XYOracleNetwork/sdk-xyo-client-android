@@ -1,12 +1,12 @@
-package network.xyo.client
+package network.xyo.client.node.client
 
 import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
+import network.xyo.client.lib.TestConstants
 import network.xyo.client.account.Account
 import network.xyo.client.archivist.wrapper.ArchivistWrapper
-import network.xyo.client.node.client.NodeClient
 import network.xyo.client.payload.XyoPayload
 import org.junit.Before
 import org.junit.Test
@@ -57,7 +57,8 @@ class NodeClientTest {
 
     @Test
     fun archivistInsertTest() {
-        val archivist = ArchivistWrapper(NodeClient(apiDomainBeta, TestConstants.TestAccount, appContext))
+        val archivist = ArchivistWrapper(NodeClient(apiDomainBeta,
+            TestConstants.TestAccount, appContext))
 
         val payloads = arrayListOf(TestConstants.debugPayload)
 

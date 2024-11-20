@@ -1,6 +1,6 @@
 package network.xyo.client.node.client
 
-import network.xyo.client.XyoSerializable
+import network.xyo.client.lib.XyoSerializable
 
 class PostQueryResult(
     val response: QueryResponseWrapper?,

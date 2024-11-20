@@ -1,4 +1,4 @@
-package network.xyo.client
+package network.xyo.client.witness
 
 import android.Manifest
 import android.content.Context
@@ -7,6 +7,9 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
+import network.xyo.client.lib.BasicPayload
+import network.xyo.client.lib.TestConstants
+import network.xyo.client.payload.XyoEventPayload
 import network.xyo.client.account.Account
 import network.xyo.client.boundwitness.XyoBoundWitnessJson
 import network.xyo.client.datastore.previous_hash_store.PreviousHashStorePrefsRepository

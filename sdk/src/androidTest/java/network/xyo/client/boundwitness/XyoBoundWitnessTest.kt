@@ -1,13 +1,15 @@
-package network.xyo.client
+package network.xyo.client.boundwitness
 
 import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
+import network.xyo.client.payload.TestPayload1
 import network.xyo.client.account.Account
-import network.xyo.client.boundwitness.XyoBoundWitnessBuilder
+import network.xyo.client.node.client.DiscoverPayload
 import network.xyo.client.datastore.previous_hash_store.PreviousHashStorePrefsRepository
+import network.xyo.client.lib.XyoSerializable
 import network.xyo.client.node.client.NodeClient
 import network.xyo.client.payload.XyoPayload
 import org.junit.Before
@@ -71,7 +73,9 @@ class XyoBoundWitnessTest {
     @Test
     fun testBoundWitnessHash() {
         runBlocking {
-            val bw = XyoBoundWitnessBuilder(appContext).signer(Account.random()).payloads(listOf(TestPayload1())).build()
+            val bw = XyoBoundWitnessBuilder(appContext).signer(Account.random()).payloads(listOf(
+                TestPayload1()
+            )).build()
             val hashableFields = bw.getBodyJson()
             assert(bw._hash !== null)
             assert(bw._hash!! == XyoSerializable.sha256String(hashableFields))
@@ -83,8 +87,12 @@ class XyoBoundWitnessTest {
     fun testBoundWitnessPreviousHash() {
         runBlocking {
             val testAccount = Account.random()
-            val bw = XyoBoundWitnessBuilder(appContext).signer(testAccount).payloads(listOf(TestPayload1())).build()
-            val bw2 = XyoBoundWitnessBuilder(appContext).signer(testAccount).payloads(listOf(TestPayload1())).build()
+            val bw = XyoBoundWitnessBuilder(appContext).signer(testAccount).payloads(listOf(
+                TestPayload1()
+            )).build()
+            val bw2 = XyoBoundWitnessBuilder(appContext).signer(testAccount).payloads(listOf(
+                TestPayload1()
+            )).build()
             assert(bw2.previous_hashes.first() == bw._hash)
         }
     }

@@ -1,4 +1,4 @@
-package network.xyo.client
+package network.xyo.client.lib
 
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -69,7 +69,7 @@ abstract class XyoSerializable: Serializable  {
                 .addLast(KotlinJsonAdapterFactory())
                 .build()
             val adapter = moshi.adapter(obj.first().javaClass)
-            val items = obj.map {item -> sortJson(adapter.toJson(item), removeMeta)}
+            val items = obj.map {item -> sortJson(adapter.toJson(item), removeMeta) }
             return items.joinToString(",", "[", "]")
         }
 
