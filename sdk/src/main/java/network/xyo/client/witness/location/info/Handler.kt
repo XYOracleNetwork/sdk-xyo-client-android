@@ -36,9 +36,9 @@ open class WitnessLocationHandler : WitnessHandlerInterface<Triple<XyoBoundWitne
                 it.reportAsyncQuery().let { result ->
                     val actualPayloads = result.payloads
                     actualPayloads?.forEach { payload ->
-                        when (payload.schema) {
-                            "network.xyo.location.android" -> locationPayload = payload
-                            "network.xyo.location.android.raw" -> locationPayloadRaw = payload
+                        when (payload) {
+                            is XyoLocationPayload -> locationPayload = payload
+                            is XyoLocationPayloadRaw -> locationPayloadRaw = payload
                         }
                     }
 
