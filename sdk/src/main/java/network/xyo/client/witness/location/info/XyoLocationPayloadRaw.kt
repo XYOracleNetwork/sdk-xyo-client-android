@@ -39,7 +39,7 @@ open class XyoLocationPayloadRaw(
     val extras: Map<String, Any?>? = null
 ): XyoPayload() {
     override var schema: String
-        get() = "network.xyo.location.android.raw"
+        get() = payloadSchema
         set(value) = Unit
 
     override fun hash(): String {
@@ -48,6 +48,7 @@ open class XyoLocationPayloadRaw(
 
 
     companion object {
+        val payloadSchema = "network.xyo.location.android"
         fun detect(
             provider: String?,
             latitude: Double,

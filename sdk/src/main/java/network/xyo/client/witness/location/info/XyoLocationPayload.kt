@@ -31,7 +31,7 @@ class XyoLocationPayload(
     override var _sources: List<String>?
 ): XyoPayload(), XyoLocationPayloadMetaInterface {
     override var schema: String
-        get() = "network.xyo.location.android"
+        get() = payloadSchema
         set(value) = Unit
 
     override fun hash(): String {
@@ -39,6 +39,7 @@ class XyoLocationPayload(
     }
 
     companion object {
+        val payloadSchema = "network.xyo.location"
         fun detect(currentLocation: CurrentLocation?, _sources: List<String>?): XyoLocationPayload {
             return XyoLocationPayload(currentLocation, _sources)
         }
