@@ -46,7 +46,6 @@ open class XyoLocationPayloadRaw(
         return sha256String(this)
     }
 
-
     companion object {
         val schema = "network.xyo.location.android"
         fun detect(
