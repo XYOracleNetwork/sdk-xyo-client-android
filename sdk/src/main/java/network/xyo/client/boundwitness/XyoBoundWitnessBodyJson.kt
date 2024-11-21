@@ -6,7 +6,7 @@ import network.xyo.client.payload.XyoPayload
 @JsonClass(generateAdapter = true)
 open class XyoBoundWitnessBodyJson(): XyoBoundWitnessBodyInterface, XyoPayload() {
     override var schema: String
-        get() = "network.xyo.boundwitness"
+        get() = XyoBoundWitnessBodyJson.schema
         set(value) = Unit
     final override var addresses = emptyList<String>()
     final override var payload_hashes = emptyList<String>()
@@ -24,5 +24,9 @@ open class XyoBoundWitnessBodyJson(): XyoBoundWitnessBodyInterface, XyoPayload()
         this.payload_hashes = payload_hashes
         this.payload_schemas = payload_schemas
         this.timestamp = timestamp
+    }
+
+    companion object {
+        val schema = "network.xyo.boundwitness"
     }
 }

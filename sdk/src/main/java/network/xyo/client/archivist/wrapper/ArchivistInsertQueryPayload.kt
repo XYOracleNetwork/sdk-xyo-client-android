@@ -4,5 +4,9 @@ import network.xyo.client.payload.XyoPayload
 
 
 class ArchivistInsertQueryPayload(): XyoPayload() {
-    override var schema = "network.xyo.query.archivist.insert"
+    override var schema = ArchivistInsertQueryPayload.schema
+
+    companion object {
+        val schema = "network.xyo.query.archivist.insert"
+    }
 }
