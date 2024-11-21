@@ -12,7 +12,7 @@ open class XyoPayload(): Payload, XyoSerializable() {
     // Note: Has to be var because "Moshi does not consider a val as a serializable member because
     // it cannot be symmetrically deserialized."
     // see - https://github.com/square/moshi/issues/1803
-    override var schema: String = "network.xyo.missing.schema"
+    override var schema: String = "network.xyo.base.schema"
 
     @Throws(XyoValidationException::class)
     open fun validate() {

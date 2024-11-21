@@ -13,10 +13,11 @@ class XyoSystemInfoPayload(
     val os: XyoSystemInfoOs? = null,
     ): XyoPayload () {
         override var schema: String
-            get() = "network.xyo.system.info.android"
+            get() = XyoSystemInfoPayload.schema
             set(value) = Unit
 
         companion object {
+            val schema = "network.xyo.system.info.android"
 
             @RequiresApi(Build.VERSION_CODES.M)
             fun detect(context: Context): XyoSystemInfoPayload {

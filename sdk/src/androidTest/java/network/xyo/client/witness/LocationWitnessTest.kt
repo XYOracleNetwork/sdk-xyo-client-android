@@ -35,14 +35,14 @@ class LocationWitnessTest {
             val locationPayload = witness.observe(context)?.first()
 
             assertInstanceOf<XyoLocationPayload>(locationPayload)
-            assert(locationPayload.schema == XyoLocationPayload.payloadSchema)
+            assert(locationPayload.schema == XyoLocationPayload.schema)
             assert(locationPayload.currentLocation !== null)
             assert(locationPayload.currentLocation?.coords?.latitude !== null)
             assert(locationPayload.currentLocation?.coords?.longitude !== null)
 
             val locationRawPayload = witness.observe(context)?.get(1)
             assertInstanceOf<XyoLocationPayloadRaw>(locationRawPayload)
-            assert(locationRawPayload.schema == XyoLocationPayloadRaw.payloadSchema)
+            assert(locationRawPayload.schema == XyoLocationPayloadRaw.schema)
 
             assert(locationPayload._sources?.first() == locationRawPayload.hash())
         }
