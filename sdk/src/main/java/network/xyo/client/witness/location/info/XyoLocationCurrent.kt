@@ -30,12 +30,11 @@ class XyoLocationCurrent {
                             }
 
                             val locationRaw = buildRawLocationPayload(location)
-                            val _sources = listOf(locationRaw.hash())
                             val coordinates = setCoordinatesFromLocation(location)
                             val currentLocation = CurrentLocation(coordinates, System.currentTimeMillis())
 
                             // Resume the coroutine with the retrieved location
-                            continuation.resumeWith(Result.success(Pair(XyoLocationPayload(currentLocation, _sources), locationRaw)))
+                            continuation.resumeWith(Result.success(Pair(XyoLocationPayload(currentLocation), locationRaw)))
                         }
                         .addOnFailureListener { exception ->
                             // Resume the coroutine with an exception if the task fails
