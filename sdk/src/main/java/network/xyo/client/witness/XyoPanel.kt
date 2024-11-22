@@ -8,6 +8,7 @@ import network.xyo.client.account.model.AccountInstance
 import network.xyo.client.archivist.wrapper.ArchivistWrapper
 import network.xyo.client.boundwitness.XyoBoundWitnessBuilder
 import network.xyo.client.boundwitness.XyoBoundWitnessJson
+import network.xyo.client.lib.XyoSerializable
 import network.xyo.client.node.client.NodeClient
 import network.xyo.client.node.client.PostQueryResult
 import network.xyo.client.payload.XyoPayload
@@ -60,8 +61,7 @@ class XyoPanel(
         }
     }
 
-    private suspend fun generateBoundWitnessJson(): XyoBoundWitnessJson {
-        val payloads = generatePayloads()
+    private suspend fun generateBoundWitnessJson(payloads: List<XyoPayload>): XyoBoundWitnessJson {
         return XyoBoundWitnessBuilder(context)
             .payloads(payloads)
             .signer(account)
@@ -81,8 +81,8 @@ class XyoPanel(
     @kotlinx.coroutines.ExperimentalCoroutinesApi
     suspend fun reportAsyncQuery(adhocWitnesses: List<XyoWitness<XyoPayload>> = emptyList()): XyoPanelReportQueryResult {
         if (nodes == null) resolveNodes()
-        val bw = generateBoundWitnessJson()
         val payloads = generatePayloads(adhocWitnesses)
+        val bw = generateBoundWitnessJson(payloads)
         val results = mutableListOf<PostQueryResult>()
 
         if (nodes.isNullOrEmpty()) {
