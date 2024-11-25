@@ -77,17 +77,23 @@ class XyoBoundWitnessTest {
             val bw = XyoBoundWitnessBuilder(appContext).signer(Account.random()).payloads(listOf(
                 TestPayload1()
             )).build()
-            assert(bw.meta.hash !== null)
-            assert(bw.meta.hash!! == bw.dataHash())
-            assert(bw.meta.hash!! != bw.rootHash())
+            assert(bw.rootHash() == XyoSerializable.sha256String(bw))
+            assert(bw.hash() == bw.getBodyJson().hash())
             assert(bw.meta.client == "android")
             assert(bw.meta.signatures?.size == 1)
+        }
+    }
 
+    @Test
+    fun testBoundWitnessMetaSerialization() {
+        runBlocking {
+            val bw = XyoBoundWitnessBuilder(appContext).signer(Account.random()).payloads(listOf(
+                TestPayload1()
+            )).build()
             val serializedBw = XyoSerializable.toJson(bw)
             val bwJson = JSONObject(serializedBw)
             val meta = bwJson.get("\$meta") as JSONObject
             assert(meta.get("client") == "android")
-            assertNotNull(meta.get("hash"))
             assertNotNull(meta.get("signatures"))
         }
     }
@@ -102,7 +108,7 @@ class XyoBoundWitnessTest {
             val bw2 = XyoBoundWitnessBuilder(appContext).signer(testAccount).payloads(listOf(
                 TestPayload1()
             )).build()
-            assert(bw2.previous_hashes.first() == bw.meta.hash)
+            assert(bw2.previous_hashes.first() == bw.hash())
         }
     }
 }

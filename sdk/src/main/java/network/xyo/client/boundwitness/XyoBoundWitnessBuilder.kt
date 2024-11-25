@@ -93,7 +93,6 @@ open class XyoBoundWitnessBuilder(private val context: Context) {
         val hashable = hashableFields()
         val hash = XyoSerializable.sha256String(hashable)
         bw.meta.signatures = this.sign(hash)
-        bw.meta.hash = hash
     }
 
     open suspend fun build(): XyoBoundWitnessJson {

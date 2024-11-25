@@ -7,7 +7,6 @@ import com.squareup.moshi.JsonClass
 class XyoBoundWitnessMeta: XyoBoundWitnessMetaInterface {
     override var signatures: List<String>? = null
     override var client: String? = null
-    override var hash: String? = null
 }
 
 @JsonClass(generateAdapter = true)
@@ -19,12 +18,12 @@ open class XyoBoundWitnessJson: XyoBoundWitnessBodyJson() {
         get() = _meta
         set(value) = Unit
 
-    fun rootHash(): String {
-        return sha256String(this)
+    override fun hash(): String {
+        return getBodyJson().hash()
     }
 
-    fun dataHash(): String {
-        return sha256String(getBodyJson())
+    fun rootHash(): String {
+        return sha256String(this)
     }
 
     open fun getBodyJson(): XyoBoundWitnessBodyJson {

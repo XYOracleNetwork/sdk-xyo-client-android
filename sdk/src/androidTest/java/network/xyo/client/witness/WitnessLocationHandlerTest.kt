@@ -78,7 +78,7 @@ class WitnessLocationHandlerTest {
                 }
             }
 
-            val firstBwHash = firstBw!!.dataHash()
+            val firstBwHash = firstBw!!.hash()
             assert(secondBw!!.previous_hashes.size == 1)
             assert(secondBw.previous_hashes.first() == firstBwHash)
         }
