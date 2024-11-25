@@ -11,6 +11,7 @@ class XyoBoundWitnessMeta: XyoBoundWitnessMetaInterface {
 
 @JsonClass(generateAdapter = true)
 open class XyoBoundWitnessJson: XyoBoundWitnessBodyJson() {
+    @Json(ignore = true)
     val _meta: XyoBoundWitnessMeta = XyoBoundWitnessMeta()
 
     @Json(name = "\$meta")
