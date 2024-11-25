@@ -10,13 +10,13 @@ import network.xyo.client.witness.types.WitnessHandlerInterface
 import network.xyo.client.witness.types.WitnessResult
 import network.xyo.client.witness.XyoPanel
 import network.xyo.client.account.model.AccountInstance
-import network.xyo.client.boundwitness.XyoBoundWitnessBodyJson
+import network.xyo.client.boundwitness.XyoBoundWitnessJson
 import network.xyo.client.payload.XyoPayload
 import network.xyo.client.settings.XyoSdk
 
-open class WitnessLocationHandler : WitnessHandlerInterface<Triple<XyoBoundWitnessBodyJson?, XyoPayload?, XyoPayload?>> {
+open class WitnessLocationHandler : WitnessHandlerInterface<Triple<XyoBoundWitnessJson?, XyoPayload?, XyoPayload?>> {
     @RequiresApi(Build.VERSION_CODES.M)
-    override suspend fun witness(context: Context, nodeUrlsAndAccounts: ArrayList<Pair<String, AccountInstance?>>): WitnessResult<Triple<XyoBoundWitnessBodyJson?, XyoPayload?, XyoPayload?>> {
+    override suspend fun witness(context: Context, nodeUrlsAndAccounts: ArrayList<Pair<String, AccountInstance?>>): WitnessResult<Triple<XyoBoundWitnessJson?, XyoPayload?, XyoPayload?>> {
         val account = XyoSdk.getInstance(context.applicationContext).getAccount()
         val panel = XyoPanel(context, account, nodeUrlsAndAccounts, listOf(
             XyoLocationWitness(account)
@@ -26,11 +26,11 @@ open class WitnessLocationHandler : WitnessHandlerInterface<Triple<XyoBoundWitne
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @RequiresApi(Build.VERSION_CODES.M)
-    private suspend fun getLocation(panel: XyoPanel): WitnessResult<Triple<XyoBoundWitnessBodyJson?, XyoPayload?, XyoPayload?>> {
+    private suspend fun getLocation(panel: XyoPanel): WitnessResult<Triple<XyoBoundWitnessJson?, XyoPayload?, XyoPayload?>> {
         return withContext(Dispatchers.IO) {
             var locationPayload: XyoPayload? = null
             var locationPayloadRaw: XyoPayload? = null
-            var bw: XyoBoundWitnessBodyJson? = null
+            var bw: XyoBoundWitnessJson? = null
             val errors: MutableList<Error> = mutableListOf()
             panel.let {
                 it.reportAsyncQuery().let { result ->
