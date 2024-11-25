@@ -3,7 +3,7 @@ package network.xyo.client.boundwitness
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
-open class QueryBoundWitnessJson: XyoBoundWitnessJson(), XyoBoundWitnessMetaInterface {
+open class QueryBoundWitnessJson: XyoBoundWitnessJson() {
     var query: String? = null
 
     // override to return a bound witness json body that has query in its hashable fields
