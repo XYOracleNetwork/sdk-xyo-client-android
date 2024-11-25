@@ -33,7 +33,7 @@ class XyoLocationPayload(
     }
 
     companion object {
-        val schema = "network.xyo.location"
+        val schema = "network.xyo.location.current"
         fun detect(currentLocation: CurrentLocation?): XyoLocationPayload {
             return XyoLocationPayload(currentLocation)
         }
