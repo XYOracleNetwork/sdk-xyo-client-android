@@ -12,6 +12,7 @@ import network.xyo.client.datastore.previous_hash_store.PreviousHashStorePrefsRe
 import network.xyo.client.lib.XyoSerializable
 import network.xyo.client.node.client.NodeClient
 import network.xyo.client.payload.XyoPayload
+import org.json.JSONObject
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -71,15 +72,23 @@ class XyoBoundWitnessTest {
     }
 
     @Test
-    fun testBoundWitnessHash() {
+    fun testBoundWitnessMeta() {
         runBlocking {
             val bw = XyoBoundWitnessBuilder(appContext).signer(Account.random()).payloads(listOf(
                 TestPayload1()
             )).build()
             val hashableFields = bw.getBodyJson()
-            assert(bw._hash !== null)
-            assert(bw._hash!! == XyoSerializable.sha256String(hashableFields))
-            assert(bw._hash!! == hashableFields.hash())
+            assert(bw.meta.hash !== null)
+            assert(bw.meta.hash!! == hashableFields.hash())
+            assert(bw.meta.client == "android")
+            assert(bw.meta.signatures?.size == 1)
+
+            val serializedBw = XyoSerializable.toJson(bw)
+            val bwJson = JSONObject(serializedBw)
+            val meta = bwJson.get("\$meta") as JSONObject
+            assert(meta.get("client") == "android")
+            assertNotNull(meta.get("hash"))
+            assertNotNull(meta.get("signatures"))
         }
     }
 
@@ -93,7 +102,7 @@ class XyoBoundWitnessTest {
             val bw2 = XyoBoundWitnessBuilder(appContext).signer(testAccount).payloads(listOf(
                 TestPayload1()
             )).build()
-            assert(bw2.previous_hashes.first() == bw._hash)
+            assert(bw2.previous_hashes.first() == bw.meta.hash)
         }
     }
 }
