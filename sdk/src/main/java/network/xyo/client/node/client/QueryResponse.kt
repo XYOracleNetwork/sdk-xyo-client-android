@@ -8,7 +8,7 @@ import network.xyo.client.payload.XyoPayload
 import org.json.JSONArray
 import org.json.JSONObject
 
-open class QueryResponseWrapper(private val rawResponse: String) {
+open class QueryResponseWrapper(val rawResponse: String) {
     val moshi: Moshi = Moshi.Builder().addLast(KotlinJsonAdapterFactory()).build()
     var bwHash: String? = null
     var bw: XyoBoundWitnessBodyJson? = null
