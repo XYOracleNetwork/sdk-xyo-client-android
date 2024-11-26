@@ -7,6 +7,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import network.xyo.client.payload.TestPayload1
 import network.xyo.client.account.Account
+import network.xyo.client.archivist.wrapper.ArchivistWrapper
 import network.xyo.client.node.client.DiscoverPayload
 import network.xyo.client.datastore.previous_hash_store.PreviousHashStorePrefsRepository
 import network.xyo.client.lib.XyoSerializable
@@ -109,6 +110,22 @@ class XyoBoundWitnessTest {
                 TestPayload1()
             )).build()
             assert(bw2.previous_hashes.first() == bw.hash())
+        }
+    }
+
+    @Test
+    fun testBoundWitnessRoundTripToArchivist() {
+        runBlocking {
+            val client = ArchivistWrapper(NodeClient("$apiDomainBeta/Archivist", null, appContext))
+            val testAccount = Account.random()
+            val testPayload = TestPayload1()
+            val bw = XyoBoundWitnessBuilder(appContext).signer(testAccount).payloads(listOf(testPayload)).build()
+            client.insert(listOf(bw, testPayload))
+
+            val bwHash = bw.hash()
+            val result = client.get(listOf(bwHash))
+            val response = result.response?.rawResponse
+            assert(response!!.contains(bwHash))
         }
     }
 }
