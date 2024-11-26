@@ -52,7 +52,7 @@ open class XyoBoundWitnessBuilder(private val context: Context) {
     fun <T: XyoPayload>payload(schema: String, payload: T): XyoBoundWitnessBuilder {
         payload.validate()
         _payloads.add(payload)
-        _payload_hashes.add(payload.hash())
+        _payload_hashes.add(payload.dataHash())
         _payload_schemas.add(schema)
         return this
     }

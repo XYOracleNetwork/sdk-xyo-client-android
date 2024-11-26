@@ -116,6 +116,6 @@ class XyoPayloadTest {
     @Test
     fun testHashing() {
         val payload = TestConstants.debugPayload
-        assertEquals(payload.hash(), TestConstants.debugPayloadHash)
+        assertEquals(payload.dataHash(), TestConstants.debugPayloadHash)
     }
 }

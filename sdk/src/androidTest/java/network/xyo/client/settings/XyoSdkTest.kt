@@ -76,7 +76,7 @@ class XyoSdkTest {
             val bw = result.bw
 
             val result2 = panel.reportAsyncQuery()
-            assert(result2.bw.previous_hashes.contains(bw.hash()))
+            assert(result2.bw.previous_hashes.contains(bw.dataHash()))
         }
     }
 }

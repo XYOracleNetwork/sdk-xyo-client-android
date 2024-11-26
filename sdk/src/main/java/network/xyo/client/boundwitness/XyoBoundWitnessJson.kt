@@ -19,8 +19,8 @@ open class XyoBoundWitnessJson: XyoBoundWitnessBodyJson() {
         get() = _meta
         set(value) = Unit
 
-    override fun hash(): String {
-        return getBodyJson().hash()
+    override fun dataHash(): String {
+        return getBodyJson().dataHash()
     }
 
     fun rootHash(): String {

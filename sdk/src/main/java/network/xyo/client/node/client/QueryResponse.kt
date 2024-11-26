@@ -24,7 +24,7 @@ open class QueryResponseWrapper(val rawResponse: String) {
         val wrapperBwString = tuple[0].toString()
         val wrapperBw = parseBW(wrapperBwString)
         if (wrapperBw !== null) {
-            bwHash = wrapperBw.hash()
+            bwHash = wrapperBw.dataHash()
             bw = wrapperBw
         }
 

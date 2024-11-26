@@ -14,7 +14,7 @@ open class XyoBoundWitnessBodyJson(): XyoBoundWitnessBodyInterface, XyoPayload()
     final override var previous_hashes = emptyList<String?>()
     final override var timestamp: Long = System.currentTimeMillis()
 
-    override fun hash(): String {
+    override fun dataHash(): String {
         return sha256String(this)
     }
 

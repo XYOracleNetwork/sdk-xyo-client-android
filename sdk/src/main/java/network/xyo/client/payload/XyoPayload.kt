@@ -21,7 +21,7 @@ open class XyoPayload(): Payload, XyoSerializable() {
         }
     }
 
-    open fun hash(): String {
+    open fun dataHash(): String {
         return sha256String(this)
     }
 }

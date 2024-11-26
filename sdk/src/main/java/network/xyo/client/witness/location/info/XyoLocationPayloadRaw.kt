@@ -42,7 +42,7 @@ open class XyoLocationPayloadRaw(
         get() = XyoLocationPayloadRaw.schema
         set(value) = Unit
 
-    override fun hash(): String {
+    override fun dataHash(): String {
         return sha256String(this)
     }
 

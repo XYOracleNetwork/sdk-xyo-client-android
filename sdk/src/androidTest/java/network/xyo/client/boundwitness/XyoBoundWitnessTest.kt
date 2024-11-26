@@ -79,7 +79,7 @@ class XyoBoundWitnessTest {
                 TestPayload1()
             )).build()
             assert(bw.rootHash() == XyoSerializable.sha256String(bw))
-            assert(bw.hash() == bw.getBodyJson().hash())
+            assert(bw.dataHash() == bw.getBodyJson().dataHash())
             assert(bw.meta.client == "android")
             assert(bw.meta.signatures?.size == 1)
         }
@@ -109,7 +109,7 @@ class XyoBoundWitnessTest {
             val bw2 = XyoBoundWitnessBuilder(appContext).signer(testAccount).payloads(listOf(
                 TestPayload1()
             )).build()
-            assert(bw2.previous_hashes.first() == bw.hash())
+            assert(bw2.previous_hashes.first() == bw.dataHash())
         }
     }
 
@@ -122,7 +122,7 @@ class XyoBoundWitnessTest {
             val bw = XyoBoundWitnessBuilder(appContext).signer(testAccount).payloads(listOf(testPayload)).build()
             client.insert(listOf(bw, testPayload))
 
-            val bwHash = bw.hash()
+            val bwHash = bw.dataHash()
             val result = client.get(listOf(bwHash))
             val response = result.response?.rawResponse
             assert(response!!.contains(bwHash))
