@@ -91,7 +91,7 @@ open class XyoBoundWitnessBuilder(private val context: Context) {
         // Note: Once fields are hashed, do not update class properties that are expected
         // in the serialized version of the bw because they will invalidate the hash
         val hashable = hashableFields()
-        val hash = XyoSerializable.sha256String(hashable)
+        val hash = hashable.dataHash()
         bw.meta.signatures = this.sign(hash)
     }
 

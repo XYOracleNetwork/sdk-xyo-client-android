@@ -13,7 +13,7 @@ class QueryBoundWitnessBuilder(context: Context) : XyoBoundWitnessBuilder(contex
     private lateinit var queryHash: String
 
     fun query(query: XyoPayload): QueryBoundWitnessBuilder {
-        this.queryHash = XyoSerializable.sha256String(query)
+        this.queryHash = query.dataHash()
         this.payload(query.schema, query)
         return this
     }

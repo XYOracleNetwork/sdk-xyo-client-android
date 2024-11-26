@@ -63,7 +63,7 @@ class LocationWitnessTest {
             val panel = XyoPanel(appContext, Account.random(), arrayListOf(Pair("${TestConstants.nodeUrlBeta}/Archivist", null)), listOf(XyoLocationWitness()))
             val result = panel.reportAsyncQuery()
             result.payloads?.forEach{ payload ->
-                val hash = XyoSerializable.sha256String(payload)
+                val hash = payload.dataHash()
                 assert(result.bw.payload_hashes.contains(hash))
             }
         }

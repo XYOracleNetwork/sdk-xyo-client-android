@@ -78,7 +78,6 @@ class XyoBoundWitnessTest {
             val bw = XyoBoundWitnessBuilder(appContext).signer(Account.random()).payloads(listOf(
                 TestPayload1()
             )).build()
-            assert(bw.rootHash() == XyoSerializable.sha256String(bw))
             assert(bw.dataHash() == bw.getBodyJson().dataHash())
             assert(bw.meta.client == "android")
             assert(bw.meta.signatures?.size == 1)
