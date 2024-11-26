@@ -10,6 +10,7 @@ import kotlinx.coroutines.runBlocking
 import network.xyo.client.lib.TestConstants
 import network.xyo.client.account.Account
 import network.xyo.client.boundwitness.XyoBoundWitnessBodyJson
+import network.xyo.client.boundwitness.XyoBoundWitnessJson
 import network.xyo.client.datastore.previous_hash_store.PreviousHashStorePrefsRepository
 import network.xyo.client.witness.types.WitnessResult
 import network.xyo.client.payload.XyoPayload
@@ -48,10 +49,10 @@ class WitnessLocationHandlerTest {
     @Test
     fun testObserve()  {
         runBlocking {
-            var firstBw: XyoBoundWitnessBodyJson? = null
+            var firstBw: XyoBoundWitnessJson? = null
             val result1 = WitnessLocationHandler().witness(appContext.applicationContext, arrayListOf(Pair(apiDomainBeta, null)))
             when (result1) {
-                is WitnessResult.Success<Triple<XyoBoundWitnessBodyJson?, XyoPayload?, XyoPayload?>> -> {
+                is WitnessResult.Success<Triple<XyoBoundWitnessJson?, XyoPayload?, XyoPayload?>> -> {
                     firstBw = result1.data.first
                     assertInstanceOf<XyoBoundWitnessBodyJson>(firstBw)
                     assertInstanceOf<XyoLocationPayload>(result1.data.second)
@@ -62,12 +63,12 @@ class WitnessLocationHandlerTest {
                 }
             }
 
-            var secondBw: XyoBoundWitnessBodyJson? = null
+            var secondBw: XyoBoundWitnessJson? = null
             val result2 = WitnessLocationHandler().witness(appContext.applicationContext, arrayListOf(Pair(apiDomainBeta, null)))
             when (result2) {
-                is WitnessResult.Success<Triple<XyoBoundWitnessBodyJson?, XyoPayload?, XyoPayload?>> -> {
+                is WitnessResult.Success<Triple<XyoBoundWitnessJson?, XyoPayload?, XyoPayload?>> -> {
                     secondBw = result2.data.first
-                    assertInstanceOf<XyoBoundWitnessBodyJson>(secondBw)
+                    assertInstanceOf<XyoBoundWitnessJson>(secondBw)
                     assertInstanceOf<XyoLocationPayload>(result2.data.second)
                     assertInstanceOf<XyoLocationPayloadRaw>(result2.data.third)
 

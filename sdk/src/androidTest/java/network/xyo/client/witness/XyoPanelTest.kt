@@ -113,7 +113,7 @@ class XyoPanelTest {
             val bw = result.bw
 
             val result2 = panel.reportAsyncQuery()
-            assert(result2.bw.previous_hashes.contains(bw._hash))
+            assert(result2.bw.previous_hashes.contains(bw.hash()))
         }
     }
 

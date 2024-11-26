@@ -81,7 +81,7 @@ open class XyoBoundWitnessBuilder(private val context: Context) {
         bw.addresses = addresses
 
         // update underscore fields
-        bw._client = "android"
+        bw.meta.client = "android"
 
         // construct fields involved in hashing
         constructHashableFieldsFields()
@@ -92,8 +92,7 @@ open class XyoBoundWitnessBuilder(private val context: Context) {
         // in the serialized version of the bw because they will invalidate the hash
         val hashable = hashableFields()
         val hash = XyoSerializable.sha256String(hashable)
-        bw._signatures = this.sign(hash)
-        bw._hash = hash
+        bw.meta.signatures = this.sign(hash)
     }
 
     open suspend fun build(): XyoBoundWitnessJson {
