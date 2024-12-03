@@ -18,7 +18,7 @@ open class Account private constructor (private val _privateKey: PrivateKey, pri
     constructor(privateKey: ByteArray, previousHash: ByteArray? = null) : this(PrivateKey.fromBytes(privateKey, secp256k1Curve), previousHash) {}
     constructor(privateKey: BigInteger, previousHash: ByteArray? = null) : this(privateKey.toByteArray(), previousHash) {}
 
-    private val _address = addressFromPublicKey(publicKey)
+    private val _address = addressFromPublicKey(publicKeyUncompressed)
 
     final override val address: ByteArray
         get() = _address
@@ -27,6 +27,8 @@ open class Account private constructor (private val _privateKey: PrivateKey, pri
     final override val privateKey: ByteArray
         get() = _privateKey.key.toBytesPadded(32)
     final override val publicKey: ByteArray
+        get() = _privateKey.toPublicKey().compressed()
+    final override val publicKeyUncompressed: ByteArray
         get() = _privateKey.toPublicKey().key.toBytesPadded(64)
 
     override suspend fun sign(hash: ByteArray): ByteArray {
