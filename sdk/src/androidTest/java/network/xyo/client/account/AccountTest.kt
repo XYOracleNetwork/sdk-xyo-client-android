@@ -25,7 +25,8 @@ class AccountTest {
     fun testRandomAccount()  {
         val account = Account.random()
         assert(account.privateKey.count() == 32)
-        assert(account.publicKey.count() == 64)
+        assert(account.publicKey.count() == 33)
+        assert(account.publicKeyUncompressed.count() == 64)
     }
 
     @OptIn(ExperimentalStdlibApi::class)
@@ -34,8 +35,9 @@ class AccountTest {
         runBlocking {
             val account = Account.fromPrivateKey(hexStringToByteArray(testVectorPrivateKey))
             assert(account.privateKey.count() == 32)
-            assert(account.publicKey.count() == 64)
-            assert(account.publicKey.toHexString() == testVectorPublicKey)
+            assert(account.publicKey.count() == 33)
+            assert(account.publicKeyUncompressed.count() == 64)
+            assert(account.publicKeyUncompressed.toHexString() == testVectorPublicKey)
             assert(account.address.toHexString() == testVectorAddress)
             val signature = account.sign(hexStringToByteArray(testVectorHash))
             assert(signature.toHexString() == testVectorSignature)
@@ -51,7 +53,7 @@ class AccountTest {
             val account = Account.fromPrivateKey(address)
             account.sign(hexStringToByteArray(testVectorHash))
 
-            val savedAddressInStore = Account.addressFromPublicKey(account.publicKey)
+            val savedAddressInStore = Account.addressFromUncompressedPublicKey(account.publicKeyUncompressed)
             val previousHashInStore = Account.previousHashStore?.getItem(savedAddressInStore)?.toHexString()
             assert(previousHashInStore == testVectorHash)
         }

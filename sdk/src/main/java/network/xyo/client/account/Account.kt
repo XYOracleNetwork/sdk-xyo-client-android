@@ -18,7 +18,7 @@ open class Account private constructor (private val _privateKey: PrivateKey, pri
     constructor(privateKey: ByteArray, previousHash: ByteArray? = null) : this(PrivateKey.fromBytes(privateKey, secp256k1Curve), previousHash) {}
     constructor(privateKey: BigInteger, previousHash: ByteArray? = null) : this(privateKey.toByteArray(), previousHash) {}
 
-    private val _address = addressFromPublicKey(publicKeyUncompressed)
+    private val _address = addressFromUncompressedPublicKey(publicKeyUncompressed)
 
     final override val address: ByteArray
         get() = _address
@@ -60,7 +60,8 @@ open class Account private constructor (private val _privateKey: PrivateKey, pri
             return fromPrivateKey(generatePrivateKeyBytes())
         }
 
-        fun addressFromPublicKey(key: ByteArray): ByteArray {
+        fun addressFromUncompressedPublicKey(key: ByteArray): ByteArray {
+            assert(key.size == 64, ) { "Invalid Key Length" }
             val publicKeyHash = toKeccak(key)
             return publicKeyHash.copyOfRange(12, publicKeyHash.size)
         }

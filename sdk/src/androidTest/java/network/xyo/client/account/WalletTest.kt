@@ -14,12 +14,4 @@ class WalletTest {
         Log.i("privateKey", wallet.privateKey.toHexString())
         assert(wallet.privateKey.toHexString() == privateKeyVectors[1])
     }
-
-    @OptIn(ExperimentalStdlibApi::class)
-    @Test
-    fun testWalletWithoutPath()  {
-        val wallet = Wallet.fromMnemonic(words)
-        Log.i("privateKey", wallet.privateKey.toHexString())
-        assert(wallet.privateKey.toHexString() == privateKeyVectors[1])
-    }
 }

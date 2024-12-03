@@ -21,6 +21,8 @@ open class Wallet(private val _extKey: ExtKey, previousHash: ByteArray? = null):
 
     companion object: WalletStatic<WalletInstance> {
 
+        val defaultPath = "m/44'/60'/0'/0/0"
+
         override var previousHashStore: PreviousHashStore? = null
 
         override fun fromExtendedKey(key: ExtKey): WalletInstance {
@@ -34,7 +36,7 @@ open class Wallet(private val _extKey: ExtKey, previousHash: ByteArray? = null):
         override fun fromMnemonic(mnemonic: MnemonicWords, path: String?): WalletInstance {
             val root = fromSeed(mnemonic.toSeed("".toCharArray()))
             return if (path === null) {
-                root.derivePath("m/44'/0'/0'/0/0")
+                root.derivePath(defaultPath)
             } else {
                 root.derivePath(path)
             }
