@@ -57,7 +57,7 @@ class XyoSdkTest {
     fun testGetAccount() {
         runBlocking {
             val instance = XyoSdk.getInstance(appContext)
-            val account = instance.getAccount()
+            val account = instance.getAccount(appContext)
             assertInstanceOf<AccountInstance>(account)
         }
     }
@@ -68,7 +68,7 @@ class XyoSdkTest {
         runBlocking {
             val instance = XyoSdk.getInstance(appContext)
 
-            val testAccount = instance.getAccount()
+            val testAccount = instance.getAccount(appContext)
             val panel = XyoPanel(appContext, testAccount, fun(_:Context): List<XyoEventPayload> {
                 return listOf(XyoEventPayload("test_event"))
             })

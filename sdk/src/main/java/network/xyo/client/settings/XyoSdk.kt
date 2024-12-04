@@ -8,18 +8,17 @@ import network.xyo.client.account.model.AccountInstance
 import network.xyo.client.datastore.accounts.AccountPrefsRepository
 import network.xyo.client.datastore.previous_hash_store.PreviousHashStorePrefsRepository
 
-class XyoSdk private constructor(context: Context, val settings: SettingsInterface) {
-    private val appContext = context.applicationContext
+class XyoSdk private constructor(val settings: SettingsInterface) {
     private var _account: AccountInstance? = null
 
     @RequiresApi(Build.VERSION_CODES.M)
-    suspend fun getAccount(): AccountInstance {
+    suspend fun getAccount(context: Context): AccountInstance {
         if (INSTANCE !== null) {
             val validInstance = INSTANCE!!
             if (validInstance._account !== null) {
                 return validInstance._account!!
             } else {
-                val repository = AccountPrefsRepository.getInstance(validInstance.appContext)
+                val repository = AccountPrefsRepository.getInstance(context.applicationContext)
                 validInstance._account = repository.getAccount()
                 return _account!!
             }
@@ -39,7 +38,7 @@ class XyoSdk private constructor(context: Context, val settings: SettingsInterfa
             Account.previousHashStore = PreviousHashStorePrefsRepository.getInstance(context.applicationContext)
 
             val newInstance = INSTANCE ?: synchronized(this) {
-                INSTANCE ?: XyoSdk(context.applicationContext, settings).also { INSTANCE = it }
+                INSTANCE ?: XyoSdk(settings).also { INSTANCE = it }
             }
             return newInstance
         }
@@ -47,8 +46,8 @@ class XyoSdk private constructor(context: Context, val settings: SettingsInterfa
         fun refresh(context: Context, settings: SettingsInterface = DefaultXyoSdkSettings()): XyoSdk {
             synchronized(this) {
                 // Initialize the singleton with the users accountPreferences
-                AccountPrefsRepository.getInstance(context.applicationContext, settings)
-                INSTANCE = XyoSdk(context.applicationContext, settings)
+                AccountPrefsRepository.getInstance(context, settings)
+                INSTANCE = XyoSdk(settings)
             }
             return INSTANCE!!
         }
