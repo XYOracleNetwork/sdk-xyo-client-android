@@ -8,7 +8,7 @@ data class TestVector(
     val address: String,
     val privateKey: String,
     val publicKey: String
-) {}
+)
 
 class WalletTestVectors {
     val phrase = "later puppy sound rebuild rebuild noise ozone amazing hope broccoli crystal grief"

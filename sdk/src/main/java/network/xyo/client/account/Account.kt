@@ -15,8 +15,8 @@ import java.security.SecureRandom
 
 open class Account private constructor (private val _privateKey: PrivateKey, private var _previousHash: ByteArray? = null): AccountInstance {
 
-    constructor(privateKey: ByteArray, previousHash: ByteArray? = null) : this(PrivateKey.fromBytes(privateKey, secp256k1Curve), previousHash) {}
-    constructor(privateKey: BigInteger, previousHash: ByteArray? = null) : this(privateKey.toByteArray(), previousHash) {}
+    constructor(privateKey: ByteArray, previousHash: ByteArray? = null) : this(PrivateKey.fromBytes(privateKey, secp256k1Curve), previousHash)
+    constructor(privateKey: BigInteger, previousHash: ByteArray? = null) : this(privateKey.toByteArray(), previousHash)
 
     private val _address = addressFromUncompressedPublicKey(publicKeyUncompressed)
 

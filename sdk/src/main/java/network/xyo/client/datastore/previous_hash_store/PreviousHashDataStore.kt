@@ -13,7 +13,7 @@ import network.xyo.data.PreviousHashPrefsDataStoreProtos
 import network.xyo.data.PreviousHashPrefsDataStoreProtos.PreviousHashPrefsDataStore
 import java.io.File
 
-fun Context.xyoPreviousHashDataStore(name: String?, path: String?): DataStore<PreviousHashPrefsDataStoreProtos.PreviousHashPrefsDataStore> {
+fun Context.xyoPreviousHashDataStore(name: String?, path: String?): DataStore<PreviousHashPrefsDataStore> {
     val resolvedName = name ?: defaultXyoSdkSettings.previousHashStorePreferences.fileName
     val resolvedPath = path ?: defaultXyoSdkSettings.previousHashStorePreferences.storagePath
 

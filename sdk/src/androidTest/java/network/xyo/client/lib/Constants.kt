@@ -9,7 +9,7 @@ class DebugPayload(val nonce: Int) : XyoPayload() {
         set(value) = Unit
 }
 
-class BasicPayload(): XyoPayload() {
+class BasicPayload : XyoPayload() {
     override var schema: String
         get() = "network.xyo.basic"
         set(value) = Unit

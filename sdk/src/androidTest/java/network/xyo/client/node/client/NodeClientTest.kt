@@ -13,7 +13,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.jupiter.api.Assertions.*
 
-class DiscoverPayload(): XyoPayload() {
+class DiscoverPayload : XyoPayload() {
     override var schema = "network.xyo.query.module.discover"
 }
 

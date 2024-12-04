@@ -10,6 +10,6 @@ interface StorageLocationPreference {
     val storagePath: String?
 }
 
-interface AccountPreferences: StorageLocationPreference {}
+interface AccountPreferences: StorageLocationPreference
 
-interface PreviousHashStorePreferences: StorageLocationPreference {}
+interface PreviousHashStorePreferences: StorageLocationPreference

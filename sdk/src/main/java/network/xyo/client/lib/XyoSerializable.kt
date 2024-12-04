@@ -40,8 +40,7 @@ abstract class XyoSerializable: Serializable  {
         fun sortJson(jsonArray: JSONArray, removeMeta: Boolean = false): JSONArray {
             val newJsonArray = JSONArray()
             for (i in 0 until jsonArray.length()) {
-                val value = jsonArray[i]
-                when (value) {
+                when (val value = jsonArray[i]) {
                     is JSONArray -> {
                         newJsonArray.put(sortJson(value, removeMeta))
                     }

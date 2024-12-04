@@ -3,7 +3,7 @@ package network.xyo.client.settings
 const val DefaultStoragePath = "__xyo-client-sdk__"
 const val DefaultFileName = "network-xyo-sdk-prefs"
 
-open class DefaultXyoSdkSettings(): SettingsInterface {
+open class DefaultXyoSdkSettings : SettingsInterface {
     override val accountPreferences: AccountPreferences = DefaultAccountPreferences()
     override val previousHashStorePreferences: PreviousHashStorePreferences = DefaultPreviousHashStorePreferences()
 }
