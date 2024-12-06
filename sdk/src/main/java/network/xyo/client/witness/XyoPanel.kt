@@ -6,9 +6,8 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import network.xyo.client.account.model.AccountInstance
 import network.xyo.client.archivist.wrapper.ArchivistWrapper
-import network.xyo.client.boundwitness.XyoBoundWitnessBuilder
+import network.xyo.client.boundwitness.BoundWitnessBuilder
 import network.xyo.client.boundwitness.XyoBoundWitnessJson
-import network.xyo.client.lib.XyoSerializable
 import network.xyo.client.node.client.NodeClient
 import network.xyo.client.node.client.PostQueryResult
 import network.xyo.client.payload.XyoPayload
@@ -62,7 +61,7 @@ class XyoPanel(
     }
 
     private suspend fun generateBoundWitnessJson(payloads: List<XyoPayload>): XyoBoundWitnessJson {
-        return XyoBoundWitnessBuilder(context)
+        return BoundWitnessBuilder()
             .payloads(payloads)
             .signer(account)
             .build()

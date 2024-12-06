@@ -2,10 +2,10 @@ package network.xyo.client.boundwitness
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
-import network.xyo.client.lib.XyoSerializable
+import network.xyo.client.lib.JsonSerializable
 
 @JsonClass(generateAdapter = true)
-class XyoBoundWitnessMeta: XyoBoundWitnessMetaInterface, XyoSerializable() {
+class XyoBoundWitnessMeta: XyoBoundWitnessMetaInterface, JsonSerializable() {
     override var signatures: List<String>? = null
     override var client: String? = null
 }

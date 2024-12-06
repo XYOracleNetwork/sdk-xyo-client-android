@@ -8,7 +8,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
-import network.xyo.client.lib.XyoSerializable
+import network.xyo.client.lib.JsonSerializable
 import network.xyo.client.account.Account
 import network.xyo.client.account.model.AccountInstance
 import network.xyo.client.boundwitness.QueryBoundWitnessBuilder
@@ -85,12 +85,12 @@ class NodeClient(private val url: String, private val accountToUse: AccountInsta
         val builtQuery = queryBuilder(query, payloads)
         val queryPayloads = buildQueryPayloads(query, payloads)
         val queryPayloadsJsonArray = queryPayloadsJsonArray(queryPayloads)
-        val builtQueryTuple = arrayListOf(XyoSerializable.toJson((builtQuery)), queryPayloadsJsonArray.toString())
+        val builtQueryTuple = arrayListOf(JsonSerializable.toJson((builtQuery)), queryPayloadsJsonArray.toString())
         return builtQueryTuple.joinToString(",", "[", "]")
     }
 
     private suspend fun queryBuilder(query: XyoPayload, payloads: List<XyoPayload>?): QueryBoundWitnessJson {
-        return QueryBoundWitnessBuilder(context).let {
+        return QueryBoundWitnessBuilder().let {
             payloads?.let { payload ->
                 it.payloads(payload)
             }
@@ -116,7 +116,7 @@ class NodeClient(private val url: String, private val accountToUse: AccountInsta
     private fun queryPayloadsJsonArray(payloads: List<XyoPayload>): JSONArray {
         return JSONArray().apply {
             payloads.forEach { payload ->
-                val serializedPayload = XyoSerializable.toJson(payload)
+                val serializedPayload = JsonSerializable.toJson(payload)
                 val obj = JSONObject(serializedPayload)
                 this.put(obj)
             }

@@ -1,15 +1,13 @@
 package network.xyo.client.boundwitness
 
-import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
-import network.xyo.client.lib.XyoSerializable
 import network.xyo.client.account.model.AccountInstance
 import network.xyo.client.payload.XyoPayload
 
 
 @RequiresApi(Build.VERSION_CODES.M)
-class QueryBoundWitnessBuilder(context: Context) : XyoBoundWitnessBuilder(context) {
+class QueryBoundWitnessBuilder : BoundWitnessBuilder() {
     private lateinit var queryHash: String
 
     fun query(query: XyoPayload): QueryBoundWitnessBuilder {
@@ -18,13 +16,13 @@ class QueryBoundWitnessBuilder(context: Context) : XyoBoundWitnessBuilder(contex
         return this
     }
 
-    override fun signer(account: AccountInstance): QueryBoundWitnessBuilder {
-        super.signer(account)
+    override fun signer(signer: AccountInstance): QueryBoundWitnessBuilder {
+        super.signer(signer)
         return this
     }
 
-    override fun signers(accounts: List<AccountInstance>): QueryBoundWitnessBuilder {
-        super.signers(accounts)
+    override fun signers(signers: List<AccountInstance>): QueryBoundWitnessBuilder {
+        super.signers(signers)
         return this
     }
 

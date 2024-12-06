@@ -6,7 +6,7 @@ import kotlinx.coroutines.runBlocking
 import network.xyo.client.lib.TestConstants
 import network.xyo.client.witness.XyoPanel
 import network.xyo.client.account.Account
-import network.xyo.client.boundwitness.XyoBoundWitnessBuilder
+import network.xyo.client.boundwitness.BoundWitnessBuilder
 import network.xyo.client.datastore.accounts.AccountPrefsRepository
 import network.xyo.client.settings.AccountPreferences
 import network.xyo.client.settings.PreviousHashStorePreferences
@@ -133,7 +133,7 @@ class AccountPrefsRepositoryTest {
             assertEquals(firstAccount.privateKey.toHexString(), testAccount.privateKey.toHexString())
 
             // Sign with the test account
-            val firstBw = XyoBoundWitnessBuilder(appContext).signer(firstAccount).payloads(listOf(
+            val firstBw = BoundWitnessBuilder().signer(firstAccount).payloads(listOf(
                 TestConstants.debugPayload
             )).build()
             val firstAddress = firstBw.addresses.first()
@@ -143,7 +143,7 @@ class AccountPrefsRepositoryTest {
             val secondAccount = secondInstance.getAccount()
 
             // Sign with the test account
-            val secondBw = XyoBoundWitnessBuilder(appContext).signer(secondAccount).payloads(listOf(
+            val secondBw = BoundWitnessBuilder().signer(secondAccount).payloads(listOf(
                 TestConstants.debugPayload
             )).build()
             val secondAddress = secondBw.addresses.first()

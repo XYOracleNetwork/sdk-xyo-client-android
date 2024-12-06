@@ -8,7 +8,11 @@ import org.json.JSONObject
 import java.io.Serializable
 import java.security.MessageDigest
 
-abstract class XyoSerializable: Serializable  {
+abstract class JsonSerializable: Serializable  {
+
+    fun toJson(removeMeta: Boolean = false): String {
+        return JsonSerializable.toJson(this, removeMeta)
+    }
 
     companion object {
 
@@ -72,7 +76,7 @@ abstract class XyoSerializable: Serializable  {
             return items.joinToString(",", "[", "]")
         }
 
-        fun <T: XyoSerializable>fromJson(json: String, obj: T): T? {
+        fun <T: JsonSerializable>fromJson(json: String, obj: T): T? {
             val moshi = Moshi.Builder()
                 .addLast(KotlinJsonAdapterFactory())
                 .build()
@@ -86,13 +90,13 @@ abstract class XyoSerializable: Serializable  {
             return md.digest()
         }
 
-        protected fun <T: XyoSerializable>sha256(obj: T): ByteArray {
+        protected fun <T: JsonSerializable>sha256(obj: T): ByteArray {
             val json = toJson(obj, true)
             return sha256(json)
         }
 
         @JvmStatic
-        protected fun <T: XyoSerializable>sha256String(obj: T): String {
+        protected fun <T: JsonSerializable>sha256String(obj: T): String {
             val shaBytes = sha256(obj)
             return bytesToHex(shaBytes)
         }

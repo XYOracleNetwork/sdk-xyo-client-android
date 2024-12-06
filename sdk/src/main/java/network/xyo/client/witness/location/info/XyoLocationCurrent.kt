@@ -9,7 +9,7 @@ import androidx.annotation.RequiresApi
 import com.google.android.gms.location.LocationServices
 import com.squareup.moshi.JsonClass
 import kotlinx.coroutines.suspendCancellableCoroutine
-import network.xyo.client.lib.XyoSerializable
+import network.xyo.client.lib.JsonSerializable
 import kotlin.coroutines.resumeWithException
 
 @JsonClass(generateAdapter = true)
@@ -57,7 +57,7 @@ class XyoLocationCurrent {
                 location.longitude,
                 location.speed
             )
-            val serialized = XyoSerializable.toJson(coordinates)
+            val serialized = JsonSerializable.toJson(coordinates)
             Log.i("xyoClient", "serialized Coordinates: $serialized")
             return coordinates
         }

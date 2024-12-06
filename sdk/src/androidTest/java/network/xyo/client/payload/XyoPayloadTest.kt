@@ -9,8 +9,8 @@ import kotlinx.coroutines.launch
 import network.xyo.client.lib.BasicPayload
 import network.xyo.client.lib.TestConstants
 import network.xyo.client.account.Account
-import network.xyo.client.boundwitness.XyoBoundWitnessBuilder
-import network.xyo.client.lib.XyoSerializable
+import network.xyo.client.boundwitness.BoundWitnessBuilder
+import network.xyo.client.lib.JsonSerializable
 import network.xyo.client.witness.XyoWitness
 import org.junit.Before
 import org.junit.Rule
@@ -80,12 +80,12 @@ class XyoPayloadTest {
     @Test
     fun testRoundTripPayload() {
         val payload = TestPayload1()
-        val payloadJsonString = XyoSerializable.toJson(payload)
+        val payloadJsonString = JsonSerializable.toJson(payload)
 
         // ensure the schema is properly serialized from the base class
         assert(payloadJsonString.contains("network.xyo.test"))
 
-        val payloadMirrored = XyoSerializable.fromJson(payloadJsonString, TestPayload1())
+        val payloadMirrored = JsonSerializable.fromJson(payloadJsonString, TestPayload1())
         assertNotNull(payloadMirrored)
         if (payloadMirrored != null) {
             assertEquals(payload.schema, payloadMirrored.schema)
@@ -103,12 +103,12 @@ class XyoPayloadTest {
         CoroutineScope(Dispatchers.Main).launch {
             val response = arrayListOf(witness.observe(appContext))
             val payloads = response.mapNotNull { payload -> payload }.flatten()
-            val bwJson = XyoBoundWitnessBuilder(appContext)
+            val bwJson = BoundWitnessBuilder()
                 .payloads(payloads)
                 .signer(Account.random())
                 .build()
-            val bwJsonString = XyoSerializable.toJson(bwJson)
-            val bwMirrored = XyoSerializable.fromJson(bwJsonString, bwJson)
+            val bwJsonString = JsonSerializable.toJson(bwJson)
+            val bwMirrored = JsonSerializable.fromJson(bwJsonString, bwJson)
             assertNotNull(bwMirrored)
         }
     }

@@ -10,7 +10,7 @@ import network.xyo.client.account.Account
 import network.xyo.client.archivist.wrapper.ArchivistWrapper
 import network.xyo.client.node.client.DiscoverPayload
 import network.xyo.client.datastore.previous_hash_store.PreviousHashStorePrefsRepository
-import network.xyo.client.lib.XyoSerializable
+import network.xyo.client.lib.JsonSerializable
 import network.xyo.client.node.client.NodeClient
 import network.xyo.client.payload.XyoPayload
 import org.json.JSONObject
@@ -75,7 +75,7 @@ class XyoBoundWitnessTest {
     @Test
     fun testBoundWitnessMeta() {
         runBlocking {
-            val bw = XyoBoundWitnessBuilder(appContext).signer(Account.random()).payloads(listOf(
+            val bw = BoundWitnessBuilder().signer(Account.random()).payloads(listOf(
                 TestPayload1()
             )).build()
             assert(bw.dataHash() == bw.getBodyJson().dataHash())
@@ -87,10 +87,10 @@ class XyoBoundWitnessTest {
     @Test
     fun testBoundWitnessMetaSerialization() {
         runBlocking {
-            val bw = XyoBoundWitnessBuilder(appContext).signer(Account.random()).payloads(listOf(
+            val bw = BoundWitnessBuilder().signer(Account.random()).payloads(listOf(
                 TestPayload1()
             )).build()
-            val serializedBw = XyoSerializable.toJson(bw)
+            val serializedBw = JsonSerializable.toJson(bw)
             val bwJson = JSONObject(serializedBw)
             val meta = bwJson.get("\$meta") as JSONObject
             assert(meta.get("client") == "android")
@@ -102,10 +102,10 @@ class XyoBoundWitnessTest {
     fun testBoundWitnessPreviousHash() {
         runBlocking {
             val testAccount = Account.random()
-            val bw = XyoBoundWitnessBuilder(appContext).signer(testAccount).payloads(listOf(
+            val bw = BoundWitnessBuilder().signer(testAccount).payloads(listOf(
                 TestPayload1()
             )).build()
-            val bw2 = XyoBoundWitnessBuilder(appContext).signer(testAccount).payloads(listOf(
+            val bw2 = BoundWitnessBuilder().signer(testAccount).payloads(listOf(
                 TestPayload1()
             )).build()
             assert(bw2.previous_hashes.first() == bw.dataHash())
@@ -118,7 +118,7 @@ class XyoBoundWitnessTest {
             val client = ArchivistWrapper(NodeClient("$apiDomainBeta/Archivist", null, appContext))
             val testAccount = Account.random()
             val testPayload = TestPayload1()
-            val bw = XyoBoundWitnessBuilder(appContext).signer(testAccount).payloads(listOf(testPayload)).build()
+            val bw = BoundWitnessBuilder().signer(testAccount).payloads(listOf(testPayload)).build()
             client.insert(listOf(bw, testPayload))
 
             val bwHash = bw.dataHash()

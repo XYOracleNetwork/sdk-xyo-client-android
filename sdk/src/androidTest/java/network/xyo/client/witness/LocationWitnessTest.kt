@@ -12,7 +12,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import network.xyo.client.account.Account
 import network.xyo.client.lib.TestConstants
-import network.xyo.client.lib.XyoSerializable
 import network.xyo.client.witness.location.info.LocationActivity
 import network.xyo.client.witness.location.info.XyoLocationPayload
 import network.xyo.client.witness.location.info.XyoLocationPayloadRaw
