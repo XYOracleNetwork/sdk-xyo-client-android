@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
-import network.xyo.client.payload.XyoEventPayload
+import network.xyo.client.payload.EventPayload
 import network.xyo.client.witness.XyoPanel
 import network.xyo.client.account.model.AccountInstance
 import org.junit.Before
@@ -69,8 +69,8 @@ class XyoSdkTest {
             val instance = XyoSdk.getInstance(appContext)
 
             val testAccount = instance.getAccount(appContext)
-            val panel = XyoPanel(appContext, testAccount, fun(_:Context): List<XyoEventPayload> {
-                return listOf(XyoEventPayload("test_event"))
+            val panel = XyoPanel(appContext, testAccount, fun(_:Context): List<EventPayload> {
+                return listOf(EventPayload("test_event"))
             })
             val result = panel.reportAsyncQuery()
             val bw = result.bw

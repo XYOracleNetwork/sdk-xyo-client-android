@@ -11,7 +11,7 @@ class XyoBoundWitnessMeta: XyoBoundWitnessMetaInterface, JsonSerializable() {
 }
 
 @JsonClass(generateAdapter = true)
-open class XyoBoundWitnessJson: XyoBoundWitnessBodyJson() {
+open class BoundWitnessJson: BoundWitnessBodyJson() {
     @Json(ignore = true)
     val _meta: XyoBoundWitnessMeta = XyoBoundWitnessMeta()
 
@@ -28,7 +28,7 @@ open class XyoBoundWitnessJson: XyoBoundWitnessBodyJson() {
         return sha256String(this)
     }
 
-    open fun getBodyJson(): XyoBoundWitnessBodyJson {
-        return XyoBoundWitnessBodyJson(this.addresses, this.previous_hashes, this.payload_hashes, this.payload_schemas, this.timestamp)
+    open fun getBodyJson(): BoundWitnessBodyJson {
+        return BoundWitnessBodyJson(this.addresses, this.previous_hashes, this.payload_hashes, this.payload_schemas, this.timestamp)
     }
 }

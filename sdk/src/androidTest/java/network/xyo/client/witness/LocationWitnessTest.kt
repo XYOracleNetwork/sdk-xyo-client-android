@@ -13,8 +13,8 @@ import kotlinx.coroutines.runBlocking
 import network.xyo.client.account.Account
 import network.xyo.client.lib.TestConstants
 import network.xyo.client.witness.location.info.LocationActivity
-import network.xyo.client.witness.location.info.XyoLocationPayload
-import network.xyo.client.witness.location.info.XyoLocationPayloadRaw
+import network.xyo.client.witness.location.info.LocationPayload
+import network.xyo.client.witness.location.info.LocationPayloadRaw
 import network.xyo.client.witness.location.info.XyoLocationWitness
 import org.junit.Before
 import org.junit.Rule
@@ -43,15 +43,15 @@ class LocationWitnessTest {
             val witness = XyoLocationWitness()
             val locationPayload = witness.observe(appContext)?.first()
 
-            assertInstanceOf<XyoLocationPayload>(locationPayload)
-            assert(locationPayload.schema == XyoLocationPayload.schema)
+            assertInstanceOf<LocationPayload>(locationPayload)
+            assert(locationPayload.schema == LocationPayload.SCHEMA)
             assert(locationPayload.currentLocation !== null)
             assert(locationPayload.currentLocation?.coords?.latitude !== null)
             assert(locationPayload.currentLocation?.coords?.longitude !== null)
 
             val locationRawPayload = witness.observe(appContext)?.get(1)
-            assertInstanceOf<XyoLocationPayloadRaw>(locationRawPayload)
-            assert(locationRawPayload.schema == XyoLocationPayloadRaw.schema)
+            assertInstanceOf<LocationPayloadRaw>(locationRawPayload)
+            assert(locationRawPayload.schema == LocationPayloadRaw.SCHEMA)
         }
     }
 

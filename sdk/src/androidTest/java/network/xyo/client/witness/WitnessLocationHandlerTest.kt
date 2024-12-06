@@ -9,14 +9,14 @@ import androidx.test.rule.GrantPermissionRule
 import kotlinx.coroutines.runBlocking
 import network.xyo.client.lib.TestConstants
 import network.xyo.client.account.Account
-import network.xyo.client.boundwitness.XyoBoundWitnessBodyJson
-import network.xyo.client.boundwitness.XyoBoundWitnessJson
+import network.xyo.client.boundwitness.BoundWitnessBodyJson
+import network.xyo.client.boundwitness.BoundWitnessJson
 import network.xyo.client.datastore.previous_hash_store.PreviousHashStorePrefsRepository
 import network.xyo.client.witness.types.WitnessResult
-import network.xyo.client.payload.XyoPayload
+import network.xyo.client.payload.Payload
 import network.xyo.client.witness.location.info.LocationActivity
-import network.xyo.client.witness.location.info.XyoLocationPayload
-import network.xyo.client.witness.location.info.XyoLocationPayloadRaw
+import network.xyo.client.witness.location.info.LocationPayload
+import network.xyo.client.witness.location.info.LocationPayloadRaw
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -49,28 +49,28 @@ class WitnessLocationHandlerTest {
     @Test
     fun testObserve()  {
         runBlocking {
-            var firstBw: XyoBoundWitnessJson? = null
+            var firstBw: BoundWitnessJson? = null
             val result1 = WitnessLocationHandler().witness(appContext.applicationContext, arrayListOf(Pair(apiDomainBeta, null)))
             when (result1) {
-                is WitnessResult.Success<Triple<XyoBoundWitnessJson?, XyoPayload?, XyoPayload?>> -> {
+                is WitnessResult.Success<Triple<BoundWitnessJson?, Payload?, Payload?>> -> {
                     firstBw = result1.data.first
-                    assertInstanceOf<XyoBoundWitnessBodyJson>(firstBw)
-                    assertInstanceOf<XyoLocationPayload>(result1.data.second)
-                    assertInstanceOf<XyoLocationPayloadRaw>(result1.data.third)
+                    assertInstanceOf<BoundWitnessBodyJson>(firstBw)
+                    assertInstanceOf<LocationPayload>(result1.data.second)
+                    assertInstanceOf<LocationPayloadRaw>(result1.data.third)
                 }
                 is WitnessResult.Error -> {
                     assert(result1.exception.size > 0)
                 }
             }
 
-            var secondBw: XyoBoundWitnessJson? = null
+            var secondBw: BoundWitnessJson? = null
             val result2 = WitnessLocationHandler().witness(appContext.applicationContext, arrayListOf(Pair(apiDomainBeta, null)))
             when (result2) {
-                is WitnessResult.Success<Triple<XyoBoundWitnessJson?, XyoPayload?, XyoPayload?>> -> {
+                is WitnessResult.Success<Triple<BoundWitnessJson?, Payload?, Payload?>> -> {
                     secondBw = result2.data.first
-                    assertInstanceOf<XyoBoundWitnessJson>(secondBw)
-                    assertInstanceOf<XyoLocationPayload>(result2.data.second)
-                    assertInstanceOf<XyoLocationPayloadRaw>(result2.data.third)
+                    assertInstanceOf<BoundWitnessJson>(secondBw)
+                    assertInstanceOf<LocationPayload>(result2.data.second)
+                    assertInstanceOf<LocationPayloadRaw>(result2.data.third)
 
                 }
                 is WitnessResult.Error -> {

@@ -1,7 +1,7 @@
 package network.xyo.client.witness.location.info
 
 import com.squareup.moshi.JsonClass
-import network.xyo.client.payload.XyoPayload
+import network.xyo.client.payload.Payload
 
 @JsonClass(generateAdapter = true)
 data class Coordinates(
@@ -21,21 +21,18 @@ data class CurrentLocation(
 )
 
 @JsonClass(generateAdapter = true)
-class XyoLocationPayload(
+class LocationPayload(
     val currentLocation: CurrentLocation? = null,
-): XyoPayload() {
-    override var schema: String
-        get() = XyoLocationPayload.schema
-        set(value) = Unit
-
+): Payload(SCHEMA) {
     override fun dataHash(): String {
         return sha256String(this)
     }
 
     companion object {
-        val schema = "network.xyo.location.current"
-        fun detect(currentLocation: CurrentLocation?): XyoLocationPayload {
-            return XyoLocationPayload(currentLocation)
+        const val SCHEMA = "network.xyo.location.current"
+
+        fun detect(currentLocation: CurrentLocation?): LocationPayload {
+            return LocationPayload(currentLocation)
         }
     }
 }

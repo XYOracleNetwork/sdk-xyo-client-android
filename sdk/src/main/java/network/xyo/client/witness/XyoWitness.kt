@@ -5,14 +5,14 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import network.xyo.client.account.Account
 import network.xyo.client.account.model.AccountInstance
-import network.xyo.client.payload.XyoPayload
+import network.xyo.client.payload.Payload
 
-abstract class DeferredObserver<out T: XyoPayload> {
+abstract class DeferredObserver<out T: Payload> {
     abstract suspend fun deferredDetect(context: Context): List<T>?
 }
 
 @RequiresApi(Build.VERSION_CODES.M)
-open class XyoWitness<out T: XyoPayload> (
+open class XyoWitness<out T: Payload> (
     val address: AccountInstance = Account.random(),
     private val observer: ((context: Context) -> List<T>?)? = null,
     val deferredObserver: DeferredObserver<T>? = null

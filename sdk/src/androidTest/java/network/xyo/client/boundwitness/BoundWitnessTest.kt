@@ -12,16 +12,16 @@ import network.xyo.client.node.client.DiscoverPayload
 import network.xyo.client.datastore.previous_hash_store.PreviousHashStorePrefsRepository
 import network.xyo.client.lib.JsonSerializable
 import network.xyo.client.node.client.NodeClient
-import network.xyo.client.payload.XyoPayload
+import network.xyo.client.payload.Payload
 import org.json.JSONObject
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.jupiter.api.Assertions.*
 
-data class RequestDependencies(val client: NodeClient, val query: XyoPayload, val payloads: List<XyoPayload>)
+data class RequestDependencies(val client: NodeClient, val query: Payload, val payloads: List<Payload>)
 
-class XyoBoundWitnessTest {
+class BoundWitnessTest {
 
     val apiDomainBeta = "https://beta.api.archivist.xyo.network"
     val apiDomainLocal = "http://10.0.2.2:8080"
@@ -47,7 +47,7 @@ class XyoBoundWitnessTest {
         val account = Account.random()
         val client = NodeClient(nodeUrl, account, appContext)
         val query = DiscoverPayload()
-        val payloads = mutableListOf<XyoPayload>()
+        val payloads = mutableListOf<Payload>()
         payloads.add(TestPayload1())
         return RequestDependencies(client, query, payloads)
     }

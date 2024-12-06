@@ -1,18 +1,18 @@
 package network.xyo.client.lib
 
 import network.xyo.client.account.Account
-import network.xyo.client.payload.XyoPayload
+import network.xyo.client.payload.Payload
 
-class DebugPayload(val nonce: Int) : XyoPayload() {
-    override var schema: String
-        get() = "network.xyo.debug"
-        set(value) = Unit
+class DebugPayload(val nonce: Int) : Payload(SCHEMA) {
+    companion object {
+        const val SCHEMA = "network.xyo.debug"
+    }
 }
 
-class BasicPayload : XyoPayload() {
-    override var schema: String
-        get() = "network.xyo.basic"
-        set(value) = Unit
+class BasicPayload : Payload(SCHEMA) {
+    companion object {
+        const val SCHEMA = "network.xyo.basic"
+    }
 }
 
 

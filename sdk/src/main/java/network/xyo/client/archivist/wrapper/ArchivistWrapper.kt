@@ -5,7 +5,7 @@ import androidx.annotation.RequiresApi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import network.xyo.client.node.client.NodeClient
 import network.xyo.client.node.client.PostQueryResult
-import network.xyo.client.payload.XyoPayload
+import network.xyo.client.payload.Payload
 
 open class ArchivistWrapper(private val nodeClient: NodeClient) {
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -17,7 +17,7 @@ open class ArchivistWrapper(private val nodeClient: NodeClient) {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @RequiresApi(Build.VERSION_CODES.M)
-    suspend fun insert(payloads: List<XyoPayload>): PostQueryResult {
+    suspend fun insert(payloads: List<Payload>): PostQueryResult {
         val query = ArchivistInsertQueryPayload()
         return nodeClient.query(query, payloads)
     }

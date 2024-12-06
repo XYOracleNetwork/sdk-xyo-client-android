@@ -8,13 +8,13 @@ import network.xyo.client.witness.DeferredObserver
 import network.xyo.client.witness.XyoWitness
 import network.xyo.client.account.Account
 import network.xyo.client.account.model.AccountInstance
-import network.xyo.client.payload.XyoPayload
+import network.xyo.client.payload.Payload
 
-class DeferredLocationObserver : DeferredObserver<XyoPayload>() {
+class DeferredLocationObserver : DeferredObserver<Payload>() {
     @RequiresApi(Build.VERSION_CODES.O)
     override suspend fun deferredDetect(
         context: Context,
-    ): List<XyoPayload>? {
+    ): List<Payload>? {
         try {
             val payloads = XyoLocationPayloads.detect(context)
             // only return the payloads that were found
@@ -32,7 +32,7 @@ class DeferredLocationObserver : DeferredObserver<XyoPayload>() {
 }
 
 @RequiresApi(Build.VERSION_CODES.M)
-class XyoLocationWitness(address: AccountInstance = Account.random()) : XyoWitness<XyoPayload>(
+class XyoLocationWitness(address: AccountInstance = Account.random()) : XyoWitness<Payload>(
     DeferredLocationObserver(),
     address
 )

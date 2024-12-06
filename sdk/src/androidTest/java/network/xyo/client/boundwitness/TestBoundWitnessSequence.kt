@@ -1,8 +1,7 @@
 import network.xyo.client.payload.Payload
 
-class IdPayload(val salt: String): Payload {
+class IdPayload(val salt: String): Payload("network.xyo.id") {
     constructor(salt: UInt) : this("${salt}")
-    override var schema = "network.xyo.id"
 }
 
 data class BoundWitnessSequenceTestCase(

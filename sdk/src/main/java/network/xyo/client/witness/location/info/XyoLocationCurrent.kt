@@ -18,7 +18,7 @@ class XyoLocationCurrent {
 
         @RequiresApi(Build.VERSION_CODES.O)
         @SuppressLint("MissingPermission")
-        suspend fun detect(context: Context): Pair<XyoLocationPayload, XyoLocationPayloadRaw>? {
+        suspend fun detect(context: Context): Pair<LocationPayload, LocationPayloadRaw>? {
             if (LocationPermissions.check((context)) && LocationPermissions.checkGooglePlayServices(context)) {
                 val fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
                 return suspendCancellableCoroutine { continuation ->
@@ -34,7 +34,7 @@ class XyoLocationCurrent {
                             val currentLocation = CurrentLocation(coordinates, System.currentTimeMillis())
 
                             // Resume the coroutine with the retrieved location
-                            continuation.resumeWith(Result.success(Pair(XyoLocationPayload(currentLocation), locationRaw)))
+                            continuation.resumeWith(Result.success(Pair(LocationPayload(currentLocation), locationRaw)))
                         }
                         .addOnFailureListener { exception ->
                             // Resume the coroutine with an exception if the task fails
@@ -63,8 +63,8 @@ class XyoLocationCurrent {
         }
 
         @RequiresApi(Build.VERSION_CODES.O)
-        private fun buildRawLocationPayload(location: Location): XyoLocationPayloadRaw {
-            return XyoLocationPayloadRaw.detect(
+        private fun buildRawLocationPayload(location: Location): LocationPayloadRaw {
+            return LocationPayloadRaw.detect(
                 location.provider,
                 location.latitude,
                 location.longitude,

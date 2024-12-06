@@ -3,14 +3,14 @@ package network.xyo.client.boundwitness
 import android.os.Build
 import androidx.annotation.RequiresApi
 import network.xyo.client.account.model.AccountInstance
-import network.xyo.client.payload.XyoPayload
+import network.xyo.client.payload.Payload
 
 
 @RequiresApi(Build.VERSION_CODES.M)
 class QueryBoundWitnessBuilder : BoundWitnessBuilder() {
     private lateinit var queryHash: String
 
-    fun query(query: XyoPayload): QueryBoundWitnessBuilder {
+    fun query(query: Payload): QueryBoundWitnessBuilder {
         this.queryHash = query.dataHash()
         this.payload(query.schema, query)
         return this

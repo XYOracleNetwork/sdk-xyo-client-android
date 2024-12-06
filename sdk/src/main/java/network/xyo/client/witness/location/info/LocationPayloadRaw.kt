@@ -2,7 +2,7 @@ package network.xyo.client.witness.location.info
 
 import android.os.Bundle
 import com.squareup.moshi.JsonClass
-import network.xyo.client.payload.XyoPayload
+import network.xyo.client.payload.Payload
 
 // Extension function for safely retrieving typed values from a Bundle
 private fun Bundle.getTypedValue(key: String): Any? {
@@ -23,7 +23,7 @@ private fun Bundle.getTypedValue(key: String): Any? {
 }
 
 @JsonClass(generateAdapter = true)
-open class XyoLocationPayloadRaw(
+open class LocationPayloadRaw(
     val provider: String?,
     val latitude: Double,
     val longitude: Double,
@@ -37,17 +37,13 @@ open class XyoLocationPayloadRaw(
     val time: Long,
     val isMock: Boolean?,
     val extras: Map<String, Any?>? = null
-): XyoPayload() {
-    override var schema: String
-        get() = XyoLocationPayloadRaw.schema
-        set(value) = Unit
-
+): Payload(SCHEMA) {
     override fun dataHash(): String {
         return sha256String(this)
     }
 
     companion object {
-        val schema = "network.xyo.location.android"
+        const val SCHEMA = "network.xyo.location.android"
         fun detect(
             provider: String?,
             latitude: Double,
@@ -62,12 +58,12 @@ open class XyoLocationPayloadRaw(
             time: Long,
             isMock: Boolean?,
             extras: Bundle? = null
-        ): XyoLocationPayloadRaw {
+        ): LocationPayloadRaw {
             val extrasMap = extras?.keySet()?.associateWith { key ->
                 extras.getTypedValue(key)
             }
 
-            return XyoLocationPayloadRaw(
+            return LocationPayloadRaw(
                 provider,
                 latitude,
                 longitude,

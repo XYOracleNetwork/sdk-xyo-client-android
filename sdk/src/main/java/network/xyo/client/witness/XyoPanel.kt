@@ -7,18 +7,18 @@ import androidx.annotation.RequiresApi
 import network.xyo.client.account.model.AccountInstance
 import network.xyo.client.archivist.wrapper.ArchivistWrapper
 import network.xyo.client.boundwitness.BoundWitnessBuilder
-import network.xyo.client.boundwitness.XyoBoundWitnessJson
+import network.xyo.client.boundwitness.BoundWitnessJson
 import network.xyo.client.node.client.NodeClient
 import network.xyo.client.node.client.PostQueryResult
-import network.xyo.client.payload.XyoPayload
+import network.xyo.client.payload.Payload
 
-data class XyoPanelReportQueryResult(val bw: XyoBoundWitnessJson, val apiResults: List<PostQueryResult>?, val payloads: List<XyoPayload>?)
+data class XyoPanelReportQueryResult(val bw: BoundWitnessJson, val apiResults: List<PostQueryResult>?, val payloads: List<Payload>?)
 
 @RequiresApi(Build.VERSION_CODES.M)
 class XyoPanel(
     val context: Context,
     val account: AccountInstance,
-    private val witnesses: List<XyoWitness<XyoPayload>>?,
+    private val witnesses: List<XyoWitness<Payload>>?,
     private val nodeUrlsAndAccounts: ArrayList<Pair<String, AccountInstance?>>?
 ) {
     private var nodes: MutableList<NodeClient>? = null
@@ -27,7 +27,7 @@ class XyoPanel(
         context: Context,
         account: AccountInstance,
         nodeUrlsAndAccounts: ArrayList<Pair<String, AccountInstance?>>,
-        witnesses: List<XyoWitness<XyoPayload>>? = null
+        witnesses: List<XyoWitness<Payload>>? = null
     ): this(
             context,
             account,
@@ -38,7 +38,7 @@ class XyoPanel(
     constructor(
         context: Context,
         account: AccountInstance,
-        observe: ((context: Context) -> List<XyoPayload>?)?
+        observe: ((context: Context) -> List<Payload>?)?
     ): this(
         context,
         account,
@@ -60,7 +60,7 @@ class XyoPanel(
         }
     }
 
-    private suspend fun generateBoundWitnessJson(payloads: List<XyoPayload>): XyoBoundWitnessJson {
+    private suspend fun generateBoundWitnessJson(payloads: List<Payload>): BoundWitnessJson {
         return BoundWitnessBuilder()
             .payloads(payloads)
             .signer(account)
@@ -68,8 +68,8 @@ class XyoPanel(
     }
 
 
-    private suspend fun generatePayloads(adhocWitnesses: List<XyoWitness<XyoPayload>> = emptyList()): List<XyoPayload> {
-        val witnesses: List<XyoWitness<XyoPayload>> = (this.witnesses ?: emptyList()).plus(adhocWitnesses)
+    private suspend fun generatePayloads(adhocWitnesses: List<XyoWitness<Payload>> = emptyList()): List<Payload> {
+        val witnesses: List<XyoWitness<Payload>> = (this.witnesses ?: emptyList()).plus(adhocWitnesses)
         val payloads = witnesses.map { witness ->
             witness.observe(context)
         }
@@ -78,7 +78,7 @@ class XyoPanel(
     }
 
     @kotlinx.coroutines.ExperimentalCoroutinesApi
-    suspend fun reportAsyncQuery(adhocWitnesses: List<XyoWitness<XyoPayload>> = emptyList()): XyoPanelReportQueryResult {
+    suspend fun reportAsyncQuery(adhocWitnesses: List<XyoWitness<Payload>> = emptyList()): XyoPanelReportQueryResult {
         if (nodes == null) resolveNodes()
         val payloads = generatePayloads(adhocWitnesses)
         val bw = generateBoundWitnessJson(payloads)

@@ -1,13 +1,10 @@
 package network.xyo.client.boundwitness
 
 import com.squareup.moshi.JsonClass
-import network.xyo.client.payload.XyoPayload
+import network.xyo.client.payload.Payload
 
 @JsonClass(generateAdapter = true)
-open class XyoBoundWitnessBodyJson(): XyoBoundWitnessBodyInterface, XyoPayload() {
-    override var schema: String
-        get() = XyoBoundWitnessBodyJson.schema
-        set(value) = Unit
+open class BoundWitnessBodyJson(): BoundWitnessBodyFields, Payload(SCHEMA) {
     final override var addresses = emptyList<String>()
     final override var payload_hashes = emptyList<String>()
     final override var payload_schemas = emptyList<String>()
@@ -27,6 +24,6 @@ open class XyoBoundWitnessBodyJson(): XyoBoundWitnessBodyInterface, XyoPayload()
     }
 
     companion object {
-        val schema = "network.xyo.boundwitness"
+        const val SCHEMA = "network.xyo.boundwitness"
     }
 }

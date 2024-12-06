@@ -1,5 +1,5 @@
 package network.xyo.client.module
 
-import network.xyo.client.boundwitness.XyoBoundWitnessJson
+import network.xyo.client.boundwitness.BoundWitnessJson
 
-typealias ModuleQueryResult<T> = Triple<XyoBoundWitnessJson, List<T>, List<Exception>>
+typealias ModuleQueryResult<T> = Triple<BoundWitnessJson, List<T>, List<Exception>>

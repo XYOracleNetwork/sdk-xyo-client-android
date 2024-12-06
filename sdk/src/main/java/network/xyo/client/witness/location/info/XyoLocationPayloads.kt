@@ -10,7 +10,7 @@ class XyoLocationPayloads {
 
         @RequiresApi(Build.VERSION_CODES.O)
         @SuppressLint("MissingPermission")
-        suspend fun detect(context: Context): Pair<XyoLocationPayload, XyoLocationPayloadRaw>? {
+        suspend fun detect(context: Context): Pair<LocationPayload, LocationPayloadRaw>? {
             return XyoLocationCurrent.detect(context)
         }
     }

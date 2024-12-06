@@ -1,11 +1,11 @@
 package network.xyo.client.archivist.wrapper
 
-import network.xyo.client.payload.XyoPayload
+import com.squareup.moshi.JsonClass
+import network.xyo.client.payload.Payload
 
-open class ArchivistGetQueryPayload(val hashes: List<String>): XyoPayload() {
-    override var schema = ArchivistGetQueryPayload.schema
-
+@JsonClass(generateAdapter = true)
+open class ArchivistGetQueryPayload(val hashes: List<String>): Payload(SCHEMA) {
     companion object {
-        val schema = "network.xyo.query.archivist.get"
+        const val SCHEMA = "network.xyo.query.archivist.get"
     }
 }

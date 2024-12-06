@@ -6,8 +6,7 @@ class TestPayload2SubObject {
     var optional_field: String? = null
 }
 
-class TestPayload2: Payload {
-    override var schema ="network.xyo.test"
+class TestPayload2: Payload("network.xyo.test") {
     var timestamp = 1_618_603_439_107
     var object_field = TestPayload2SubObject()
     var string_field = "there"

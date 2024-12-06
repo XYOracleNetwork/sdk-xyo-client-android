@@ -17,8 +17,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.jupiter.api.Assertions.*
 
-open class TestSubjectPayload: XyoPayload() {
-    override var schema = "network.xyo.test"
+open class TestSubjectPayload: Payload("network.xyo.test") {
+
 }
 
 class TestPayload1SubObject {
@@ -55,7 +55,7 @@ class TestInvalidSchemaPayload: TestSubjectPayload() {
 val knownAddress = Account.fromPrivateKey(ByteArray(32) {index -> index.toByte()})
 const val knownHash = "6e173bbfc0577ebde66b44b090316eca5ecad8ecdb5c51886211d805c769d2ea"
 
-class XyoPayloadTest {
+class PayloadTest {
 
     @Rule
     @JvmField
@@ -96,7 +96,7 @@ class XyoPayloadTest {
     @Test
     fun testRoundTripPanel() {
         val address = Account.fromPrivateKey("5a95531488b4d0d3645aea49678297ae9e2034879ce0389b80eb788e8b533592")
-        val witness = XyoWitness(address, fun(_: Context): List<XyoPayload> {
+        val witness = XyoWitness(address, fun(_: Context): List<Payload> {
             return listOf(BasicPayload())
         })
 

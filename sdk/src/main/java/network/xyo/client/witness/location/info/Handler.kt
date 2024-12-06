@@ -10,13 +10,13 @@ import network.xyo.client.witness.types.WitnessHandlerInterface
 import network.xyo.client.witness.types.WitnessResult
 import network.xyo.client.witness.XyoPanel
 import network.xyo.client.account.model.AccountInstance
-import network.xyo.client.boundwitness.XyoBoundWitnessJson
-import network.xyo.client.payload.XyoPayload
+import network.xyo.client.boundwitness.BoundWitnessJson
+import network.xyo.client.payload.Payload
 import network.xyo.client.settings.XyoSdk
 
-open class WitnessLocationHandler : WitnessHandlerInterface<Triple<XyoBoundWitnessJson?, XyoPayload?, XyoPayload?>> {
+open class WitnessLocationHandler : WitnessHandlerInterface<Triple<BoundWitnessJson?, Payload?, Payload?>> {
     @RequiresApi(Build.VERSION_CODES.M)
-    override suspend fun witness(context: Context, nodeUrlsAndAccounts: ArrayList<Pair<String, AccountInstance?>>): WitnessResult<Triple<XyoBoundWitnessJson?, XyoPayload?, XyoPayload?>> {
+    override suspend fun witness(context: Context, nodeUrlsAndAccounts: ArrayList<Pair<String, AccountInstance?>>): WitnessResult<Triple<BoundWitnessJson?, Payload?, Payload?>> {
         val account = XyoSdk.getInstance(context.applicationContext).getAccount(context)
         val panel = XyoPanel(context, account, nodeUrlsAndAccounts, listOf(
             XyoLocationWitness(account)
@@ -26,19 +26,19 @@ open class WitnessLocationHandler : WitnessHandlerInterface<Triple<XyoBoundWitne
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @RequiresApi(Build.VERSION_CODES.M)
-    private suspend fun getLocation(panel: XyoPanel): WitnessResult<Triple<XyoBoundWitnessJson?, XyoPayload?, XyoPayload?>> {
+    private suspend fun getLocation(panel: XyoPanel): WitnessResult<Triple<BoundWitnessJson?, Payload?, Payload?>> {
         return withContext(Dispatchers.IO) {
-            var locationPayload: XyoPayload? = null
-            var locationPayloadRaw: XyoPayload? = null
-            var bw: XyoBoundWitnessJson? = null
+            var locationPayload: Payload? = null
+            var locationPayloadRaw: Payload? = null
+            var bw: BoundWitnessJson? = null
             val errors: MutableList<Error> = mutableListOf()
             panel.let {
                 it.reportAsyncQuery().let { result ->
                     val actualPayloads = result.payloads
                     actualPayloads?.forEach { payload ->
                         when (payload) {
-                            is XyoLocationPayload -> locationPayload = payload
-                            is XyoLocationPayloadRaw -> locationPayloadRaw = payload
+                            is LocationPayload -> locationPayload = payload
+                            is LocationPayloadRaw -> locationPayloadRaw = payload
                         }
                     }
 

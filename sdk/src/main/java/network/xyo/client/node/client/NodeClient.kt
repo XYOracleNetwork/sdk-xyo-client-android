@@ -13,7 +13,7 @@ import network.xyo.client.account.Account
 import network.xyo.client.account.model.AccountInstance
 import network.xyo.client.boundwitness.QueryBoundWitnessBuilder
 import network.xyo.client.boundwitness.QueryBoundWitnessJson
-import network.xyo.client.payload.XyoPayload
+import network.xyo.client.payload.Payload
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -39,7 +39,7 @@ class NodeClient(private val url: String, private val accountToUse: AccountInsta
 
     @ExperimentalCoroutinesApi
     @RequiresApi(Build.VERSION_CODES.M)
-    suspend fun query(query: XyoPayload, payloads: List<XyoPayload>?): PostQueryResult {
+    suspend fun query(query: Payload, payloads: List<Payload>?): PostQueryResult {
         val bodyString = buildQuery(query, payloads)
         val postBody = bodyString.toRequestBody(MEDIA_TYPE_JSON)
         val request = Request.Builder()
@@ -81,7 +81,7 @@ class NodeClient(private val url: String, private val accountToUse: AccountInsta
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
-    private suspend fun buildQuery(query: XyoPayload, payloads: List<XyoPayload>?): String {
+    private suspend fun buildQuery(query: Payload, payloads: List<Payload>?): String {
         val builtQuery = queryBuilder(query, payloads)
         val queryPayloads = buildQueryPayloads(query, payloads)
         val queryPayloadsJsonArray = queryPayloadsJsonArray(queryPayloads)
@@ -89,7 +89,7 @@ class NodeClient(private val url: String, private val accountToUse: AccountInsta
         return builtQueryTuple.joinToString(",", "[", "]")
     }
 
-    private suspend fun queryBuilder(query: XyoPayload, payloads: List<XyoPayload>?): QueryBoundWitnessJson {
+    private suspend fun queryBuilder(query: Payload, payloads: List<Payload>?): QueryBoundWitnessJson {
         return QueryBoundWitnessBuilder().let {
             payloads?.let { payload ->
                 it.payloads(payload)
@@ -100,8 +100,8 @@ class NodeClient(private val url: String, private val accountToUse: AccountInsta
     }
 
     // combine payloads and query
-    private fun buildQueryPayloads(query: XyoPayload, payloads: List<XyoPayload>?): List<XyoPayload>{
-        return arrayListOf<XyoPayload>().let { queryPayloads ->
+    private fun buildQueryPayloads(query: Payload, payloads: List<Payload>?): List<Payload>{
+        return arrayListOf<Payload>().let { queryPayloads ->
             payloads?.let { payloads ->
                 payloads.forEach { payload ->
                     queryPayloads.add(payload)
@@ -113,7 +113,7 @@ class NodeClient(private val url: String, private val accountToUse: AccountInsta
     }
 
     // stringify combined payloads
-    private fun queryPayloadsJsonArray(payloads: List<XyoPayload>): JSONArray {
+    private fun queryPayloadsJsonArray(payloads: List<Payload>): JSONArray {
         return JSONArray().apply {
             payloads.forEach { payload ->
                 val serializedPayload = JsonSerializable.toJson(payload)

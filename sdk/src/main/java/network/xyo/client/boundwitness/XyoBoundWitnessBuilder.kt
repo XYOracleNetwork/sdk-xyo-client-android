@@ -5,7 +5,7 @@ import androidx.annotation.RequiresApi
 import network.xyo.client.lib.JsonSerializable
 import network.xyo.client.account.hexStringToByteArray
 import network.xyo.client.account.model.AccountInstance
-import network.xyo.client.payload.XyoPayload
+import network.xyo.client.payload.Payload
 import network.xyo.client.payload.XyoValidationException
 
 @RequiresApi(Build.VERSION_CODES.M)
@@ -13,8 +13,8 @@ open class BoundWitnessBuilder {
     protected var _signers = mutableListOf<AccountInstance>()
     protected var _payload_hashes = mutableListOf<String>()
     protected var _payload_schemas = mutableListOf<String>()
-    protected var _payloads = mutableListOf<XyoPayload>()
-    protected open var bw: XyoBoundWitnessJson = XyoBoundWitnessJson()
+    protected var _payloads = mutableListOf<Payload>()
+    protected open var bw: BoundWitnessJson = BoundWitnessJson()
 
     var _timestamp: Long? = null
 
@@ -33,7 +33,7 @@ open class BoundWitnessBuilder {
     }
 
     @OptIn(ExperimentalStdlibApi::class)
-    private fun hashableFields(): XyoBoundWitnessBodyJson {
+    private fun hashableFields(): BoundWitnessBodyJson {
         // if a timestamp is not provided, set one at the time hashable fields are set
         bw.timestamp = _timestamp ?: System.currentTimeMillis()
 
@@ -46,7 +46,7 @@ open class BoundWitnessBuilder {
     }
 
     @Throws(XyoValidationException::class)
-    fun <T: XyoPayload>payload(schema: String, payload: T): BoundWitnessBuilder {
+    fun <T: Payload>payload(schema: String, payload: T): BoundWitnessBuilder {
         payload.validate()
         _payloads.add(payload)
         _payload_hashes.add(payload.dataHash())
@@ -55,7 +55,7 @@ open class BoundWitnessBuilder {
     }
 
     @Throws(XyoValidationException::class)
-    fun payloads(payloads: List<XyoPayload>): BoundWitnessBuilder {
+    fun payloads(payloads: List<Payload>): BoundWitnessBuilder {
         payloads.forEach {
             payload(it.schema, it)
         }
@@ -92,7 +92,7 @@ open class BoundWitnessBuilder {
         bw.meta.signatures = this.sign(hash)
     }
 
-    open suspend fun build(): XyoBoundWitnessJson {
+    open suspend fun build(): BoundWitnessJson {
         return bw.let{
             // update fields
             constructFields()

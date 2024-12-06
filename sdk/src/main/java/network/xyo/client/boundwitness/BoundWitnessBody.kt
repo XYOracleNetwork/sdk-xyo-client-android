@@ -1,8 +1,8 @@
 package network.xyo.client.boundwitness
 
-import network.xyo.client.payload.Payload
+import network.xyo.client.payload.model.Payload
 
-interface XyoBoundWitnessBodyInterface : Payload {
+interface BoundWitnessBodyFields : Payload {
     var addresses: List<String>
     var payload_hashes: List<String>
     var payload_schemas: List<String>

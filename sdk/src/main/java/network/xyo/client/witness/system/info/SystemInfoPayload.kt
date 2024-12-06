@@ -4,28 +4,24 @@ import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
 import com.squareup.moshi.JsonClass
-import network.xyo.client.payload.XyoPayload
+import network.xyo.client.payload.Payload
 
 @JsonClass(generateAdapter = true)
-class XyoSystemInfoPayload(
+class SystemInfoPayload(
     val device: XyoSystemInfoDevice? = null,
     val network: XyoSystemInfoNetwork? = null,
     val os: XyoSystemInfoOs? = null
-): XyoPayload () {
-    override var schema: String
-        get() = XyoSystemInfoPayload.schema
-        set(value) = Unit
-
+): Payload (SCHEMA) {
     override fun dataHash(): String {
         return sha256String(this)
     }
 
     companion object {
-        val schema = "network.xyo.system.info.android"
+        const val SCHEMA = "network.xyo.system.info.android"
 
         @RequiresApi(Build.VERSION_CODES.M)
-        fun detect(context: Context): XyoSystemInfoPayload {
-            return XyoSystemInfoPayload(
+        fun detect(context: Context): SystemInfoPayload {
+            return SystemInfoPayload(
                 XyoSystemInfoDevice.detect(context),
                 XyoSystemInfoNetwork.detect(context),
                 XyoSystemInfoOs.detect(context)
