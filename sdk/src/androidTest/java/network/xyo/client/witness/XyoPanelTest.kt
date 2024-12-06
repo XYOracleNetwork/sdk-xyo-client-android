@@ -11,7 +11,7 @@ import network.xyo.client.lib.BasicPayload
 import network.xyo.client.lib.TestConstants
 import network.xyo.client.payload.EventPayload
 import network.xyo.client.account.Account
-import network.xyo.client.boundwitness.BoundWitnessJson
+import network.xyo.client.boundwitness.BoundWitness
 import network.xyo.client.datastore.previous_hash_store.PreviousHashStorePrefsRepository
 import network.xyo.client.payload.Payload
 import network.xyo.client.witness.location.info.LocationActivity
@@ -134,7 +134,7 @@ class XyoPanelTest {
         runBlocking {
             val panel = XyoPanel(appContext, Account.random(), arrayListOf(), listOf(XyoSystemInfoWitness()))
             val results = panel.reportAsyncQuery()
-            assertInstanceOf<BoundWitnessJson>(results.bw)
+            assertInstanceOf<BoundWitness>(results.bw)
             assertInstanceOf<SystemInfoPayload>(results.payloads?.first())
         }
     }

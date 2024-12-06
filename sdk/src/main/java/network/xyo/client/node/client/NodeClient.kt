@@ -12,7 +12,7 @@ import network.xyo.client.lib.JsonSerializable
 import network.xyo.client.account.Account
 import network.xyo.client.account.model.AccountInstance
 import network.xyo.client.boundwitness.QueryBoundWitnessBuilder
-import network.xyo.client.boundwitness.QueryBoundWitnessJson
+import network.xyo.client.boundwitness.QueryBoundWitness
 import network.xyo.client.payload.Payload
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -89,7 +89,7 @@ class NodeClient(private val url: String, private val accountToUse: AccountInsta
         return builtQueryTuple.joinToString(",", "[", "]")
     }
 
-    private suspend fun queryBuilder(query: Payload, payloads: List<Payload>?): QueryBoundWitnessJson {
+    private suspend fun queryBuilder(query: Payload, payloads: List<Payload>?): QueryBoundWitness {
         return QueryBoundWitnessBuilder().let {
             payloads?.let { payload ->
                 it.payloads(payload)

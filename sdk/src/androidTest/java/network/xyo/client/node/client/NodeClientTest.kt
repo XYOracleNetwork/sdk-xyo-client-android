@@ -7,7 +7,7 @@ import kotlinx.coroutines.runBlocking
 import network.xyo.client.lib.TestConstants
 import network.xyo.client.account.Account
 import network.xyo.client.archivist.wrapper.ArchivistWrapper
-import network.xyo.client.boundwitness.BoundWitnessBodyJson
+import network.xyo.client.boundwitness.BoundWitnessBody
 import network.xyo.client.payload.Payload
 import org.junit.Before
 import org.junit.Test
@@ -71,7 +71,7 @@ class NodeClientTest {
             assertEquals(errors, null)
 
             if (response != null) {
-                assertEquals(response.bw?.schema, BoundWitnessBodyJson.SCHEMA)
+                assertEquals(response.bw?.schema, BoundWitnessBody.SCHEMA)
             } else {
                 throw(Error("Response should not be null"))
             }

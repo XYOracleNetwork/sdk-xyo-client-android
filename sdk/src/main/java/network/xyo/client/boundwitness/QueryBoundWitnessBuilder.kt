@@ -26,11 +26,11 @@ class QueryBoundWitnessBuilder : BoundWitnessBuilder() {
         return this
     }
 
-    override suspend fun build(): QueryBoundWitnessJson {
-        bw = QueryBoundWitnessJson()
+    override suspend fun build(): QueryBoundWitness {
+        bw = QueryBoundWitness()
         // override to support additional properties for query bound witnesses
         return bw.let {
-            val qbw = it as QueryBoundWitnessJson
+            val qbw = it as QueryBoundWitness
             qbw.query = this.queryHash
             constructFields()
             it

@@ -1,8 +1,11 @@
 package network.xyo.client.lib
 
+import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import network.xyo.client.account.hexStringToByteArray
+import okio.Buffer
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.Serializable
@@ -12,6 +15,10 @@ abstract class JsonSerializable: Serializable  {
 
     fun toJson(removeMeta: Boolean = false): String {
         return JsonSerializable.toJson(this, removeMeta)
+    }
+
+    fun toPrettyJson(removeMeta: Boolean = false): String {
+        return JsonSerializable.toPrettyJson(this, removeMeta)
     }
 
     companion object {
@@ -67,6 +74,14 @@ abstract class JsonSerializable: Serializable  {
             return sortJson(adapter.toJson(obj), removeMeta)
         }
 
+        fun toPrettyJson(obj: Any, removeMeta: Boolean = false): String {
+            val moshi = Moshi.Builder()
+                .addLast(KotlinJsonAdapterFactory())
+                .build()
+            val adapter = moshi.adapter(obj.javaClass)
+            return sortJson(adapter.toPrettyJson(obj), removeMeta)
+        }
+
         fun toJson(obj: List<Any>, removeMeta: Boolean = false): String {
             val moshi = Moshi.Builder()
                 .addLast(KotlinJsonAdapterFactory())
@@ -118,4 +133,13 @@ abstract class JsonSerializable: Serializable  {
 
 fun String.hexToBytes(): ByteArray {
     return hexStringToByteArray(this)
+}
+
+fun <T> JsonAdapter<T>.toPrettyJson(value: T, indent: String = "  "): String {
+    val buffer = Buffer()
+    val writer: JsonWriter = JsonWriter.of(buffer).apply {
+        indent(indent)
+    }
+    this.toJson(writer, value)
+    return buffer.readUtf8()
 }

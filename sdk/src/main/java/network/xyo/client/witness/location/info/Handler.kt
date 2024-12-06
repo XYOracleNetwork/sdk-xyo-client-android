@@ -10,13 +10,13 @@ import network.xyo.client.witness.types.WitnessHandlerInterface
 import network.xyo.client.witness.types.WitnessResult
 import network.xyo.client.witness.XyoPanel
 import network.xyo.client.account.model.AccountInstance
-import network.xyo.client.boundwitness.BoundWitnessJson
+import network.xyo.client.boundwitness.BoundWitness
 import network.xyo.client.payload.Payload
 import network.xyo.client.settings.XyoSdk
 
-open class WitnessLocationHandler : WitnessHandlerInterface<Triple<BoundWitnessJson?, Payload?, Payload?>> {
+open class WitnessLocationHandler : WitnessHandlerInterface<Triple<BoundWitness?, Payload?, Payload?>> {
     @RequiresApi(Build.VERSION_CODES.M)
-    override suspend fun witness(context: Context, nodeUrlsAndAccounts: ArrayList<Pair<String, AccountInstance?>>): WitnessResult<Triple<BoundWitnessJson?, Payload?, Payload?>> {
+    override suspend fun witness(context: Context, nodeUrlsAndAccounts: ArrayList<Pair<String, AccountInstance?>>): WitnessResult<Triple<BoundWitness?, Payload?, Payload?>> {
         val account = XyoSdk.getInstance(context.applicationContext).getAccount(context)
         val panel = XyoPanel(context, account, nodeUrlsAndAccounts, listOf(
             XyoLocationWitness(account)
@@ -26,11 +26,11 @@ open class WitnessLocationHandler : WitnessHandlerInterface<Triple<BoundWitnessJ
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @RequiresApi(Build.VERSION_CODES.M)
-    private suspend fun getLocation(panel: XyoPanel): WitnessResult<Triple<BoundWitnessJson?, Payload?, Payload?>> {
+    private suspend fun getLocation(panel: XyoPanel): WitnessResult<Triple<BoundWitness?, Payload?, Payload?>> {
         return withContext(Dispatchers.IO) {
             var locationPayload: Payload? = null
             var locationPayloadRaw: Payload? = null
-            var bw: BoundWitnessJson? = null
+            var bw: BoundWitness? = null
             val errors: MutableList<Error> = mutableListOf()
             panel.let {
                 it.reportAsyncQuery().let { result ->

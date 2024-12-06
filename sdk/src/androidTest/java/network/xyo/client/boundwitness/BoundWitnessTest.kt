@@ -79,8 +79,8 @@ class BoundWitnessTest {
                 TestPayload1()
             )).build()
             assert(bw.dataHash() == bw.getBodyJson().dataHash())
-            assert(bw.meta.client == "android")
-            assert(bw.meta.signatures?.size == 1)
+            assert(bw._meta.client == "android")
+            assert(bw._meta.signatures?.size == 1)
         }
     }
 
@@ -119,7 +119,21 @@ class BoundWitnessTest {
             val testAccount = Account.random()
             val testPayload = TestPayload1()
             val bw = BoundWitnessBuilder().signer(testAccount).payloads(listOf(testPayload)).build()
-            client.insert(listOf(bw, testPayload))
+            val bwJson: String = bw.toPrettyJson()
+            println("bwJson-start")
+            println(bwJson)
+            println("bwJson-end")
+            val queryResult = client.insert(listOf(bw, testPayload))
+
+            assert((queryResult.errors?.size ?: 0) == 0)
+            assert((queryResult.response?.payloads?.size == 2))
+
+            val bwDataHash = bw.dataHash()
+            assert(((queryResult.response?.payloads?.filter { it.dataHash() == bwDataHash})?.size == 1))
+
+            val dataResult = client.get(listOf(bwDataHash))
+            val dataResponse = dataResult.response?.rawResponse
+            assert(dataResponse!!.contains(bwDataHash))
 
             val bwHash = bw.dataHash()
             val result = client.get(listOf(bwHash))

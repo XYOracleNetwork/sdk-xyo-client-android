@@ -7,12 +7,12 @@ import androidx.annotation.RequiresApi
 import network.xyo.client.account.model.AccountInstance
 import network.xyo.client.archivist.wrapper.ArchivistWrapper
 import network.xyo.client.boundwitness.BoundWitnessBuilder
-import network.xyo.client.boundwitness.BoundWitnessJson
+import network.xyo.client.boundwitness.BoundWitness
 import network.xyo.client.node.client.NodeClient
 import network.xyo.client.node.client.PostQueryResult
 import network.xyo.client.payload.Payload
 
-data class XyoPanelReportQueryResult(val bw: BoundWitnessJson, val apiResults: List<PostQueryResult>?, val payloads: List<Payload>?)
+data class XyoPanelReportQueryResult(val bw: BoundWitness, val apiResults: List<PostQueryResult>?, val payloads: List<Payload>?)
 
 @RequiresApi(Build.VERSION_CODES.M)
 class XyoPanel(
@@ -60,7 +60,7 @@ class XyoPanel(
         }
     }
 
-    private suspend fun generateBoundWitnessJson(payloads: List<Payload>): BoundWitnessJson {
+    private suspend fun generateBoundWitnessJson(payloads: List<Payload>): BoundWitness {
         return BoundWitnessBuilder()
             .payloads(payloads)
             .signer(account)

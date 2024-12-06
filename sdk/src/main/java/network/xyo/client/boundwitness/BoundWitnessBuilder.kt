@@ -14,7 +14,7 @@ open class BoundWitnessBuilder {
     protected var _payload_hashes = mutableListOf<String>()
     protected var _payload_schemas = mutableListOf<String>()
     protected var _payloads = mutableListOf<Payload>()
-    protected open var bw: BoundWitnessJson = BoundWitnessJson()
+    protected open var bw: BoundWitness = BoundWitness()
 
     var _timestamp: Long? = null
 
@@ -33,7 +33,7 @@ open class BoundWitnessBuilder {
     }
 
     @OptIn(ExperimentalStdlibApi::class)
-    private fun hashableFields(): BoundWitnessBodyJson {
+    private fun hashableFields(): BoundWitnessBody {
         // if a timestamp is not provided, set one at the time hashable fields are set
         bw.timestamp = _timestamp ?: System.currentTimeMillis()
 
@@ -78,7 +78,7 @@ open class BoundWitnessBuilder {
         bw.addresses = addresses
 
         // update underscore fields
-        bw.meta.client = "android"
+        bw._meta.client = "android"
 
         // construct fields involved in hashing
         constructHashableFieldsFields()
@@ -89,10 +89,10 @@ open class BoundWitnessBuilder {
         // in the serialized version of the bw because they will invalidate the hash
         val hashable = hashableFields()
         val hash = hashable.dataHash()
-        bw.meta.signatures = this.sign(hash)
+        bw._meta.signatures = this.sign(hash)
     }
 
-    open suspend fun build(): BoundWitnessJson {
+    open suspend fun build(): BoundWitness {
         return bw.let{
             // update fields
             constructFields()

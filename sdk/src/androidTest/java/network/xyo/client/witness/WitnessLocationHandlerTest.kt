@@ -9,8 +9,8 @@ import androidx.test.rule.GrantPermissionRule
 import kotlinx.coroutines.runBlocking
 import network.xyo.client.lib.TestConstants
 import network.xyo.client.account.Account
-import network.xyo.client.boundwitness.BoundWitnessBodyJson
-import network.xyo.client.boundwitness.BoundWitnessJson
+import network.xyo.client.boundwitness.BoundWitnessBody
+import network.xyo.client.boundwitness.BoundWitness
 import network.xyo.client.datastore.previous_hash_store.PreviousHashStorePrefsRepository
 import network.xyo.client.witness.types.WitnessResult
 import network.xyo.client.payload.Payload
@@ -49,12 +49,12 @@ class WitnessLocationHandlerTest {
     @Test
     fun testObserve()  {
         runBlocking {
-            var firstBw: BoundWitnessJson? = null
+            var firstBw: BoundWitness? = null
             val result1 = WitnessLocationHandler().witness(appContext.applicationContext, arrayListOf(Pair(apiDomainBeta, null)))
             when (result1) {
-                is WitnessResult.Success<Triple<BoundWitnessJson?, Payload?, Payload?>> -> {
+                is WitnessResult.Success<Triple<BoundWitness?, Payload?, Payload?>> -> {
                     firstBw = result1.data.first
-                    assertInstanceOf<BoundWitnessBodyJson>(firstBw)
+                    assertInstanceOf<BoundWitnessBody>(firstBw)
                     assertInstanceOf<LocationPayload>(result1.data.second)
                     assertInstanceOf<LocationPayloadRaw>(result1.data.third)
                 }
@@ -63,12 +63,12 @@ class WitnessLocationHandlerTest {
                 }
             }
 
-            var secondBw: BoundWitnessJson? = null
+            var secondBw: BoundWitness? = null
             val result2 = WitnessLocationHandler().witness(appContext.applicationContext, arrayListOf(Pair(apiDomainBeta, null)))
             when (result2) {
-                is WitnessResult.Success<Triple<BoundWitnessJson?, Payload?, Payload?>> -> {
+                is WitnessResult.Success<Triple<BoundWitness?, Payload?, Payload?>> -> {
                     secondBw = result2.data.first
-                    assertInstanceOf<BoundWitnessJson>(secondBw)
+                    assertInstanceOf<BoundWitness>(secondBw)
                     assertInstanceOf<LocationPayload>(result2.data.second)
                     assertInstanceOf<LocationPayloadRaw>(result2.data.third)
 
