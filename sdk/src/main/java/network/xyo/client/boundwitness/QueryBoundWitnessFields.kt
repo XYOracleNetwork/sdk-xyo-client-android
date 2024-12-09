@@ -9,5 +9,6 @@ open class QueryBoundWitnessFields(
     payload_hashes: List<String>,
     payload_schemas: List<String>,
     val query: String,
-    timestamp: Long?
-): BoundWitnessFields(addresses, previous_hashes, payload_hashes, payload_schemas, timestamp)
+    timestamp: Long?,
+    signatures: List<String>,
+): BoundWitnessFields(addresses, previous_hashes, payload_hashes, payload_schemas, timestamp, signatures)

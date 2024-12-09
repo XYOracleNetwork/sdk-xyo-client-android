@@ -6,6 +6,5 @@ import network.xyo.client.lib.JsonSerializable
 
 @JsonClass(generateAdapter = true)
 class BoundWitnessMeta: BoundWitnessMeta, JsonSerializable() {
-    override var signatures: List<String>? = null
     override var client: String? = null
 }

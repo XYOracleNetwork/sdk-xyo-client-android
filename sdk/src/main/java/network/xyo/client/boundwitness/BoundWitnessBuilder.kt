@@ -84,7 +84,7 @@ open class BoundWitnessBuilder {
         // in the serialized version of the bw because they will invalidate the hash
         setPreviousHashes()
         val dataHash = bw.dataHash()
-        bw._meta.signatures = this.sign(dataHash)
+        bw.__signatures = this.sign(dataHash)
     }
 
     open suspend fun build(): BoundWitness {
