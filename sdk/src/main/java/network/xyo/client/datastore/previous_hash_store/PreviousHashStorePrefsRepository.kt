@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import network.xyo.client.account.hexStringToByteArray
+import network.xyo.client.lib.hexStringToByteArray
 import network.xyo.client.account.model.PreviousHashStore
 import network.xyo.client.settings.PreviousHashStorePreferences
 import network.xyo.client.settings.SettingsInterface

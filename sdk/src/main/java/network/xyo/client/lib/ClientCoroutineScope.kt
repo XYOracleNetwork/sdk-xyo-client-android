@@ -3,7 +3,7 @@ package network.xyo.client.lib
 import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
 
-class XyoClientCoroutineScope : CoroutineScope {
+class ClientCoroutineScope : CoroutineScope {
 
     private var parentJob = Job()
 
@@ -20,4 +20,4 @@ class XyoClientCoroutineScope : CoroutineScope {
     }
 }
 
-val xyoScope = XyoClientCoroutineScope()
+

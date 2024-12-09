@@ -3,14 +3,17 @@ package network.xyo.client.boundwitness
 import android.os.Build
 import androidx.annotation.RequiresApi
 import network.xyo.client.lib.JsonSerializable
-import network.xyo.client.account.hexStringToByteArray
-import network.xyo.client.account.model.AccountInstance
+import network.xyo.client.lib.hexStringToByteArray
+import network.xyo.client.account.model.Account
 import network.xyo.client.payload.Payload
 import network.xyo.client.payload.XyoValidationException
+import network.xyo.client.types.Hash
+import org.json.JSONObject
 
+@OptIn(ExperimentalStdlibApi::class)
 @RequiresApi(Build.VERSION_CODES.M)
 open class BoundWitnessBuilder {
-    protected var _signers = mutableListOf<AccountInstance>()
+    protected var _signers = mutableListOf<Account>()
     protected var _payload_hashes = mutableListOf<String>()
     protected var _payload_schemas = mutableListOf<String>()
     protected var _payloads = mutableListOf<Payload>()
@@ -22,34 +25,28 @@ open class BoundWitnessBuilder {
     val addresses: List<String>
         get() = _signers.map { witness -> witness.address.toHexString() }
 
-    open fun signers(signers: List<AccountInstance>): BoundWitnessBuilder {
+    open fun signers(signers: List<Account>): BoundWitnessBuilder {
         signers.forEach { signer -> signer(signer) }
         return this
     }
 
-    open fun signer(signer: AccountInstance): BoundWitnessBuilder {
+    open fun signer(signer: Account): BoundWitnessBuilder {
         _signers.add(signer)
         return this
     }
 
     @OptIn(ExperimentalStdlibApi::class)
-    private fun hashableFields(): BoundWitnessBody {
-        // if a timestamp is not provided, set one at the time hashable fields are set
-        bw.timestamp = _timestamp ?: System.currentTimeMillis()
-
+    private fun setPreviousHashes() {
         bw.previous_hashes = _signers.map {
             signer -> signer.previousHash?.toHexString()
         }
-
-        // return the body with hashable fields
-        return bw.getBodyJson()
     }
 
     @Throws(XyoValidationException::class)
     fun <T: Payload>payload(schema: String, payload: T): BoundWitnessBuilder {
         payload.validate()
         _payloads.add(payload)
-        _payload_hashes.add(payload.dataHash())
+        _payload_hashes.add(payload.hash().toHexString())
         _payload_schemas.add(schema)
         return this
     }
@@ -62,9 +59,9 @@ open class BoundWitnessBuilder {
         return this
     }
 
-    private suspend fun sign(hash: String): List<String> {
+    private suspend fun sign(hash: Hash): List<String> {
         return _signers.map {
-            val sig = JsonSerializable.bytesToHex(it.sign(hexStringToByteArray(hash)))
+            val sig = JsonSerializable.bytesToHex(it.sign(hash))
             sig
         }
     }
@@ -87,9 +84,9 @@ open class BoundWitnessBuilder {
     private suspend fun constructHashableFieldsFields() {
         // Note: Once fields are hashed, do not update class properties that are expected
         // in the serialized version of the bw because they will invalidate the hash
-        val hashable = hashableFields()
-        val hash = hashable.dataHash()
-        bw._meta.signatures = this.sign(hash)
+        setPreviousHashes()
+        val dataHash = bw.dataHash()
+        bw._meta.signatures = this.sign(dataHash)
     }
 
     open suspend fun build(): BoundWitness {

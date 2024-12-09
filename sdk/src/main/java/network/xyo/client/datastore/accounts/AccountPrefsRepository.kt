@@ -9,7 +9,6 @@ import network.xyo.data.AccountPrefsDataStoreProtos.AccountPrefsDataStore
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import network.xyo.client.account.Account
-import network.xyo.client.account.model.AccountInstance
 import network.xyo.client.settings.AccountPreferences
 import network.xyo.client.settings.SettingsInterface
 import network.xyo.client.settings.defaultXyoSdkSettings
@@ -27,14 +26,14 @@ class AccountPrefsRepository(context: Context, settings: SettingsInterface = def
     )
 
     @RequiresApi(Build.VERSION_CODES.M)
-    suspend fun getAccount(): AccountInstance {
+    suspend fun getAccount(): network.xyo.client.account.model.Account {
         val saveKeyHex = getAccountKey()
         return Account.fromPrivateKey(saveKeyHex)
     }
 
     @OptIn(ExperimentalStdlibApi::class)
     @RequiresApi(Build.VERSION_CODES.M)
-    suspend fun initializeAccount(account: AccountInstance): AccountInstance? {
+    suspend fun initializeAccount(account: network.xyo.client.account.model.Account): network.xyo.client.account.model.Account? {
         var updatedKey: String? = null
         val job = xyoScope.launch {
             val savedKey = accountPrefsDataStore.data.first().accountKey
@@ -60,7 +59,7 @@ class AccountPrefsRepository(context: Context, settings: SettingsInterface = def
     private suspend fun getAccountKey(): String {
         val savedKey = accountPrefsDataStore.data.first().accountKey
         return if (savedKey.isEmpty()) {
-            val newAccount: AccountInstance = Account.random()
+            val newAccount: network.xyo.client.account.model.Account = Account.random()
             setAccountKey(newAccount.privateKey.toHexString())
             newAccount.privateKey.toHexString()
         } else {

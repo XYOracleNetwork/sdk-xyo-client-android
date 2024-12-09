@@ -1,11 +1,8 @@
 package network.xyo.client.lib
 
-import com.squareup.moshi.JsonAdapter
-import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import network.xyo.client.account.hexStringToByteArray
-import okio.Buffer
+import network.xyo.client.types.Hash
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.Serializable
@@ -14,11 +11,7 @@ import java.security.MessageDigest
 abstract class JsonSerializable: Serializable  {
 
     fun toJson(removeMeta: Boolean = false): String {
-        return JsonSerializable.toJson(this, removeMeta)
-    }
-
-    fun toPrettyJson(removeMeta: Boolean = false): String {
-        return JsonSerializable.toPrettyJson(this, removeMeta)
+        return toJson(this, removeMeta)
     }
 
     companion object {
@@ -33,6 +26,9 @@ abstract class JsonSerializable: Serializable  {
             keys.forEach {
                 if (removeMeta) {
                     if (it.startsWith("_")) {
+                        return@forEach
+                    }
+                    if (it.startsWith("$")) {
                         return@forEach
                     }
                 }
@@ -74,14 +70,6 @@ abstract class JsonSerializable: Serializable  {
             return sortJson(adapter.toJson(obj), removeMeta)
         }
 
-        fun toPrettyJson(obj: Any, removeMeta: Boolean = false): String {
-            val moshi = Moshi.Builder()
-                .addLast(KotlinJsonAdapterFactory())
-                .build()
-            val adapter = moshi.adapter(obj.javaClass)
-            return sortJson(adapter.toPrettyJson(obj), removeMeta)
-        }
-
         fun toJson(obj: List<Any>, removeMeta: Boolean = false): String {
             val moshi = Moshi.Builder()
                 .addLast(KotlinJsonAdapterFactory())
@@ -99,20 +87,31 @@ abstract class JsonSerializable: Serializable  {
             return adapter.fromJson(json)
         }
 
-        fun sha256(value: String): ByteArray {
+        fun sha256(value: String): Hash {
             val md = MessageDigest.getInstance("SHA256")
-            md.update(value.encodeToByteArray())
+            val valueBytes = value.encodeToByteArray()
+            var total = 0
+            for (byte in valueBytes) {
+                total += byte
+            }
+            val len = value.length
+            if (len == valueBytes.size) {
+                println(total)
+                println(len)
+            }
+            md.update(valueBytes)
             return md.digest()
         }
 
-        protected fun <T: JsonSerializable>sha256(obj: T): ByteArray {
-            val json = toJson(obj, true)
+        @JvmStatic
+        fun <T: JsonSerializable>sha256(obj: T, removeMeta: Boolean = true): Hash {
+            val json = toJson(obj, removeMeta)
             return sha256(json)
         }
 
         @JvmStatic
-        protected fun <T: JsonSerializable>sha256String(obj: T): String {
-            val shaBytes = sha256(obj)
+        fun <T: JsonSerializable>sha256String(obj: T, removeMeta: Boolean = true): String {
+            val shaBytes = sha256(obj, removeMeta)
             return bytesToHex(shaBytes)
         }
 
@@ -129,17 +128,4 @@ abstract class JsonSerializable: Serializable  {
             return String(hexChars)
         }
     }
-}
-
-fun String.hexToBytes(): ByteArray {
-    return hexStringToByteArray(this)
-}
-
-fun <T> JsonAdapter<T>.toPrettyJson(value: T, indent: String = "  "): String {
-    val buffer = Buffer()
-    val writer: JsonWriter = JsonWriter.of(buffer).apply {
-        indent(indent)
-    }
-    this.toJson(writer, value)
-    return buffer.readUtf8()
 }

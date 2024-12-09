@@ -5,7 +5,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import kotlinx.coroutines.runBlocking
 import network.xyo.client.lib.TestConstants
 import network.xyo.client.account.Account
-import network.xyo.client.account.hexStringToByteArray
+import network.xyo.client.lib.hexStringToByteArray
 import network.xyo.client.datastore.previous_hash_store.PreviousHashStorePrefsRepository
 import org.junit.Before
 import org.junit.Test

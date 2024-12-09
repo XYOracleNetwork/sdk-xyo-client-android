@@ -12,10 +12,6 @@ class SystemInfoPayload(
     val network: XyoSystemInfoNetwork? = null,
     val os: XyoSystemInfoOs? = null
 ): Payload (SCHEMA) {
-    override fun dataHash(): String {
-        return sha256String(this)
-    }
-
     companion object {
         const val SCHEMA = "network.xyo.system.info.android"
 

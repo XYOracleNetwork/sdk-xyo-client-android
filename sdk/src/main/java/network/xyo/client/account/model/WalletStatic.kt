@@ -4,7 +4,7 @@ import tech.figure.hdwallet.bip32.ExtKey
 import tech.figure.hdwallet.bip39.DeterministicSeed
 import tech.figure.hdwallet.bip39.MnemonicWords
 
-interface WalletStatic<T: WalletInstance> {
+interface WalletStatic<T: Wallet> {
     var previousHashStore: PreviousHashStore?
     fun fromExtendedKey(key: ExtKey): T
     fun fromMnemonic(mnemonic: MnemonicWords, path: String? = null): T

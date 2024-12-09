@@ -38,10 +38,6 @@ open class LocationPayloadRaw(
     val isMock: Boolean?,
     val extras: Map<String, Any?>? = null
 ): Payload(SCHEMA) {
-    override fun dataHash(): String {
-        return sha256String(this)
-    }
-
     companion object {
         const val SCHEMA = "network.xyo.location.android"
         fun detect(

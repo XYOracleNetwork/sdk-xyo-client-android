@@ -7,7 +7,6 @@ import androidx.annotation.RequiresApi
 import network.xyo.client.witness.DeferredObserver
 import network.xyo.client.witness.XyoWitness
 import network.xyo.client.account.Account
-import network.xyo.client.account.model.AccountInstance
 import network.xyo.client.payload.Payload
 
 class DeferredLocationObserver : DeferredObserver<Payload>() {
@@ -32,7 +31,7 @@ class DeferredLocationObserver : DeferredObserver<Payload>() {
 }
 
 @RequiresApi(Build.VERSION_CODES.M)
-class XyoLocationWitness(address: AccountInstance = Account.random()) : XyoWitness<Payload>(
+class XyoLocationWitness(address: network.xyo.client.account.model.Account = Account.random()) : XyoWitness<Payload>(
     DeferredLocationObserver(),
     address
 )

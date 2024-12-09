@@ -99,7 +99,7 @@ class XyoPanelTest {
     }
     */
 
-    @OptIn(ExperimentalCoroutinesApi::class)
+    @OptIn(ExperimentalCoroutinesApi::class, ExperimentalStdlibApi::class)
     @Test
     fun testSimplePanelReport() {
         runBlocking {
@@ -113,7 +113,7 @@ class XyoPanelTest {
             val bw = result.bw
 
             val result2 = panel.reportAsyncQuery()
-            assert(result2.bw.previous_hashes.contains(bw.dataHash()))
+            assert(result2.bw.previous_hashes.contains(bw.dataHash().toHexString()))
         }
     }
 

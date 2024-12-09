@@ -1,4 +1,4 @@
-package network.xyo.client.account
+package network.xyo.client.lib
 
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -7,17 +7,6 @@ import java.math.BigInteger
 
 data class Point(val x: BigInteger, val y: BigInteger) {
     fun isAtInfinity() = x == BigInteger.ZERO && y == BigInteger.ZERO
-}
-
-object Secp256k1CurveConstants {
-    val p: BigInteger = BigInteger("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F", 16)
-    val a: BigInteger = BigInteger.ZERO
-    val b: BigInteger = BigInteger.valueOf(7)
-    val n: BigInteger = BigInteger("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141", 16)
-    val g: Point = Point(
-        BigInteger("79BE667EF9DCBBAC55A06295CE870B07029BFCDB2DCE28D959F2815B16F81798", 16),
-        BigInteger("483ADA7726A3C4655DA4FBFC0E1108A8FD17B448A68554199C47D08FFB10D4B8", 16)
-    )
 }
 
 fun ByteArray.padStart(targetLength: Int, padValue: Byte = 0): ByteArray {

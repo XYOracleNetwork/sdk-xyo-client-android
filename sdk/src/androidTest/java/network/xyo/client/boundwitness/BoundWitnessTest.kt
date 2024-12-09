@@ -7,6 +7,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import network.xyo.client.payload.TestPayload1
 import network.xyo.client.account.Account
+import network.xyo.client.account.Wallet
 import network.xyo.client.archivist.wrapper.ArchivistWrapper
 import network.xyo.client.node.client.DiscoverPayload
 import network.xyo.client.datastore.previous_hash_store.PreviousHashStorePrefsRepository
@@ -78,7 +79,6 @@ class BoundWitnessTest {
             val bw = BoundWitnessBuilder().signer(Account.random()).payloads(listOf(
                 TestPayload1()
             )).build()
-            assert(bw.dataHash() == bw.getBodyJson().dataHash())
             assert(bw._meta.client == "android")
             assert(bw._meta.signatures?.size == 1)
         }
@@ -98,20 +98,32 @@ class BoundWitnessTest {
         }
     }
 
+    @OptIn(ExperimentalStdlibApi::class)
     @Test
     fun testBoundWitnessPreviousHash() {
         runBlocking {
-            val testAccount = Account.random()
+            val testAccount = Wallet.fromMnemonic("abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about")
+            val knownBw1DataHash = "cb8b63aaaa8da5763f3e62541421c48b9b2356b4b9da24f58359072b89549e66"
+            val testPayload = TestPayload1()
             val bw = BoundWitnessBuilder().signer(testAccount).payloads(listOf(
-                TestPayload1()
+                testPayload
             )).build()
+            val calcDataHash = bw.dataHash().toHexString()
+            val calcJson = bw.toJson()
+            val calcDataJson = bw.toJson(true)
+            val calcDataHash2 = JsonSerializable.sha256(calcDataJson).toHexString()
+            assertEquals(calcDataHash, calcDataHash2)
+            assertNotEquals(calcJson, calcDataJson)
+            assertEquals(knownBw1DataHash, calcDataHash)
             val bw2 = BoundWitnessBuilder().signer(testAccount).payloads(listOf(
                 TestPayload1()
             )).build()
-            assert(bw2.previous_hashes.first() == bw.dataHash())
+            assertEquals(bw2.previous_hashes.first(), knownBw1DataHash)
+            assertEquals(bw2.previous_hashes.first(), bw.dataHash().toHexString())
         }
     }
 
+    @OptIn(ExperimentalStdlibApi::class)
     @Test
     fun testBoundWitnessRoundTripToArchivist() {
         runBlocking {
@@ -119,23 +131,24 @@ class BoundWitnessTest {
             val testAccount = Account.random()
             val testPayload = TestPayload1()
             val bw = BoundWitnessBuilder().signer(testAccount).payloads(listOf(testPayload)).build()
-            val bwJson: String = bw.toPrettyJson()
+            val bwJson: String = bw.toJson()
             println("bwJson-start")
             println(bwJson)
             println("bwJson-end")
-            val queryResult = client.insert(listOf(bw, testPayload))
+            val queryResult = client.insert(listOf(testPayload))
 
             assert((queryResult.errors?.size ?: 0) == 0)
-            assert((queryResult.response?.payloads?.size == 2))
+            assert(((queryResult.response?.payloads?.size ?: 0) > 0))
+            assert(((queryResult.response?.payloads?.size ?: 0) == 2))
 
-            val bwDataHash = bw.dataHash()
-            assert(((queryResult.response?.payloads?.filter { it.dataHash() == bwDataHash})?.size == 1))
+            val bwDataHash = bw.dataHash().toHexString()
+            assert(((queryResult.response?.payloads?.filter { it.dataHash().toHexString() == bwDataHash})?.size == 1))
 
             val dataResult = client.get(listOf(bwDataHash))
             val dataResponse = dataResult.response?.rawResponse
             assert(dataResponse!!.contains(bwDataHash))
 
-            val bwHash = bw.dataHash()
+            val bwHash = bw.dataHash().toHexString()
             val result = client.get(listOf(bwHash))
             val response = result.response?.rawResponse
             assert(response!!.contains(bwHash))

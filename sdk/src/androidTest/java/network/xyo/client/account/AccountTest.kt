@@ -3,6 +3,7 @@ package network.xyo.client.account
 import androidx.test.platform.app.InstrumentationRegistry
 import kotlinx.coroutines.runBlocking
 import network.xyo.client.datastore.previous_hash_store.PreviousHashStorePrefsRepository
+import network.xyo.client.lib.hexStringToByteArray
 import org.junit.Before
 import org.junit.Test
 

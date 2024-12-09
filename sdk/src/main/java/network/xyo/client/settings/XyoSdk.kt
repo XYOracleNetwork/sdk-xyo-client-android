@@ -4,15 +4,14 @@ import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
 import network.xyo.client.account.Account
-import network.xyo.client.account.model.AccountInstance
 import network.xyo.client.datastore.accounts.AccountPrefsRepository
 import network.xyo.client.datastore.previous_hash_store.PreviousHashStorePrefsRepository
 
 class XyoSdk private constructor(val settings: SettingsInterface) {
-    private var _account: AccountInstance? = null
+    private var _account: network.xyo.client.account.model.Account? = null
 
     @RequiresApi(Build.VERSION_CODES.M)
-    suspend fun getAccount(context: Context): AccountInstance {
+    suspend fun getAccount(context: Context): network.xyo.client.account.model.Account {
         if (INSTANCE !== null) {
             val validInstance = INSTANCE!!
             if (validInstance._account !== null) {

@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
 import network.xyo.client.account.Account
-import network.xyo.client.account.model.AccountInstance
 import network.xyo.client.payload.Payload
 
 abstract class DeferredObserver<out T: Payload> {
@@ -13,19 +12,19 @@ abstract class DeferredObserver<out T: Payload> {
 
 @RequiresApi(Build.VERSION_CODES.M)
 open class XyoWitness<out T: Payload> (
-    val address: AccountInstance = Account.random(),
+    val address: network.xyo.client.account.model.Account = Account.random(),
     private val observer: ((context: Context) -> List<T>?)? = null,
     val deferredObserver: DeferredObserver<T>? = null
 ) {
 
     constructor(
         observer: ((context: Context) -> List<T>?)?,
-        account: AccountInstance = Account.random()
+        account: network.xyo.client.account.model.Account = Account.random()
     ): this(account, observer)
 
     constructor(
         observer: DeferredObserver<T>?,
-        account: AccountInstance = Account.random()
+        account: network.xyo.client.account.model.Account = Account.random()
     ): this(account, null, observer)
 
     open suspend fun observe(context: Context): List<T>? {

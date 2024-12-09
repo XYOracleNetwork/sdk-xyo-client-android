@@ -3,6 +3,7 @@ package network.xyo.client.payload
 import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
+import com.squareup.moshi.Json
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -11,11 +12,14 @@ import network.xyo.client.lib.TestConstants
 import network.xyo.client.account.Account
 import network.xyo.client.boundwitness.BoundWitnessBuilder
 import network.xyo.client.lib.JsonSerializable
+import network.xyo.client.payload.model.WithMeta
+import network.xyo.client.types.HashHex
 import network.xyo.client.witness.XyoWitness
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.jupiter.api.Assertions.*
+import java.io.Serializable
 
 open class TestSubjectPayload: Payload("network.xyo.test") {
 
@@ -26,11 +30,21 @@ class TestPayload1SubObject {
     var string_value = "yo"
 }
 
-class TestPayload1: TestSubjectPayload() {
+class TestPayload1Meta: Serializable {
+    var name = "yo"
+}
+
+open class TestPayload1Body: TestSubjectPayload() {
     var timestamp = 1618603439107
     var number_field = 1
     var object_field = TestPayload1SubObject()
     var string_field = "there"
+}
+
+@OptIn(ExperimentalStdlibApi::class)
+class TestPayload1: TestPayload1Body(), WithMeta<TestPayload1Meta> {
+    @Json(name = "\$meta")
+    override var _meta = TestPayload1Meta()
 }
 
 class TestPayload2SubObject {
@@ -55,6 +69,7 @@ class TestInvalidSchemaPayload: TestSubjectPayload() {
 val knownAddress = Account.fromPrivateKey(ByteArray(32) {index -> index.toByte()})
 const val knownHash = "6e173bbfc0577ebde66b44b090316eca5ecad8ecdb5c51886211d805c769d2ea"
 
+@OptIn(ExperimentalStdlibApi::class)
 class PayloadTest {
 
     @Rule
@@ -116,6 +131,6 @@ class PayloadTest {
     @Test
     fun testHashing() {
         val payload = TestConstants.debugPayload
-        assertEquals(payload.dataHash(), TestConstants.debugPayloadHash)
+        assertEquals(payload.dataHash().toHexString(), TestConstants.debugPayloadHash)
     }
 }

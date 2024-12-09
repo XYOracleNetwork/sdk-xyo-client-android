@@ -24,10 +24,6 @@ data class CurrentLocation(
 class LocationPayload(
     val currentLocation: CurrentLocation? = null,
 ): Payload(SCHEMA) {
-    override fun dataHash(): String {
-        return sha256String(this)
-    }
-
     companion object {
         const val SCHEMA = "network.xyo.location.current"
 

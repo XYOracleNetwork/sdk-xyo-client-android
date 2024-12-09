@@ -1,6 +1,6 @@
 package network.xyo.client.account.model
 
-interface AccountInstance: PrivateKeyInstance {
+interface Account: PrivateKey {
     val previousHash: ByteArray?
     val privateKey: ByteArray
     val publicKey: ByteArray

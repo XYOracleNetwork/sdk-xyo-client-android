@@ -9,14 +9,14 @@ import kotlinx.coroutines.withContext
 import network.xyo.client.witness.types.WitnessHandlerInterface
 import network.xyo.client.witness.types.WitnessResult
 import network.xyo.client.witness.XyoPanel
-import network.xyo.client.account.model.AccountInstance
+import network.xyo.client.account.model.Account
 import network.xyo.client.boundwitness.BoundWitness
 import network.xyo.client.payload.Payload
 import network.xyo.client.settings.XyoSdk
 
 open class WitnessLocationHandler : WitnessHandlerInterface<Triple<BoundWitness?, Payload?, Payload?>> {
     @RequiresApi(Build.VERSION_CODES.M)
-    override suspend fun witness(context: Context, nodeUrlsAndAccounts: ArrayList<Pair<String, AccountInstance?>>): WitnessResult<Triple<BoundWitness?, Payload?, Payload?>> {
+    override suspend fun witness(context: Context, nodeUrlsAndAccounts: ArrayList<Pair<String, Account?>>): WitnessResult<Triple<BoundWitness?, Payload?, Payload?>> {
         val account = XyoSdk.getInstance(context.applicationContext).getAccount(context)
         val panel = XyoPanel(context, account, nodeUrlsAndAccounts, listOf(
             XyoLocationWitness(account)

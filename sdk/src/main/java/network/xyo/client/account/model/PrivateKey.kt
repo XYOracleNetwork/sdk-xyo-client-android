@@ -1,5 +1,5 @@
 package network.xyo.client.account.model
 
-interface PrivateKeyInstance: PublicKeyInstance {
+interface PrivateKey: PublicKey {
     suspend fun sign(hash: ByteArray): ByteArray
 }

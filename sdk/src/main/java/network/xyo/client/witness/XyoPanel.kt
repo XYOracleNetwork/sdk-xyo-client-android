@@ -4,7 +4,7 @@ import android.content.Context
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
-import network.xyo.client.account.model.AccountInstance
+import network.xyo.client.account.model.Account
 import network.xyo.client.archivist.wrapper.ArchivistWrapper
 import network.xyo.client.boundwitness.BoundWitnessBuilder
 import network.xyo.client.boundwitness.BoundWitness
@@ -17,16 +17,16 @@ data class XyoPanelReportQueryResult(val bw: BoundWitness, val apiResults: List<
 @RequiresApi(Build.VERSION_CODES.M)
 class XyoPanel(
     val context: Context,
-    val account: AccountInstance,
+    val account: Account,
     private val witnesses: List<XyoWitness<Payload>>?,
-    private val nodeUrlsAndAccounts: ArrayList<Pair<String, AccountInstance?>>?
+    private val nodeUrlsAndAccounts: ArrayList<Pair<String, Account?>>?
 ) {
     private var nodes: MutableList<NodeClient>? = null
 
     constructor(
         context: Context,
-        account: AccountInstance,
-        nodeUrlsAndAccounts: ArrayList<Pair<String, AccountInstance?>>,
+        account: Account,
+        nodeUrlsAndAccounts: ArrayList<Pair<String, Account?>>,
         witnesses: List<XyoWitness<Payload>>? = null
     ): this(
             context,
@@ -37,7 +37,7 @@ class XyoPanel(
 
     constructor(
         context: Context,
-        account: AccountInstance,
+        account: Account,
         observe: ((context: Context) -> List<Payload>?)?
     ): this(
         context,

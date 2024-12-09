@@ -55,14 +55,14 @@ class LocationWitnessTest {
         }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
+    @OptIn(ExperimentalCoroutinesApi::class, ExperimentalStdlibApi::class)
     @Test
     fun testInsidePanel() {
         runBlocking {
             val panel = XyoPanel(appContext, Account.random(), arrayListOf(Pair("${TestConstants.nodeUrlBeta}/Archivist", null)), listOf(XyoLocationWitness()))
             val result = panel.reportAsyncQuery()
             result.payloads?.forEach{ payload ->
-                val hash = payload.dataHash()
+                val hash = payload.dataHash().toHexString()
                 assert(result.bw.payload_hashes.contains(hash))
             }
         }

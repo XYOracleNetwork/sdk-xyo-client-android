@@ -1,6 +1,5 @@
 import network.xyo.client.account.Account
 import network.xyo.client.account.Wallet
-import network.xyo.client.account.model.AccountInstance
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.*
@@ -18,7 +17,7 @@ class BoundWitnessBuilderTest {
     fun build_returns_expected_hash() {
         for (testCase in boundWitnessSequenceTestCases) {
             // Create accounts
-            val signers = mutableListOf<AccountInstance>()
+            val signers = mutableListOf<network.xyo.client.account.model.Account>()
             for ((i, mnemonic) in testCase.mnemonics.withIndex()) {
                 val path = testCase.paths[i]
                 val account = try {

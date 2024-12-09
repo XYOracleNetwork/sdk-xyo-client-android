@@ -3,15 +3,16 @@ package network.xyo.client.node.client
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import network.xyo.client.boundwitness.BoundWitnessBody
+import network.xyo.client.boundwitness.BoundWitnessFields
 import network.xyo.client.payload.Payload
+import network.xyo.client.types.Hash
 import org.json.JSONArray
 import org.json.JSONObject
 
 open class QueryResponseWrapper(val rawResponse: String) {
     val moshi: Moshi = Moshi.Builder().addLast(KotlinJsonAdapterFactory()).build()
-    var bwHash: String? = null
-    var bw: BoundWitnessBody? = null
+    var bwHash: Hash? = null
+    var bw: BoundWitnessFields? = null
     var payloads: List<Payload>? = null
 
     private fun unwrap() {
@@ -32,8 +33,8 @@ open class QueryResponseWrapper(val rawResponse: String) {
         payloads = parsePayloads(payloadsString)
     }
 
-    protected open fun parseBW(bwString: String): BoundWitnessBody? {
-        val bwAdapter = moshi.adapter(BoundWitnessBody::class.java)
+    protected open fun parseBW(bwString: String): BoundWitnessFields? {
+        val bwAdapter = moshi.adapter(BoundWitnessFields::class.java)
         val bw = bwAdapter.fromJson(bwString)
         return bw
     }

@@ -9,7 +9,7 @@ import androidx.test.rule.GrantPermissionRule
 import kotlinx.coroutines.runBlocking
 import network.xyo.client.lib.TestConstants
 import network.xyo.client.account.Account
-import network.xyo.client.boundwitness.BoundWitnessBody
+import network.xyo.client.boundwitness.BoundWitnessFields
 import network.xyo.client.boundwitness.BoundWitness
 import network.xyo.client.datastore.previous_hash_store.PreviousHashStorePrefsRepository
 import network.xyo.client.witness.types.WitnessResult
@@ -46,6 +46,7 @@ class WitnessLocationHandlerTest {
     private val apiDomainBeta = "${TestConstants.nodeUrlBeta}/Archivist"
     private val apiDomainLocal = "${TestConstants.nodeUrlLocal}/Archivist"
 
+    @OptIn(ExperimentalStdlibApi::class)
     @Test
     fun testObserve()  {
         runBlocking {
@@ -54,7 +55,7 @@ class WitnessLocationHandlerTest {
             when (result1) {
                 is WitnessResult.Success<Triple<BoundWitness?, Payload?, Payload?>> -> {
                     firstBw = result1.data.first
-                    assertInstanceOf<BoundWitnessBody>(firstBw)
+                    assertInstanceOf<BoundWitnessFields>(firstBw)
                     assertInstanceOf<LocationPayload>(result1.data.second)
                     assertInstanceOf<LocationPayloadRaw>(result1.data.third)
                 }
@@ -78,7 +79,7 @@ class WitnessLocationHandlerTest {
                 }
             }
 
-            val firstBwHash = firstBw!!.dataHash()
+            val firstBwHash = firstBw!!.dataHash().toHexString()
             assert(secondBw!!.previous_hashes.size == 1)
             assert(secondBw.previous_hashes.first() == firstBwHash)
         }

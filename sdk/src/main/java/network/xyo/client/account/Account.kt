@@ -2,9 +2,13 @@ package network.xyo.client.account
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import network.xyo.client.account.model.AccountInstance
+import network.xyo.client.account.model.Account
 import network.xyo.client.account.model.AccountStatic
 import network.xyo.client.account.model.PreviousHashStore
+import network.xyo.client.lib.Secp256k1CurveConstants
+import network.xyo.client.lib.hexStringToByteArray
+import network.xyo.client.lib.publicKeyToAddress
+import network.xyo.client.lib.recoverPublicKey
 import org.spongycastle.jcajce.provider.digest.Keccak
 import tech.figure.hdwallet.ec.PrivateKey
 import tech.figure.hdwallet.ec.extensions.toBytesPadded
@@ -13,7 +17,8 @@ import tech.figure.hdwallet.signer.BCECSigner
 import java.math.BigInteger
 import java.security.SecureRandom
 
-open class Account private constructor (private val _privateKey: PrivateKey, private var _previousHash: ByteArray? = null): AccountInstance {
+open class Account private constructor (private val _privateKey: PrivateKey, private var _previousHash: ByteArray? = null):
+    Account {
 
     constructor(privateKey: ByteArray, previousHash: ByteArray? = null) : this(PrivateKey.fromBytes(privateKey, secp256k1Curve), previousHash)
     constructor(privateKey: BigInteger, previousHash: ByteArray? = null) : this(privateKey.toByteArray(), previousHash)
@@ -45,18 +50,18 @@ open class Account private constructor (private val _privateKey: PrivateKey, pri
         return recoveredAddress.contentEquals(address)
     }
 
-    companion object: AccountStatic<AccountInstance> {
+    companion object: AccountStatic<Account> {
         override var previousHashStore: PreviousHashStore? = null
 
-        override fun fromPrivateKey(key: ByteArray): AccountInstance {
+        override fun fromPrivateKey(key: ByteArray): Account {
             return Account(key)
         }
 
-        override fun fromPrivateKey(key: String): AccountInstance {
+        override fun fromPrivateKey(key: String): Account {
             return fromPrivateKey(hexStringToByteArray(key))
         }
 
-        override fun random(): AccountInstance {
+        override fun random(): Account {
             return fromPrivateKey(generatePrivateKeyBytes())
         }
 
@@ -77,7 +82,7 @@ open class Account private constructor (private val _privateKey: PrivateKey, pri
             val private = ByteArray(32)
             secureRandom.nextBytes(private)
             //this line is to make sure the key is below n
-            while(BigInteger(private) > secp256k1Curve.n) {
+            while(BigInteger(private) > Secp256k1CurveConstants.n) {
                 secureRandom.nextBytes(private)
             }
             return private

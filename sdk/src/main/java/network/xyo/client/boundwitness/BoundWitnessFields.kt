@@ -1,20 +1,16 @@
 package network.xyo.client.boundwitness
 
 import com.squareup.moshi.JsonClass
-import network.xyo.client.boundwitness.model.BoundWitnessBody
+import network.xyo.client.boundwitness.model.BoundWitnessFields
 import network.xyo.client.payload.Payload
 
 @JsonClass(generateAdapter = true)
-open class BoundWitnessBody(): BoundWitnessBody, Payload(SCHEMA) {
+open class BoundWitnessFields(): BoundWitnessFields, Payload(SCHEMA) {
     final override var addresses = emptyList<String>()
     final override var payload_hashes = emptyList<String>()
     final override var payload_schemas = emptyList<String>()
     final override var previous_hashes = emptyList<String?>()
     final override var timestamp: Long? = null
-
-    override fun dataHash(): String {
-        return sha256String(this)
-    }
 
     constructor (
         addresses: List<String>,
@@ -27,6 +23,7 @@ open class BoundWitnessBody(): BoundWitnessBody, Payload(SCHEMA) {
         this.previous_hashes = previous_hashes
         this.payload_hashes = payload_hashes
         this.payload_schemas = payload_schemas
+        this.timestamp = timestamp
     }
 
     companion object {

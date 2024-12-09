@@ -6,7 +6,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import network.xyo.client.payload.EventPayload
 import network.xyo.client.witness.XyoPanel
-import network.xyo.client.account.model.AccountInstance
+import network.xyo.client.account.model.Account
 import org.junit.Before
 import org.junit.Test
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -58,11 +58,11 @@ class XyoSdkTest {
         runBlocking {
             val instance = XyoSdk.getInstance(appContext)
             val account = instance.getAccount(appContext)
-            assertInstanceOf<AccountInstance>(account)
+            assertInstanceOf<Account>(account)
         }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
+    @OptIn(ExperimentalCoroutinesApi::class, ExperimentalStdlibApi::class)
     @Test
     fun testValidChainOnInit() {
         runBlocking {
@@ -76,7 +76,7 @@ class XyoSdkTest {
             val bw = result.bw
 
             val result2 = panel.reportAsyncQuery()
-            assert(result2.bw.previous_hashes.contains(bw.dataHash()))
+            assert(result2.bw.previous_hashes.contains(bw.dataHash().toHexString()))
         }
     }
 }

@@ -7,5 +7,4 @@ import java.io.Serializable
 interface WithMeta<T: Serializable> : Serializable {
     @Json(name = "\$meta")
     var _meta: T
-    var _hash: HashHex
 }
