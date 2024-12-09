@@ -3,12 +3,10 @@ package network.xyo.client.boundwitness
 import android.os.Build
 import androidx.annotation.RequiresApi
 import network.xyo.client.lib.JsonSerializable
-import network.xyo.client.lib.hexStringToByteArray
 import network.xyo.client.account.model.Account
 import network.xyo.client.payload.Payload
 import network.xyo.client.payload.XyoValidationException
 import network.xyo.client.types.Hash
-import org.json.JSONObject
 
 @OptIn(ExperimentalStdlibApi::class)
 @RequiresApi(Build.VERSION_CODES.M)
