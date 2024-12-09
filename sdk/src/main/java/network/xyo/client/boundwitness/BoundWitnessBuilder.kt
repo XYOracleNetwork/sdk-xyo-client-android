@@ -72,9 +72,6 @@ open class BoundWitnessBuilder {
         bw.previous_hashes = _signers.map {account -> account.previousHash?.toHexString()}
         bw.addresses = addresses
 
-        // update underscore fields
-        bw._meta.client = "android"
-
         // construct fields involved in hashing
         constructHashableFieldsFields()
     }

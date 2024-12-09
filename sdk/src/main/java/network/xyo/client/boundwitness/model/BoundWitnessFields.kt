@@ -10,8 +10,4 @@ interface BoundWitnessFields : Payload {
     // Note: Long is a higher precision type than JavaScript's Number type but it is the default type from
     // Kotlin's System.currentTimeMillis().
     var timestamp: Long?
-
-    // Meta Properties
-    // Note - these fields will transform the `__` prefix to `$`
-    var __signatures: List<String>
 }

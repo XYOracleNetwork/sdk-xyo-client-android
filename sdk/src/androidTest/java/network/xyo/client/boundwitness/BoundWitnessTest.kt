@@ -79,7 +79,7 @@ class BoundWitnessTest {
             val bw = BoundWitnessBuilder().signer(Account.random()).payloads(listOf(
                 TestPayload1()
             )).build()
-            assert(bw._meta.client == "android")
+            assert(bw.__client == "android")
             assert(bw.__signatures.size == 1)
         }
     }
@@ -92,8 +92,7 @@ class BoundWitnessTest {
             )).build()
             val serializedBw = JsonSerializable.toJson(bw)
             val bwJson = JSONObject(serializedBw)
-            val meta = bwJson.get("\$meta") as JSONObject
-            assert(meta.get("client") == "android")
+            assert(bwJson.get("\$client") == "android")
             assertNotNull(bwJson.get("\$signatures"))
         }
     }

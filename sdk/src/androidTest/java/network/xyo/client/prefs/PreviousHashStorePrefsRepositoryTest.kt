@@ -20,7 +20,6 @@ class PreviousHashStorePrefsRepositoryTest {
         this.appContext = InstrumentationRegistry.getInstrumentation().targetContext
     }
 
-    @OptIn(ExperimentalStdlibApi::class)
     @Test
     fun testPreviousHashStorePersistence() {
         runBlocking {
