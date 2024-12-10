@@ -7,8 +7,7 @@ import network.xyo.client.boundwitness.model.BoundWitnessMeta
 @JsonClass(generateAdapter = true)
 open class BoundWitness(client: String? = "android", signatures: List<String> = emptyList()) : BoundWitnessMeta,
     BoundWitnessFields() {
-    @Json(name = "\$client")
-    final override var __client: String? = client
+    final override var _client: String? = client
 
     @Json(name = "\$signatures")
     final override var __signatures = signatures
