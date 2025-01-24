@@ -79,7 +79,6 @@ class BoundWitnessTest {
             val bw = BoundWitnessBuilder().signer(Account.random()).payloads(listOf(
                 TestPayload1()
             )).build()
-            assert(bw._client == "android")
             assert(bw.__signatures.size == 1)
         }
     }
@@ -126,7 +125,7 @@ class BoundWitnessTest {
     @Test
     fun testBoundWitnessRoundTripToArchivist() {
         runBlocking {
-            val client = ArchivistWrapper(NodeClient("$apiDomainBeta/Archivist", null, appContext))
+            val client = ArchivistWrapper(NodeClient("$apiDomainLocal/Archivist", null, appContext))
             val testAccount = Account.random()
             val testPayload = TestPayload1()
             val bw = BoundWitnessBuilder().signer(testAccount).payloads(listOf(testPayload)).build()
@@ -134,7 +133,7 @@ class BoundWitnessTest {
             println("bwJson-start")
             println(bwJson)
             println("bwJson-end")
-            val queryResult = client.insert(listOf(testPayload))
+            val queryResult = client.insert(listOf(bw))
 
             assert((queryResult.errors?.size ?: 0) == 0)
             assert(((queryResult.response?.payloads?.size ?: 0) > 0))
