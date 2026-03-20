@@ -44,7 +44,7 @@ open class WitnessLocationHandler : WitnessHandlerInterface<Triple<BoundWitness?
 
                     // target the first result because we are only looking at a single location witness
                     val apiResult = result.apiResults?.first()
-                    if (apiResult?.errors?.size !== null && apiResult.errors.size > 0) {
+                    if (apiResult?.errors?.size != null && apiResult.errors.size > 0) {
                         apiResult.errors.forEach { error -> errors.add(error)}
                     }
 

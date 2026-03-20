@@ -29,7 +29,7 @@ open class XyoWitness<out T: Payload> (
 
     open suspend fun observe(context: Context): List<T>? {
         val appContext = context.applicationContext
-        if (deferredObserver !== null) {
+        if (deferredObserver != null) {
             val payload = deferredObserver.deferredDetect(appContext)
             return payload
         }

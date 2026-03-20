@@ -1,16 +1,15 @@
 package network.xyo.client.node.client
 
-import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import network.xyo.client.boundwitness.BoundWitnessFields
+import network.xyo.client.lib.JsonSerializable
 import network.xyo.client.payload.Payload
 import network.xyo.client.types.Hash
 import org.json.JSONArray
 import org.json.JSONObject
 
 open class QueryResponseWrapper(val rawResponse: String) {
-    val moshi: Moshi = Moshi.Builder().addLast(KotlinJsonAdapterFactory()).build()
+    private val moshi = JsonSerializable.moshi
     var bwHash: Hash? = null
     var bw: BoundWitnessFields? = null
     var payloads: List<Payload>? = null
@@ -24,7 +23,7 @@ open class QueryResponseWrapper(val rawResponse: String) {
     private fun splitTuple(tuple: JSONArray) {
         val wrapperBwString = tuple[0].toString()
         val wrapperBw = parseBW(wrapperBwString)
-        if (wrapperBw !== null) {
+        if (wrapperBw != null) {
             bwHash = wrapperBw.dataHash()
             bw = wrapperBw
         }

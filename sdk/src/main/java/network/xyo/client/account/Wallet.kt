@@ -37,7 +37,7 @@ open class Wallet(private val _extKey: ExtKey, previousHash: ByteArray? = null):
 
         override fun fromMnemonic(mnemonic: MnemonicWords, path: String?): Wallet {
             val root = fromSeed(mnemonic.toSeed("".toCharArray()))
-            return if (path === null) {
+            return if (path == null) {
                 root.derivePath(defaultPath)
             } else {
                 root.derivePath(path)

@@ -6,7 +6,6 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import network.xyo.client.lib.JsonSerializable
 import network.xyo.client.account.Account
@@ -28,8 +27,8 @@ class NodeClient(private val url: String, private val accountToUse: network.xyo.
 
     private val account: network.xyo.client.account.model.Account
         get() {
-            if (this.accountToUse === null) {
-                println("WARNING: Anonymous Queries not allowed, but running anyway.")
+            if (this.accountToUse == null) {
+                Log.w("xyoClient", "Anonymous Queries not allowed, but running anyway.")
                 return this._internalAccount
             }
             return this.accountToUse
@@ -47,34 +46,20 @@ class NodeClient(private val url: String, private val accountToUse: network.xyo.
             .build()
 
         return withContext(Dispatchers.IO) {
-            return@withContext suspendCancellableCoroutine { continuation ->
-                try {
-                    okHttp.newCall(request).execute().use { response ->
-                        if (!response.isSuccessful) {
-                            continuation.resume(
-                                PostQueryResult(
-                                    null,
-                                    arrayListOf(Error(response.message))
-                                )
-                            ) { cause, _, _ -> null?.let { it(cause) } }
-                        } else {
-                            continuation.resume(
-                                PostQueryResult(
-                                    QueryResponseWrapper.parse(response.body!!.string()),
-                                    null
-                                )
-                            ) { cause, _, _ -> null?.let { it(cause) } }
-                        }
-                    }
-                } catch (ex: IOException) {
-                    Log.e("xyoClient", ex.message ?: ex.toString())
-                    continuation.resume(
+            try {
+                okHttp.newCall(request).execute().use { response ->
+                    if (!response.isSuccessful) {
+                        PostQueryResult(null, arrayListOf(Error(response.message)))
+                    } else {
                         PostQueryResult(
-                            null,
-                            arrayListOf(Error(ex.message))
+                            QueryResponseWrapper.parse(response.body!!.string()),
+                            null
                         )
-                    ) { cause, _, _ -> null?.let { it(cause) } }
+                    }
                 }
+            } catch (ex: IOException) {
+                Log.e("xyoClient", ex.message ?: ex.toString())
+                PostQueryResult(null, arrayListOf(Error(ex.message)))
             }
         }
     }

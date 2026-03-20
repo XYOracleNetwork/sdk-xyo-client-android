@@ -9,7 +9,7 @@ import network.xyo.client.lib.Secp256k1CurveConstants
 import network.xyo.client.lib.hexStringToByteArray
 import network.xyo.client.lib.publicKeyToAddress
 import network.xyo.client.lib.recoverPublicKey
-import org.spongycastle.jcajce.provider.digest.Keccak
+import org.bouncycastle.jcajce.provider.digest.Keccak
 import tech.figure.hdwallet.ec.PrivateKey
 import tech.figure.hdwallet.ec.extensions.toBytesPadded
 import tech.figure.hdwallet.ec.secp256k1Curve
@@ -79,13 +79,12 @@ open class Account private constructor (private val _privateKey: PrivateKey, pri
 
         private fun generatePrivateKeyBytes(): ByteArray {
             val secureRandom = SecureRandom()
-            val private = ByteArray(32)
-            secureRandom.nextBytes(private)
-            //this line is to make sure the key is below n
-            while(BigInteger(private) > Secp256k1CurveConstants.n) {
-                secureRandom.nextBytes(private)
+            val keyBytes = ByteArray(32)
+            secureRandom.nextBytes(keyBytes)
+            while (BigInteger(keyBytes) > Secp256k1CurveConstants.n) {
+                secureRandom.nextBytes(keyBytes)
             }
-            return private
+            return keyBytes
         }
     }
 }

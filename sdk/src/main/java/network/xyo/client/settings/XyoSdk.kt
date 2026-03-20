@@ -12,9 +12,9 @@ class XyoSdk private constructor(val settings: SettingsInterface) {
 
     @RequiresApi(Build.VERSION_CODES.M)
     suspend fun getAccount(context: Context): network.xyo.client.account.model.Account {
-        if (INSTANCE !== null) {
+        if (INSTANCE != null) {
             val validInstance = INSTANCE!!
-            if (validInstance._account !== null) {
+            if (validInstance._account != null) {
                 return validInstance._account!!
             } else {
                 val repository = AccountPrefsRepository.getInstance(context.applicationContext)

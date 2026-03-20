@@ -47,7 +47,7 @@ class AccountPrefsRepository(context: Context, settings: SettingsInterface = def
             }
         }
         job.join()
-        return if (updatedKey !== null) {
+        return if (updatedKey != null) {
             account
         } else {
             null

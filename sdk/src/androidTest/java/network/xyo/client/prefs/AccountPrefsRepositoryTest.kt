@@ -70,7 +70,7 @@ class AccountPrefsRepositoryTest {
 
             val refreshedAddress = instance.getAccount().privateKey.toHexString()
 
-            assert(originalAddress !== refreshedAddress)
+            assert(originalAddress != refreshedAddress)
         }
     }
 
@@ -113,7 +113,7 @@ class AccountPrefsRepositoryTest {
 
             val refreshedAddress = refreshedInstance.getAccount().privateKey.toHexString()
 
-            assert(originalAddress !== refreshedAddress)
+            assert(originalAddress != refreshedAddress)
         }
     }
 

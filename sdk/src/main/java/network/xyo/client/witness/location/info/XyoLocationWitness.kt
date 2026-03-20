@@ -17,8 +17,8 @@ class DeferredLocationObserver : DeferredObserver<Payload>() {
         try {
             val payloads = XyoLocationPayloads.detect(context)
             // only return the payloads that were found
-            val foundPayloads = payloads.takeIf { it !== null }
-            return if (foundPayloads !== null) {
+            val foundPayloads = payloads.takeIf { it != null }
+            return if (foundPayloads != null) {
                 listOf(foundPayloads.first, foundPayloads.second)
             } else {
                 return null

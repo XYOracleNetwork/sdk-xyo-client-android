@@ -16,13 +16,17 @@ abstract class JsonSerializable: Serializable  {
 
     companion object {
 
+        val moshi: Moshi = Moshi.Builder()
+            .addLast(KotlinJsonAdapterFactory())
+            .build()
+
         fun sortJson(json: String, removeMeta: Boolean = false): String {
             return sortJson(JSONObject(json), removeMeta).toString()
         }
 
         fun sortJson(jsonObject: JSONObject, removeMeta: Boolean = false): JSONObject {
             val keys = jsonObject.keys().asSequence().sorted()
-            val newJsonObject = JSONObject()
+            val sortedMap = linkedMapOf<String, Any?>()
             keys.forEach {
                 if (removeMeta) {
                     if (it.startsWith("_")) {
@@ -34,14 +38,14 @@ abstract class JsonSerializable: Serializable  {
                 }
                 val value = jsonObject.get(it)
                 if (value is JSONObject) {
-                    newJsonObject.put(it, sortJson(value, removeMeta))
+                    sortedMap[it] = sortJson(value, removeMeta)
                 } else if (value is JSONArray) {
-                    newJsonObject.put(it, sortJson(value, removeMeta))
+                    sortedMap[it] = sortJson(value, removeMeta)
                 } else {
-                    newJsonObject.put(it, value)
+                    sortedMap[it] = value
                 }
             }
-            return newJsonObject
+            return JSONObject(sortedMap)
         }
 
         fun sortJson(jsonArray: JSONArray, removeMeta: Boolean = false): JSONArray {
@@ -63,43 +67,24 @@ abstract class JsonSerializable: Serializable  {
         }
 
         fun toJson(obj: Any, removeMeta: Boolean = false): String {
-            val moshi = Moshi.Builder()
-                .addLast(KotlinJsonAdapterFactory())
-                .build()
             val adapter = moshi.adapter(obj.javaClass)
             return sortJson(adapter.toJson(obj), removeMeta)
         }
 
         fun toJson(obj: List<Any>, removeMeta: Boolean = false): String {
-            val moshi = Moshi.Builder()
-                .addLast(KotlinJsonAdapterFactory())
-                .build()
             val adapter = moshi.adapter(obj.first().javaClass)
-            val items = obj.map {item -> sortJson(adapter.toJson(item), removeMeta) }
+            val items = obj.map { item -> sortJson(adapter.toJson(item), removeMeta) }
             return items.joinToString(",", "[", "]")
         }
 
         fun <T: JsonSerializable>fromJson(json: String, obj: T): T? {
-            val moshi = Moshi.Builder()
-                .addLast(KotlinJsonAdapterFactory())
-                .build()
             val adapter = moshi.adapter(obj.javaClass)
             return adapter.fromJson(json)
         }
 
         fun sha256(value: String): Hash {
             val md = MessageDigest.getInstance("SHA256")
-            val valueBytes = value.encodeToByteArray()
-            var total = 0
-            for (byte in valueBytes) {
-                total += byte
-            }
-            val len = value.length
-            if (len == valueBytes.size) {
-                println(total)
-                println(len)
-            }
-            md.update(valueBytes)
+            md.update(value.encodeToByteArray())
             return md.digest()
         }
 

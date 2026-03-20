@@ -24,7 +24,7 @@ class XyoLocationCurrent {
                 return suspendCancellableCoroutine { continuation ->
                     fusedLocationProviderClient.lastLocation
                         .addOnSuccessListener { location ->
-                            if (location === null) {
+                            if (location == null) {
                                 continuation.resumeWith(Result.success(null))
                                 return@addOnSuccessListener
                             }

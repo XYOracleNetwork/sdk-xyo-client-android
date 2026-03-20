@@ -2,7 +2,7 @@ package network.xyo.client.lib
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import org.spongycastle.jcajce.provider.digest.Keccak
+import org.bouncycastle.jcajce.provider.digest.Keccak
 import java.math.BigInteger
 
 data class Point(val x: BigInteger, val y: BigInteger) {

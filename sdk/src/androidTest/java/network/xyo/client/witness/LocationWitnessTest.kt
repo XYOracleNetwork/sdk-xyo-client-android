@@ -45,9 +45,9 @@ class LocationWitnessTest {
 
             assertInstanceOf<LocationPayload>(locationPayload)
             assert(locationPayload.schema == LocationPayload.SCHEMA)
-            assert(locationPayload.currentLocation !== null)
-            assert(locationPayload.currentLocation?.coords?.latitude !== null)
-            assert(locationPayload.currentLocation?.coords?.longitude !== null)
+            assert(locationPayload.currentLocation != null)
+            assert(locationPayload.currentLocation?.coords?.latitude != null)
+            assert(locationPayload.currentLocation?.coords?.longitude != null)
 
             val locationRawPayload = witness.observe(appContext)?.get(1)
             assertInstanceOf<LocationPayloadRaw>(locationRawPayload)
