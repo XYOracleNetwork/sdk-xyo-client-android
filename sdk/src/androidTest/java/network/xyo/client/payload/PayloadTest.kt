@@ -14,7 +14,7 @@ import network.xyo.client.boundwitness.BoundWitnessBuilder
 import network.xyo.client.lib.JsonSerializable
 import network.xyo.client.payload.model.WithMeta
 import network.xyo.client.types.HashHex
-import network.xyo.client.witness.XyoWitness
+import network.xyo.client.android.witness.XyoWitness
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test

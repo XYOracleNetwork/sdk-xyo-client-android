@@ -1,9 +1,5 @@
 package network.xyo.client.node.client
 
-import android.content.Context
-import android.os.Build
-import android.util.Log
-import androidx.annotation.RequiresApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.withContext
@@ -20,15 +16,13 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.io.IOException
 
-@RequiresApi(Build.VERSION_CODES.M)
-class NodeClient(private val url: String, private val accountToUse: network.xyo.client.account.model.Account?, private val context: Context) {
+class NodeClient(private val url: String, private val accountToUse: network.xyo.client.account.model.Account?) {
     private val _internalAccount = Account.random()
     private val okHttp = OkHttpClient()
 
     private val account: network.xyo.client.account.model.Account
         get() {
             if (this.accountToUse == null) {
-                Log.w("xyoClient", "Anonymous Queries not allowed, but running anyway.")
                 return this._internalAccount
             }
             return this.accountToUse
@@ -36,7 +30,6 @@ class NodeClient(private val url: String, private val accountToUse: network.xyo.
 
 
     @ExperimentalCoroutinesApi
-    @RequiresApi(Build.VERSION_CODES.M)
     suspend fun query(query: Payload, payloads: List<Payload>?): PostQueryResult {
         val bodyString = buildQuery(query, payloads)
         val postBody = bodyString.toRequestBody(MEDIA_TYPE_JSON)
@@ -58,13 +51,11 @@ class NodeClient(private val url: String, private val accountToUse: network.xyo.
                     }
                 }
             } catch (ex: IOException) {
-                Log.e("xyoClient", ex.message ?: ex.toString())
                 PostQueryResult(null, arrayListOf(Error(ex.message)))
             }
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.M)
     private suspend fun buildQuery(query: Payload, payloads: List<Payload>?): String {
         val builtQuery = queryBuilder(query, payloads)
         val queryPayloads = buildQueryPayloads(query, payloads)

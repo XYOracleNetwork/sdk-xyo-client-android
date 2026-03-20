@@ -12,10 +12,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import network.xyo.client.account.Account
 import network.xyo.client.lib.TestConstants
-import network.xyo.client.witness.location.info.LocationActivity
-import network.xyo.client.witness.location.info.LocationPayload
-import network.xyo.client.witness.location.info.LocationPayloadRaw
-import network.xyo.client.witness.location.info.XyoLocationWitness
+import network.xyo.client.android.witness.XyoPanel
+import network.xyo.client.android.witness.location.info.LocationActivity
+import network.xyo.client.android.witness.location.info.LocationPayload
+import network.xyo.client.android.witness.location.info.LocationPayloadRaw
+import network.xyo.client.android.witness.location.info.XyoLocationWitness
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test

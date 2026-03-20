@@ -10,7 +10,7 @@ import network.xyo.client.account.Account
 import network.xyo.client.account.Wallet
 import network.xyo.client.archivist.wrapper.ArchivistWrapper
 import network.xyo.client.node.client.DiscoverPayload
-import network.xyo.client.datastore.previous_hash_store.PreviousHashStorePrefsRepository
+import network.xyo.client.android.datastore.previous_hash_store.PreviousHashStorePrefsRepository
 import network.xyo.client.lib.JsonSerializable
 import network.xyo.client.node.client.NodeClient
 import network.xyo.client.payload.Payload
@@ -46,7 +46,7 @@ class BoundWitnessTest {
 
     fun generateQuery(nodeUrl: String): RequestDependencies {
         val account = Account.random()
-        val client = NodeClient(nodeUrl, account, appContext)
+        val client = NodeClient(nodeUrl, account)
         val query = DiscoverPayload()
         val payloads = mutableListOf<Payload>()
         payloads.add(TestPayload1())
@@ -125,7 +125,7 @@ class BoundWitnessTest {
     @Test
     fun testBoundWitnessRoundTripToArchivist() {
         runBlocking {
-            val client = ArchivistWrapper(NodeClient("$apiDomainLocal/Archivist", null, appContext))
+            val client = ArchivistWrapper(NodeClient("$apiDomainLocal/Archivist", null))
             val testAccount = Account.random()
             val testPayload = TestPayload1()
             val bw = BoundWitnessBuilder().signer(testAccount).payloads(listOf(testPayload)).build()

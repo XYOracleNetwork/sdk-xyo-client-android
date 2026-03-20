@@ -1,6 +1,6 @@
 package network.xyo.client.witness
 
-import network.xyo.client.witness.location.info.WitnessLocationHandler
+import network.xyo.client.android.witness.location.info.WitnessLocationHandler
 import android.Manifest
 import android.content.Context
 import androidx.test.ext.junit.rules.ActivityScenarioRule
@@ -11,12 +11,12 @@ import network.xyo.client.lib.TestConstants
 import network.xyo.client.account.Account
 import network.xyo.client.boundwitness.BoundWitnessFields
 import network.xyo.client.boundwitness.BoundWitness
-import network.xyo.client.datastore.previous_hash_store.PreviousHashStorePrefsRepository
+import network.xyo.client.android.datastore.previous_hash_store.PreviousHashStorePrefsRepository
 import network.xyo.client.witness.types.WitnessResult
 import network.xyo.client.payload.Payload
-import network.xyo.client.witness.location.info.LocationActivity
-import network.xyo.client.witness.location.info.LocationPayload
-import network.xyo.client.witness.location.info.LocationPayloadRaw
+import network.xyo.client.android.witness.location.info.LocationActivity
+import network.xyo.client.android.witness.location.info.LocationPayload
+import network.xyo.client.android.witness.location.info.LocationPayloadRaw
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test

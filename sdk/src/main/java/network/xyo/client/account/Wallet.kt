@@ -1,7 +1,5 @@
 package network.xyo.client.account
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import network.xyo.client.account.model.PreviousHashStore
 import network.xyo.client.account.model.Wallet
 import network.xyo.client.account.model.WalletStatic
@@ -12,7 +10,6 @@ import tech.figure.hdwallet.bip39.DeterministicSeed
 import tech.figure.hdwallet.bip39.MnemonicWords
 import tech.figure.hdwallet.ec.extensions.toBytesPadded
 
-@RequiresApi(Build.VERSION_CODES.M)
 open class Wallet(private val _extKey: ExtKey, previousHash: ByteArray? = null):
     Account(_extKey.keyPair.privateKey.key.toBytesPadded(32), previousHash),
     Wallet {

@@ -34,7 +34,7 @@ class NodeClientTest {
     @Test
     fun discoverTestBeta() {
         val account = Account.random()
-        val client = NodeClient(TestConstants.nodeUrlBeta, account, appContext)
+        val client = NodeClient(TestConstants.nodeUrlBeta, account)
         val query = DiscoverPayload()
 
         runBlocking {
@@ -61,7 +61,7 @@ class NodeClientTest {
     @Test
     fun archivistInsertTest() {
         val archivist = ArchivistWrapper(NodeClient(apiDomainBeta,
-            TestConstants.TestAccount, appContext))
+            TestConstants.TestAccount))
 
         val payloads = arrayListOf(TestConstants.debugPayload)
 

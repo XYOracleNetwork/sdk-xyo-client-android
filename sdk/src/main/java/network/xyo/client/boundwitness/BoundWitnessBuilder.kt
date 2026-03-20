@@ -1,7 +1,5 @@
 package network.xyo.client.boundwitness
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import network.xyo.client.lib.JsonSerializable
 import network.xyo.client.account.model.Account
 import network.xyo.client.payload.Payload
@@ -9,7 +7,6 @@ import network.xyo.client.payload.XyoValidationException
 import network.xyo.client.types.Hash
 
 @OptIn(ExperimentalStdlibApi::class)
-@RequiresApi(Build.VERSION_CODES.M)
 open class BoundWitnessBuilder {
     protected var _signers = mutableListOf<Account>()
     protected var _payload_hashes = mutableListOf<String>()

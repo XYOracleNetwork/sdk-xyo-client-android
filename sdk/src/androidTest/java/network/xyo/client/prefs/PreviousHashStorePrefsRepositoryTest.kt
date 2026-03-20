@@ -6,7 +6,7 @@ import kotlinx.coroutines.runBlocking
 import network.xyo.client.lib.TestConstants
 import network.xyo.client.account.Account
 import network.xyo.client.lib.hexStringToByteArray
-import network.xyo.client.datastore.previous_hash_store.PreviousHashStorePrefsRepository
+import network.xyo.client.android.datastore.previous_hash_store.PreviousHashStorePrefsRepository
 import org.junit.Before
 import org.junit.Test
 import org.junit.jupiter.api.Assertions.assertNotNull

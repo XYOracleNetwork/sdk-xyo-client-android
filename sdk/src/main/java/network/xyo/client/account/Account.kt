@@ -1,7 +1,5 @@
 package network.xyo.client.account
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import network.xyo.client.account.model.Account
 import network.xyo.client.account.model.AccountStatic
 import network.xyo.client.account.model.PreviousHashStore
@@ -43,7 +41,6 @@ open class Account private constructor (private val _privateKey: PrivateKey, pri
         return result.encodeAsBTC().toByteArray()
     }
 
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun verify(msg: ByteArray, signature: ByteArray): Boolean {
         val recoveredPublicKey = recoverPublicKey(msg, signature) ?: return false
         val recoveredAddress = publicKeyToAddress(recoveredPublicKey)

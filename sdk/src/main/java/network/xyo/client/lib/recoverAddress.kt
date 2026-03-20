@@ -1,7 +1,5 @@
 package network.xyo.client.lib
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import org.bouncycastle.jcajce.provider.digest.Keccak
 import java.math.BigInteger
 
@@ -16,7 +14,6 @@ fun ByteArray.padStart(targetLength: Int, padValue: Byte = 0): ByteArray {
 }
 
 // Double and Add algorithm for point multiplication
-@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 fun pointMultiply(k: BigInteger, point: Point): Point {
     var result = Point(BigInteger.ZERO, BigInteger.ZERO) // Infinity point
     var addend = point
@@ -34,7 +31,6 @@ fun pointMultiply(k: BigInteger, point: Point): Point {
 }
 
 // Point addition on the elliptic curve
-@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 fun pointAdd(p: Point, q: Point): Point {
     if (p.isAtInfinity()) return q
     if (q.isAtInfinity()) return p
@@ -53,11 +49,9 @@ fun pointAdd(p: Point, q: Point): Point {
 }
 
 // Point doubling on the elliptic curve
-@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 fun pointDouble(p: Point): Point = pointAdd(p, p)
 
 // Recover public key from signature
-@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 fun recoverPublicKey(messageHash: BigInteger, r: BigInteger, s: BigInteger, v: Int): Point? {
     val isYEven = (v % 2 == 0)
     val x = r.add(Secp256k1CurveConstants.n.multiply(BigInteger.valueOf((v / 2).toLong())))
@@ -95,7 +89,6 @@ fun publicKeyToAddress(publicKey: ByteArray): ByteArray {
 }
 
 // Main function to recover address
-@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 fun recoverPublicKey(messageHash: ByteArray, signature: ByteArray): ByteArray? {
     if (signature.size != 64) return null
 
