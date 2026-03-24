@@ -9,3 +9,15 @@ plugins {
 tasks.register<Delete>("clean") {
     delete(rootProject.layout.buildDirectory)
 }
+
+tasks.register("test") {
+    description = "Run tests for all modules"
+    group = "verification"
+    dependsOn(":sdk:test", ":protocol:test")
+}
+
+tasks.register("testProtocol") {
+    description = "Run tests for the protocol module"
+    group = "verification"
+    dependsOn(":protocol:test")
+}

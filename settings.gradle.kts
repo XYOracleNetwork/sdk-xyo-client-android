@@ -20,3 +20,4 @@ plugins {
 
 rootProject.name = "XYO Client"
 include(":sdk")
+include(":protocol")
