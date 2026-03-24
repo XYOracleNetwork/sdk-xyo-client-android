@@ -5,6 +5,7 @@ import android.content.Context
 import android.location.Location
 import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import com.google.android.gms.location.LocationServices
 import com.squareup.moshi.JsonClass
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -15,6 +16,7 @@ import kotlin.coroutines.resumeWithException
 class XyoLocationCurrent {
     companion object {
 
+        @RequiresApi(Build.VERSION_CODES.O)
         @SuppressLint("MissingPermission")
         suspend fun detect(context: Context): Pair<LocationPayload, LocationPayloadRaw>? {
             if (LocationPermissions.check((context)) && LocationPermissions.checkGooglePlayServices(context)) {
@@ -60,6 +62,7 @@ class XyoLocationCurrent {
             return coordinates
         }
 
+        @RequiresApi(Build.VERSION_CODES.O)
         private fun buildRawLocationPayload(location: Location): LocationPayloadRaw {
             return LocationPayloadRaw.detect(
                 location.provider,
