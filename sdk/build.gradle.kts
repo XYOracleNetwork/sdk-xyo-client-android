@@ -13,16 +13,16 @@ group = "network.xyo"
 
 val majorVersion = 3
 val minorVersion = 1
-val patchVersion = 1
+val patchVersion = 2
 
 val verCode = majorVersion * 10000000 + minorVersion * 10000 + patchVersion
 val verString = "$majorVersion.$minorVersion(Build-$patchVersion)"
 
 android {
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
-        minSdk = 21
+        minSdk = 23
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments["runnerBuilder"] = "de.mannodermaus.junit5.AndroidJUnit5Builder"
@@ -30,11 +30,11 @@ android {
     }
 
     testOptions {
-        targetSdk = 35
+        targetSdk = 36
     }
 
     lint {
-        targetSdk = 35
+        targetSdk = 36
     }
 
     buildTypes {
@@ -65,16 +65,16 @@ android {
 }
 
 dependencies {
-    implementation(libs.kotlin.reflect)
-    implementation(libs.kotlinx.coroutines.core)
-    implementation(libs.moshi.kotlin)
+    api(libs.kotlin.reflect)
+    api(libs.kotlinx.coroutines.core)
+    api(libs.moshi.kotlin)
     ksp(libs.moshi.codegen)
     implementation(libs.androidx.core.ktx)
     implementation(libs.play.services.location)
     implementation(libs.hdwallet) {
         exclude(group = "org.bouncycastle", module = "bcprov-jdk15on")
     }
-    implementation(libs.okhttp)
+    api(libs.okhttp)
     implementation(libs.bouncycastle.prov)
     implementation(libs.bignum)
     implementation(libs.androidx.datastore)
@@ -88,7 +88,7 @@ dependencies {
     androidTestImplementation(libs.junit.jupiter)
 
     testImplementation(libs.junit.jupiter)
-    testImplementation("org.json:json:20231013")
+    testImplementation(libs.org.json)
 }
 
 publishing {
@@ -114,6 +114,14 @@ publishing {
                         dependencyNode.appendNode("groupId", dep.group)
                         dependencyNode.appendNode("artifactId", dep.name)
                         dependencyNode.appendNode("version", dep.version)
+
+                        // Exclude old BouncyCastle from hdwallet transitive
+                        if (dep.name == "hdwallet") {
+                            val exclusionsNode = dependencyNode.appendNode("exclusions")
+                            val exclusionNode = exclusionsNode.appendNode("exclusion")
+                            exclusionNode.appendNode("groupId", "org.bouncycastle")
+                            exclusionNode.appendNode("artifactId", "bcprov-jdk15on")
+                        }
                     }
                 }
             }

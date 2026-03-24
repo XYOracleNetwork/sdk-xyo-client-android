@@ -8,10 +8,10 @@ plugins {
 group = "network.xyo"
 
 android {
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
-        minSdk = 21
+        minSdk = 23
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments["runnerBuilder"] = "de.mannodermaus.junit5.AndroidJUnit5Builder"
@@ -19,11 +19,11 @@ android {
     }
 
     testOptions {
-        targetSdk = 35
+        targetSdk = 36
     }
 
     lint {
-        targetSdk = 35
+        targetSdk = 36
     }
 
     buildTypes {
@@ -46,13 +46,10 @@ android {
 
 dependencies {
     implementation(project(":sdk"))
-    implementation(libs.kotlin.reflect)
-    implementation(libs.kotlinx.coroutines.core)
-    implementation(libs.moshi.kotlin)
+
     ksp(libs.moshi.codegen)
-    implementation(libs.okhttp)
-    implementation(libs.bouncycastle.prov)
 
     testImplementation(libs.junit.jupiter)
-    testImplementation("org.json:json:20231013")
+    testImplementation(libs.org.json)
+    testImplementation(libs.kotlinx.coroutines.core)
 }
