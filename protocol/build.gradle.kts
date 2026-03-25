@@ -83,7 +83,7 @@ publishing {
                 sdkNode.appendNode("version", "$majorVersion.$minorVersion.$patchVersion")
 
                 configurations.getByName("implementation").allDependencies.forEach { dep ->
-                    if (dep.name != "unspecified") {
+                    if (dep.name != "unspecified" && dep !is ProjectDependency) {
                         val dependencyNode = (dependenciesNode as groovy.util.Node).appendNode("dependency")
                         dependencyNode.appendNode("groupId", dep.group)
                         dependencyNode.appendNode("artifactId", dep.name)
