@@ -3,9 +3,16 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.android.junit5)
+    `maven-publish`
 }
 
 group = "network.xyo"
+
+val majorVersion: Int by rootProject.extra
+val minorVersion: Int by rootProject.extra
+val patchVersion: Int by rootProject.extra
+
+val verString = "$majorVersion.$minorVersion(Build-$patchVersion)"
 
 android {
     compileSdk = 36
@@ -50,6 +57,36 @@ android {
     }
 
     namespace = "network.xyo.chain.protocol"
+}
+
+publishing {
+    publications {
+        register<MavenPublication>("Production") {
+            artifact("${layout.buildDirectory.get()}/outputs/aar/protocol-release.aar") {
+                builtBy(tasks.named("assemble"))
+            }
+            groupId = "network.xyo"
+            artifactId = "sdk-xyo-client-android-protocol"
+            version = verString
+
+            pom.withXml {
+                val dependenciesNode = asNode().let { node ->
+                    (node.children() as List<*>)
+                        .filterIsInstance<groovy.util.Node>()
+                        .find { it.name().toString().endsWith("dependencies") }
+                        ?: node.appendNode("dependencies")
+                }
+                configurations.getByName("implementation").allDependencies.forEach { dep ->
+                    if (dep.name != "unspecified") {
+                        val dependencyNode = (dependenciesNode as groovy.util.Node).appendNode("dependency")
+                        dependencyNode.appendNode("groupId", dep.group)
+                        dependencyNode.appendNode("artifactId", dep.name)
+                        dependencyNode.appendNode("version", dep.version)
+                    }
+                }
+            }
+        }
+    }
 }
 
 dependencies {

@@ -11,9 +11,9 @@ plugins {
 
 group = "network.xyo"
 
-val majorVersion = 3
-val minorVersion = 1
-val patchVersion = 2
+val majorVersion: Int by rootProject.extra
+val minorVersion: Int by rootProject.extra
+val patchVersion: Int by rootProject.extra
 
 val verCode = majorVersion * 10000000 + minorVersion * 10000 + patchVersion
 val verString = "$majorVersion.$minorVersion(Build-$patchVersion)"

@@ -1,3 +1,7 @@
+val majorVersion by extra(3)
+val minorVersion by extra(1)
+val patchVersion by extra(3)
+
 plugins {
     alias(libs.plugins.android.library) apply false
     alias(libs.plugins.kotlin.android) apply false
