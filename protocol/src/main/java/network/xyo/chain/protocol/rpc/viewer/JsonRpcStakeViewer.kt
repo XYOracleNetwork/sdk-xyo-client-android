@@ -31,28 +31,15 @@ class JsonRpcStakeViewer(
         return transport.sendRequest(RpcMethodNames.STAKE_VIEWER_STAKES_BY_STAKER, listOf(staker), schemas)
     }
 
-    override suspend fun activeStakes(): List<Position> {
-        return transport.sendRequest(RpcMethodNames.STAKE_VIEWER_ACTIVE, schemas = schemas)
-    }
-
-    override suspend fun removedStakes(): List<Position> {
-        return transport.sendRequest(RpcMethodNames.STAKE_VIEWER_REMOVED, schemas = schemas)
-    }
-
-    override suspend fun withdrawnStakes(): List<Position> {
-        return transport.sendRequest(RpcMethodNames.STAKE_VIEWER_WITHDRAWN, schemas = schemas)
-    }
-
     override suspend fun minWithdrawalBlocks(): Long {
-        val result = transport.sendRawRequest("stakeViewer_minWithdrawalBlocks")
-        return (result as Number).toLong()
+        return transport.sendRequest(RpcMethodNames.STAKE_VIEWER_MIN_WITHDRAWAL_BLOCKS, schemas = schemas)
     }
 
     override suspend fun rewardsContract(): String {
-        return transport.sendRawRequest("stakeViewer_rewardsContract") as String
+        return transport.sendRequest(RpcMethodNames.STAKE_VIEWER_REWARDS_CONTRACT, schemas = schemas)
     }
 
     override suspend fun stakingTokenAddress(): String {
-        return transport.sendRawRequest("stakeViewer_stakingTokenAddress") as String
+        return transport.sendRequest(RpcMethodNames.STAKE_VIEWER_STAKING_TOKEN_ADDRESS, schemas = schemas)
     }
 }

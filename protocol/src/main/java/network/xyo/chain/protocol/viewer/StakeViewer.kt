@@ -11,9 +11,6 @@ interface StakeViewer : Provider {
     suspend fun stakeByStaker(staker: String, slot: Int): Position
     suspend fun stakesByStaked(staked: String): List<Position>
     suspend fun stakesByStaker(staker: String): List<Position>
-    suspend fun activeStakes(): List<Position>
-    suspend fun removedStakes(): List<Position>
-    suspend fun withdrawnStakes(): List<Position>
     suspend fun minWithdrawalBlocks(): Long
     suspend fun rewardsContract(): String
     suspend fun stakingTokenAddress(): String

@@ -17,26 +17,6 @@ class JsonRpcAccountBalanceViewer(
 
     private val schemas = AccountBalanceViewerRpcSchemas
 
-    override suspend fun accountBalance(address: String, config: AccountBalanceConfig?): AttoXL1 {
-        val result = accountBalances(listOf(address), config)
-        return result[address] ?: AttoXL1.ZERO
-    }
-
-    override suspend fun accountBalances(addresses: List<String>, config: AccountBalanceConfig?): Map<String, AttoXL1> {
-        val params = if (config != null) listOf(addresses, config) else listOf(addresses)
-        return transport.sendRequest(RpcMethodNames.ACCOUNT_BALANCE_VIEWER_BALANCES, params, schemas)
-    }
-
-    override suspend fun accountBalanceHistory(address: String, config: AccountBalanceConfig?): List<AccountBalanceHistoryItem> {
-        val params = if (config != null) listOf(address, config) else listOf(address)
-        return transport.sendRequest(RpcMethodNames.ACCOUNT_BALANCE_VIEWER_HISTORY, params, schemas)
-    }
-
-    override suspend fun accountBalanceHistories(addresses: List<String>, config: AccountBalanceConfig?): Map<String, List<AccountBalanceHistoryItem>> {
-        val params = if (config != null) listOf(addresses, config) else listOf(addresses)
-        return transport.sendRequest(RpcMethodNames.ACCOUNT_BALANCE_VIEWER_HISTORIES, params, schemas)
-    }
-
     override suspend fun qualifiedAccountBalances(addresses: List<String>, config: AccountBalanceConfig): ChainQualified<Map<String, AttoXL1>> {
         return transport.sendRequest(RpcMethodNames.ACCOUNT_BALANCE_VIEWER_QUALIFIED_BALANCES, listOf(addresses, config), schemas)
     }

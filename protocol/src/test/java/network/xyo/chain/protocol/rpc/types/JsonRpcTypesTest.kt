@@ -60,7 +60,7 @@ class JsonRpcTypesTest {
     @Test
     fun `RpcMethodNames constants are non-empty`() {
         assertTrue(RpcMethodNames.BLOCK_VIEWER_CURRENT_BLOCK.isNotEmpty())
-        assertTrue(RpcMethodNames.ACCOUNT_BALANCE_VIEWER_BALANCE.isNotEmpty())
+        assertTrue(RpcMethodNames.ACCOUNT_BALANCE_VIEWER_QUALIFIED_BALANCES.isNotEmpty())
         assertTrue(RpcMethodNames.MEMPOOL_RUNNER_SUBMIT_TRANSACTIONS.isNotEmpty())
     }
 }

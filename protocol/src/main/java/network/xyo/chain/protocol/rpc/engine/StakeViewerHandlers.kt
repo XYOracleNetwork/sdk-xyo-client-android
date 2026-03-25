@@ -16,7 +16,13 @@ fun rpcMethodHandlersFromStakeViewer(viewer: StakeViewer): RpcMethodHandlerMap =
     RpcMethodNames.STAKE_VIEWER_STAKES_BY_STAKER to RpcMethodHandler { params ->
         viewer.stakesByStaker(params[0] as String)
     },
-    RpcMethodNames.STAKE_VIEWER_ACTIVE to RpcMethodHandler { viewer.activeStakes() },
-    RpcMethodNames.STAKE_VIEWER_REMOVED to RpcMethodHandler { viewer.removedStakes() },
-    RpcMethodNames.STAKE_VIEWER_WITHDRAWN to RpcMethodHandler { viewer.withdrawnStakes() },
+    RpcMethodNames.STAKE_VIEWER_MIN_WITHDRAWAL_BLOCKS to RpcMethodHandler {
+        viewer.minWithdrawalBlocks()
+    },
+    RpcMethodNames.STAKE_VIEWER_REWARDS_CONTRACT to RpcMethodHandler {
+        viewer.rewardsContract()
+    },
+    RpcMethodNames.STAKE_VIEWER_STAKING_TOKEN_ADDRESS to RpcMethodHandler {
+        viewer.stakingTokenAddress()
+    },
 )

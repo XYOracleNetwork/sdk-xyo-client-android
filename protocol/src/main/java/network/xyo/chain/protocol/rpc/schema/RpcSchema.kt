@@ -2,7 +2,9 @@ package network.xyo.chain.protocol.rpc.schema
 
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import com.squareup.moshi.Types
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 
 /**
@@ -38,20 +40,33 @@ class RpcSchema<TResult>(
 /** A map of RPC method names to their schema definitions. */
 typealias RpcSchemaMap = Map<String, RpcSchema<*>>
 
+/**
+ * Captures a reified type as a [Type], preserving generic type parameters.
+ * Works by creating an anonymous subclass of TypeToken that Moshi's Types
+ * utility can extract the full parameterized type from.
+ */
+abstract class TypeToken<T> {
+    val type: Type
+        get() {
+            val superclass = javaClass.genericSuperclass as ParameterizedType
+            return superclass.actualTypeArguments[0]
+        }
+}
+
 /** Builder DSL for constructing an RpcSchemaMap. */
 class RpcSchemaMapBuilder {
     @PublishedApi
     internal val schemas = mutableMapOf<String, RpcSchema<*>>()
 
     inline fun <reified TResult> method(name: String) {
-        schemas[name] = RpcSchema<TResult>(
-            resultType = TResult::class.java,
-        )
+        val type = object : TypeToken<TResult>() {}.type
+        schemas[name] = RpcSchema<TResult>(resultType = type)
     }
 
     inline fun <reified TResult> method(name: String, noinline transform: (Any?) -> TResult) {
+        val type = object : TypeToken<TResult>() {}.type
         schemas[name] = RpcSchema<TResult>(
-            resultType = TResult::class.java,
+            resultType = type,
             resultTransform = transform,
         )
     }
@@ -65,5 +80,6 @@ inline fun rpcSchemaMap(block: RpcSchemaMapBuilder.() -> Unit): RpcSchemaMap {
 
 /** Shared Moshi instance for RPC schema operations. */
 val rpcMoshi: Moshi = Moshi.Builder()
+    .add(PayloadJsonAdapterFactory())
     .addLast(KotlinJsonAdapterFactory())
     .build()

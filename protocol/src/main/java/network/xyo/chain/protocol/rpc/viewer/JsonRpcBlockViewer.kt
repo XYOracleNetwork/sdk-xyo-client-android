@@ -2,11 +2,6 @@ package network.xyo.chain.protocol.rpc.viewer
 
 import network.xyo.chain.protocol.block.SignedHydratedBlockWithHashMeta
 import network.xyo.chain.protocol.block.XL1BlockNumber
-import network.xyo.chain.protocol.chain.ChainId
-import network.xyo.chain.protocol.model.BlockRate
-import network.xyo.chain.protocol.model.TimeConfig
-import network.xyo.chain.protocol.model.TimeUnit
-import network.xyo.chain.protocol.model.XL1BlockRange
 import network.xyo.chain.protocol.rpc.schema.BlockViewerRpcSchemas
 import network.xyo.chain.protocol.rpc.transport.RpcTransport
 import network.xyo.chain.protocol.rpc.transport.sendRequest
@@ -45,49 +40,7 @@ class JsonRpcBlockViewer(
         return transport.sendRequest(RpcMethodNames.BLOCK_VIEWER_CURRENT_BLOCK, schemas = schemas)
     }
 
-    override suspend fun currentBlockHash(): String {
-        return transport.sendRequest(RpcMethodNames.BLOCK_VIEWER_CURRENT_BLOCK_HASH, schemas = schemas)
-    }
-
-    override suspend fun currentBlockNumber(): XL1BlockNumber {
-        return transport.sendRequest(RpcMethodNames.BLOCK_VIEWER_CURRENT_BLOCK_NUMBER, schemas = schemas)
-    }
-
-    override suspend fun chainId(blockNumber: XL1BlockNumber?): ChainId {
-        val params = if (blockNumber != null) listOf(blockNumber.value) else emptyList()
-        return transport.sendRequest(RpcMethodNames.BLOCK_VIEWER_CHAIN_ID, params, schemas)
-    }
-
-    override suspend fun payloadByHash(hash: String): Payload? {
-        val results = payloadsByHash(listOf(hash))
-        return results.firstOrNull()
-    }
-
     override suspend fun payloadsByHash(hashes: List<String>): List<Payload> {
         return transport.sendRequest(RpcMethodNames.BLOCK_VIEWER_PAYLOADS_BY_HASH, listOf(hashes), schemas)
-    }
-
-    override suspend fun rate(range: XL1BlockRange, timeUnit: TimeUnit): BlockRate {
-        return transport.sendRequest(
-            RpcMethodNames.BLOCK_VIEWER_RATE,
-            listOf(listOf(range.start.value, range.end.value), timeUnit.name),
-            schemas,
-        )
-    }
-
-    override suspend fun stepSizeRate(start: XL1BlockNumber, stepIndex: Int, count: Int?, timeUnit: TimeUnit): BlockRate {
-        val params = listOfNotNull(start.value, stepIndex, count, timeUnit.name)
-        return transport.sendRequest("blockViewer_stepSizeRate", params, schemas)
-    }
-
-    override suspend fun timeDurationRate(timeConfig: TimeConfig, startBlockNumber: XL1BlockNumber?, timeUnit: TimeUnit, toleranceMs: Long?, maxAttempts: Int?): BlockRate {
-        val params = buildList<Any> {
-            add(timeConfig)
-            startBlockNumber?.let { add(it.value) }
-            add(timeUnit.name)
-            toleranceMs?.let { add(it) }
-            maxAttempts?.let { add(it) }
-        }
-        return transport.sendRequest("blockViewer_timeDurationRate", params, schemas)
     }
 }

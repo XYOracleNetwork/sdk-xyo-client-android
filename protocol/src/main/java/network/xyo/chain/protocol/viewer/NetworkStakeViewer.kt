@@ -1,15 +1,25 @@
 package network.xyo.chain.protocol.viewer
 
+import network.xyo.chain.protocol.block.XL1BlockNumber
 import network.xyo.chain.protocol.model.Position
 import network.xyo.chain.protocol.model.PositionId
 import network.xyo.chain.protocol.provider.Provider
 import java.math.BigInteger
 
+/**
+ * Result of the networkStakeViewer_active RPC call.
+ * Contains the total active stake and the number of active validators.
+ */
+data class ActiveStakeResult(
+    val totalStake: BigInteger,
+    val validatorCount: Int,
+)
+
 interface NetworkStakeViewer : Provider {
     override val moniker: String get() = MONIKER
 
-    suspend fun totalStake(): BigInteger
-    suspend fun positionCount(): Int
+    /** Get the active stake total and validator count, optionally at a specific block. */
+    suspend fun active(blockNumber: XL1BlockNumber? = null): ActiveStakeResult
 
     companion object {
         const val MONIKER = "NetworkStakeViewer"
