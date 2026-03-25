@@ -30,7 +30,7 @@ class HttpRpcTransport(
     private val requestAdapter = moshi.adapter(JsonRpcRequest::class.java)
     private val responseAdapter = moshi.adapter(JsonRpcResponse::class.java)
 
-    override suspend fun sendRequest(method: String, params: List<Any?>): Any? {
+    override suspend fun sendRawRequest(method: String, params: List<Any?>): Any? {
         val request = JsonRpcRequest(
             id = UUID.randomUUID().toString(),
             method = method,

@@ -1,7 +1,9 @@
 package network.xyo.chain.protocol.rpc.runner
 
 import network.xyo.chain.protocol.block.SignedHydratedBlock
+import network.xyo.chain.protocol.rpc.schema.MempoolRunnerRpcSchemas
 import network.xyo.chain.protocol.rpc.transport.RpcTransport
+import network.xyo.chain.protocol.rpc.transport.sendRequest
 import network.xyo.chain.protocol.rpc.types.RpcMethodNames
 import network.xyo.chain.protocol.runner.MempoolPruneOptions
 import network.xyo.chain.protocol.runner.MempoolRunner
@@ -12,25 +14,23 @@ class JsonRpcMempoolRunner(
 ) : MempoolRunner {
     override val moniker: String = MempoolRunner.MONIKER
 
-    @Suppress("UNCHECKED_CAST")
+    private val schemas = MempoolRunnerRpcSchemas
+
     override suspend fun submitTransactions(transactions: List<SignedHydratedTransaction>): List<String> {
-        val result = transport.sendRequest(RpcMethodNames.MEMPOOL_RUNNER_SUBMIT_TRANSACTIONS, listOf(transactions))
-        return result as? List<String> ?: emptyList()
+        return transport.sendRequest(RpcMethodNames.MEMPOOL_RUNNER_SUBMIT_TRANSACTIONS, listOf(transactions), schemas)
     }
 
-    @Suppress("UNCHECKED_CAST")
     override suspend fun submitBlocks(blocks: List<SignedHydratedBlock>): List<String> {
-        val result = transport.sendRequest(RpcMethodNames.MEMPOOL_RUNNER_SUBMIT_BLOCKS, listOf(blocks))
-        return result as? List<String> ?: emptyList()
+        return transport.sendRequest(RpcMethodNames.MEMPOOL_RUNNER_SUBMIT_BLOCKS, listOf(blocks), schemas)
     }
 
     override suspend fun prunePendingTransactions(options: MempoolPruneOptions?): Pair<Int, Int> {
-        // TODO: implement
+        // TODO: implement when RPC method is available
         return Pair(0, 0)
     }
 
     override suspend fun prunePendingBlocks(options: MempoolPruneOptions?): Pair<Int, Int> {
-        // TODO: implement
+        // TODO: implement when RPC method is available
         return Pair(0, 0)
     }
 }

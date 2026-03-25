@@ -1,6 +1,5 @@
 package network.xyo.chain.protocol.rpc.viewer
 
-import network.xyo.chain.protocol.block.SignedBlockBoundWitness
 import network.xyo.chain.protocol.block.SignedHydratedBlockWithHashMeta
 import network.xyo.chain.protocol.block.XL1BlockNumber
 import network.xyo.chain.protocol.chain.ChainId
@@ -8,7 +7,9 @@ import network.xyo.chain.protocol.model.BlockRate
 import network.xyo.chain.protocol.model.TimeConfig
 import network.xyo.chain.protocol.model.TimeUnit
 import network.xyo.chain.protocol.model.XL1BlockRange
+import network.xyo.chain.protocol.rpc.schema.BlockViewerRpcSchemas
 import network.xyo.chain.protocol.rpc.transport.RpcTransport
+import network.xyo.chain.protocol.rpc.transport.sendRequest
 import network.xyo.chain.protocol.rpc.types.RpcMethodNames
 import network.xyo.chain.protocol.viewer.BlockViewer
 import network.xyo.client.payload.model.Payload
@@ -17,6 +18,8 @@ class JsonRpcBlockViewer(
     private val transport: RpcTransport,
 ) : BlockViewer {
     override val moniker: String = BlockViewer.MONIKER
+
+    private val schemas = BlockViewerRpcSchemas
 
     override suspend fun blockByHash(hash: String): SignedHydratedBlockWithHashMeta? {
         val results = blocksByHash(hash, 1)
@@ -28,39 +31,31 @@ class JsonRpcBlockViewer(
         return results.firstOrNull()
     }
 
-    @Suppress("UNCHECKED_CAST")
     override suspend fun blocksByHash(hash: String, limit: Int?): List<SignedHydratedBlockWithHashMeta> {
         val params = if (limit != null) listOf(hash, limit) else listOf(hash)
-        val result = transport.sendRequest(RpcMethodNames.BLOCK_VIEWER_BLOCKS_BY_HASH, params)
-        return parseBlockList(result)
+        return transport.sendRequest(RpcMethodNames.BLOCK_VIEWER_BLOCKS_BY_HASH, params, schemas)
     }
 
-    @Suppress("UNCHECKED_CAST")
     override suspend fun blocksByNumber(block: XL1BlockNumber, limit: Int?): List<SignedHydratedBlockWithHashMeta> {
         val params = if (limit != null) listOf(block.value, limit) else listOf(block.value)
-        val result = transport.sendRequest(RpcMethodNames.BLOCK_VIEWER_BLOCKS_BY_NUMBER, params)
-        return parseBlockList(result)
+        return transport.sendRequest(RpcMethodNames.BLOCK_VIEWER_BLOCKS_BY_NUMBER, params, schemas)
     }
 
     override suspend fun currentBlock(): SignedHydratedBlockWithHashMeta {
-        val result = transport.sendRequest(RpcMethodNames.BLOCK_VIEWER_CURRENT_BLOCK)
-        return parseBlock(result) ?: error("Current block not found")
+        return transport.sendRequest(RpcMethodNames.BLOCK_VIEWER_CURRENT_BLOCK, schemas = schemas)
     }
 
     override suspend fun currentBlockHash(): String {
-        return transport.sendRequest(RpcMethodNames.BLOCK_VIEWER_CURRENT_BLOCK_HASH) as? String
-            ?: error("Current block hash not found")
+        return transport.sendRequest(RpcMethodNames.BLOCK_VIEWER_CURRENT_BLOCK_HASH, schemas = schemas)
     }
 
     override suspend fun currentBlockNumber(): XL1BlockNumber {
-        val result = transport.sendRequest(RpcMethodNames.BLOCK_VIEWER_CURRENT_BLOCK_NUMBER)
-        return XL1BlockNumber((result as Number).toLong())
+        return transport.sendRequest(RpcMethodNames.BLOCK_VIEWER_CURRENT_BLOCK_NUMBER, schemas = schemas)
     }
 
     override suspend fun chainId(blockNumber: XL1BlockNumber?): ChainId {
         val params = if (blockNumber != null) listOf(blockNumber.value) else emptyList()
-        return transport.sendRequest(RpcMethodNames.BLOCK_VIEWER_CHAIN_ID, params) as? String
-            ?: error("Chain ID not found")
+        return transport.sendRequest(RpcMethodNames.BLOCK_VIEWER_CHAIN_ID, params, schemas)
     }
 
     override suspend fun payloadByHash(hash: String): Payload? {
@@ -69,20 +64,20 @@ class JsonRpcBlockViewer(
     }
 
     override suspend fun payloadsByHash(hashes: List<String>): List<Payload> {
-        transport.sendRequest(RpcMethodNames.BLOCK_VIEWER_PAYLOADS_BY_HASH, listOf(hashes))
-        // TODO: deserialize payload results
-        return emptyList()
+        return transport.sendRequest(RpcMethodNames.BLOCK_VIEWER_PAYLOADS_BY_HASH, listOf(hashes), schemas)
     }
 
     override suspend fun rate(range: XL1BlockRange, timeUnit: TimeUnit): BlockRate {
-        val result = transport.sendRequest(RpcMethodNames.BLOCK_VIEWER_RATE, listOf(listOf(range.start.value, range.end.value), timeUnit.name))
-        return parseBlockRate(result)
+        return transport.sendRequest(
+            RpcMethodNames.BLOCK_VIEWER_RATE,
+            listOf(listOf(range.start.value, range.end.value), timeUnit.name),
+            schemas,
+        )
     }
 
     override suspend fun stepSizeRate(start: XL1BlockNumber, stepIndex: Int, count: Int?, timeUnit: TimeUnit): BlockRate {
         val params = listOfNotNull(start.value, stepIndex, count, timeUnit.name)
-        val result = transport.sendRequest("blockViewer_stepSizeRate", params)
-        return parseBlockRate(result)
+        return transport.sendRequest("blockViewer_stepSizeRate", params, schemas)
     }
 
     override suspend fun timeDurationRate(timeConfig: TimeConfig, startBlockNumber: XL1BlockNumber?, timeUnit: TimeUnit, toleranceMs: Long?, maxAttempts: Int?): BlockRate {
@@ -93,35 +88,6 @@ class JsonRpcBlockViewer(
             toleranceMs?.let { add(it) }
             maxAttempts?.let { add(it) }
         }
-        val result = transport.sendRequest("blockViewer_timeDurationRate", params)
-        return parseBlockRate(result)
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    private fun parseBlockList(result: Any?): List<SignedHydratedBlockWithHashMeta> {
-        // TODO: full deserialization with Moshi adapters
-        return emptyList()
-    }
-
-    private fun parseBlock(result: Any?): SignedHydratedBlockWithHashMeta? {
-        // TODO: full deserialization with Moshi adapters
-        return null
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    private fun parseBlockRate(result: Any?): BlockRate {
-        val map = result as? Map<String, Any> ?: error("Invalid BlockRate response")
-        val rangeList = map["range"] as? List<Number> ?: error("Invalid range in BlockRate")
-        return BlockRate(
-            range = XL1BlockRange(
-                XL1BlockNumber(rangeList[0].toLong()),
-                XL1BlockNumber(rangeList[1].toLong()),
-            ),
-            rate = (map["rate"] as Number).toDouble(),
-            timeUnit = TimeUnit.valueOf(map["timeUnit"] as String),
-            span = (map["span"] as Number).toLong(),
-            timeDifference = (map["timeDifference"] as Number).toDouble(),
-            timePerBlock = (map["timePerBlock"] as Number).toDouble(),
-        )
+        return transport.sendRequest("blockViewer_timeDurationRate", params, schemas)
     }
 }
