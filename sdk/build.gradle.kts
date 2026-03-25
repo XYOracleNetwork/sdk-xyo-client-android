@@ -106,8 +106,8 @@ publishing {
             artifact("${layout.buildDirectory.get()}/outputs/aar/sdk-release.aar") {
                 builtBy(tasks.named("assemble"))
             }
-            groupId = "network.xyo"
-            artifactId = "sdk-xyo-client-android"
+            groupId = "com.github.xyoraclenetwork.sdk-xyo-client-android"
+            artifactId = "sdk-xyo-client-android-sdk"
             version = verString
 
             pom.withXml {

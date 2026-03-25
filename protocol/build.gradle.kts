@@ -65,7 +65,7 @@ publishing {
             artifact("${layout.buildDirectory.get()}/outputs/aar/protocol-release.aar") {
                 builtBy(tasks.named("assemble"))
             }
-            groupId = "network.xyo"
+            groupId = "com.github.xyoraclenetwork.sdk-xyo-client-android"
             artifactId = "sdk-xyo-client-android-protocol"
             version = verString
 
@@ -76,12 +76,6 @@ publishing {
                         .find { it.name().toString().endsWith("dependencies") }
                         ?: node.appendNode("dependencies")
                 }
-                // Add the sdk module dependency with JitPack coordinates
-                val sdkNode = (dependenciesNode as groovy.util.Node).appendNode("dependency")
-                sdkNode.appendNode("groupId", "com.github.xyoraclenetwork.sdk-xyo-client-android")
-                sdkNode.appendNode("artifactId", "sdk-xyo-client-android")
-                sdkNode.appendNode("version", "$majorVersion.$minorVersion.$patchVersion")
-
                 configurations.getByName("implementation").allDependencies.forEach { dep ->
                     if (dep.name != "unspecified" && dep !is ProjectDependency) {
                         val dependencyNode = (dependenciesNode as groovy.util.Node).appendNode("dependency")
@@ -96,7 +90,8 @@ publishing {
 }
 
 dependencies {
-    implementation(project(":sdk"))
+    compileOnly(project(":sdk"))
+    testImplementation(project(":sdk"))
 
     ksp(libs.moshi.codegen)
 
