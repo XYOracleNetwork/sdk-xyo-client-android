@@ -10,7 +10,7 @@
     <application>
         <activity
             android:exported="true"
-            android:name="network.xyo.client.witness.location.info.LocationActivity" />
+            android:name="network.xyo.client.android.witness.location.info.LocationActivity" />
     </application>
 
 </manifest>

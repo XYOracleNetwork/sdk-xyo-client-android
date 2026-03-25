@@ -85,7 +85,7 @@ class XyoPanel(
             Log.e("xyoClient", "No Nodes found, so no payloads will be sent to archivist(s)")
         }
 
-        nodes?.forEach { node ->
+        for (node in nodes.orEmpty()) {
             val archivist = ArchivistWrapper(node)
             val payloadsWithBoundWitness = payloads.plus(bw)
             val queryResult = archivist.insert(payloadsWithBoundWitness)

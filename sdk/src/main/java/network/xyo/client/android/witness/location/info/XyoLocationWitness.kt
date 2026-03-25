@@ -1,6 +1,7 @@
 package network.xyo.client.android.witness.location.info
 
 import android.content.Context
+import android.os.Build
 import android.util.Log
 import network.xyo.client.android.witness.DeferredObserver
 import network.xyo.client.android.witness.XyoWitness
@@ -11,6 +12,7 @@ class DeferredLocationObserver : DeferredObserver<Payload>() {
     override suspend fun deferredDetect(
         context: Context,
     ): List<Payload>? {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return null
         try {
             val payloads = XyoLocationPayloads.detect(context)
             // only return the payloads that were found

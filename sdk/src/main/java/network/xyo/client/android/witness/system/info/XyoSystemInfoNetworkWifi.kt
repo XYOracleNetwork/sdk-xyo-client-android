@@ -44,17 +44,15 @@ class XyoSystemInfoNetworkWifi (
                 latch.await(5, TimeUnit.SECONDS)
                 val connectivityManager = context.getSystemService(ConnectivityManager::class.java)
 
-                if (Build.VERSION.SDK_INT >= 23) {
-                    val network = connectivityManager.activeNetwork
-                    val networkCaps = connectivityManager.getNetworkCapabilities(network)
-                    if (networkCaps?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true) {
-                        return XyoSystemInfoNetworkWifi(
-                            getIpAddress(),
-                            wifiInfo?.macAddress,
-                            wifiInfo?.rssi,
-                            wifiInfo?.ssid?.replace("\"", "")
-                        )
-                    }
+                val network = connectivityManager.activeNetwork
+                val networkCaps = connectivityManager.getNetworkCapabilities(network)
+                if (networkCaps?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true) {
+                    return XyoSystemInfoNetworkWifi(
+                        getIpAddress(),
+                        wifiInfo?.macAddress,
+                        wifiInfo?.rssi,
+                        wifiInfo?.ssid?.replace("\"", "")
+                    )
                 }
                 return null
             } catch (e: InterruptedException) {
@@ -73,8 +71,10 @@ class XyoSystemInfoNetworkWifi (
 
             val networkCallback = object : NetworkCallback() {
                 override fun onCapabilitiesChanged(network: Network, networkCapabilities: NetworkCapabilities) {
-                    val localWifiInfo = networkCapabilities.transportInfo as? WifiInfo
-                    wifiInfo = localWifiInfo
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        val localWifiInfo = networkCapabilities.transportInfo as? WifiInfo
+                        wifiInfo = localWifiInfo
+                    }
                     // countDown to zero to lift the latch
                     latch.countDown()
                 }

@@ -78,7 +78,7 @@ class NodeClient(private val url: String, private val accountToUse: network.xyo.
     private fun buildQueryPayloads(query: Payload, payloads: List<Payload>?): List<Payload>{
         return arrayListOf<Payload>().let { queryPayloads ->
             payloads?.let { payloads ->
-                payloads.forEach { payload ->
+                for (payload in payloads) {
                     queryPayloads.add(payload)
                 }
             }
@@ -90,7 +90,7 @@ class NodeClient(private val url: String, private val accountToUse: network.xyo.
     // stringify combined payloads
     private fun queryPayloadsJsonArray(payloads: List<Payload>): JSONArray {
         return JSONArray().apply {
-            payloads.forEach { payload ->
+            for (payload in payloads) {
                 val serializedPayload = JsonSerializable.toJson(payload)
                 val obj = JSONObject(serializedPayload)
                 this.put(obj)

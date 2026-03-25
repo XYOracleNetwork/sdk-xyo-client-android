@@ -3,7 +3,6 @@ package network.xyo.client.android.witness.system.info
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import android.os.Build
 import android.telephony.TelephonyManager
 import com.squareup.moshi.JsonClass
 import java.net.NetworkInterface
@@ -20,20 +19,18 @@ class XyoSystemInfoNetworkCellular(
 ) {
     companion object {
         fun detect(context: Context): XyoSystemInfoNetworkCellular? {
-            if (Build.VERSION.SDK_INT >= 23) {
-                val connectivityManager =
-                    context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-                val network = connectivityManager.activeNetwork
-                val networkCaps = connectivityManager.getNetworkCapabilities(network)
-                if (networkCaps?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) == true) {
-                    val telephonyManager =
-                        context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-                    val provider = XyoSystemInfoNetworkCellularProvider(
-                        telephonyManager.networkOperatorName
-                    )
+            val connectivityManager =
+                context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val network = connectivityManager.activeNetwork
+            val networkCaps = connectivityManager.getNetworkCapabilities(network)
+            if (networkCaps?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) == true) {
+                val telephonyManager =
+                    context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+                val provider = XyoSystemInfoNetworkCellularProvider(
+                    telephonyManager.networkOperatorName
+                )
 
-                    return XyoSystemInfoNetworkCellular(getIpAddress(), provider)
-                }
+                return XyoSystemInfoNetworkCellular(getIpAddress(), provider)
             }
             return null
         }

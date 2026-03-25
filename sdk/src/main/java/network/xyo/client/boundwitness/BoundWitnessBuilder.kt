@@ -21,7 +21,7 @@ open class BoundWitnessBuilder {
         get() = _signers.map { witness -> witness.address.toHexString() }
 
     open fun signers(signers: List<Account>): BoundWitnessBuilder {
-        signers.forEach { signer -> signer(signer) }
+        for (signer in signers) { signer(signer) }
         return this
     }
 
@@ -48,7 +48,7 @@ open class BoundWitnessBuilder {
 
     @Throws(XyoValidationException::class)
     fun payloads(payloads: List<Payload>): BoundWitnessBuilder {
-        payloads.forEach {
+        for (it in payloads) {
             payload(it.schema, it)
         }
         return this

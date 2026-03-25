@@ -27,7 +27,7 @@ object StepSizes {
         BigInteger.ZERO to BigInteger.ONE,
         BigInteger.ZERO to BigInteger.ONE,
         BigInteger.ONE to BigInteger.valueOf(10_000),
-        BigInteger.TWO to BigInteger.valueOf(1_000),
+        BigInteger.valueOf(2) to BigInteger.valueOf(1_000),
         BigInteger.valueOf(3) to BigInteger.valueOf(100),
         BigInteger.valueOf(45) to BigInteger.valueOf(100),
     )

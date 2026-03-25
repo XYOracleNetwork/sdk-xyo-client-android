@@ -37,7 +37,7 @@ fun pointAdd(p: Point, q: Point): Point {
 
     val slope = if (p.x == q.x) {
         if ((p.y + q.y).mod(Secp256k1CurveConstants.p) == BigInteger.ZERO) return Point(BigInteger.ZERO, BigInteger.ZERO)
-        (BigInteger.valueOf(3) * p.x.pow(2) + Secp256k1CurveConstants.a).mod(Secp256k1CurveConstants.p) * (BigInteger.TWO * p.y).modInverse(Secp256k1CurveConstants.p)
+        (BigInteger.valueOf(3) * p.x.pow(2) + Secp256k1CurveConstants.a).mod(Secp256k1CurveConstants.p) * (BigInteger.valueOf(2) * p.y).modInverse(Secp256k1CurveConstants.p)
     } else {
         (q.y - p.y).mod(Secp256k1CurveConstants.p) * (q.x - p.x).modInverse(Secp256k1CurveConstants.p)
     }.mod(Secp256k1CurveConstants.p)
