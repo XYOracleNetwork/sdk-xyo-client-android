@@ -1,8 +1,8 @@
 package network.xyo.client.account.model
 
-interface Account: PrivateKey {
-    val previousHash: ByteArray?
-    val privateKey: ByteArray
-    val publicKey: ByteArray
-    val publicKeyUncompressed: ByteArray
-}
+/**
+ * Backward-compatible alias for [AccountInstance].
+ *
+ * New code should prefer [AccountInstance] to match JS SDK naming.
+ */
+interface Account : AccountInstance

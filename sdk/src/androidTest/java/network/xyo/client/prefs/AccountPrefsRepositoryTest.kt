@@ -133,7 +133,7 @@ class AccountPrefsRepositoryTest {
             assertEquals(firstAccount.privateKey.toHexString(), testAccount.privateKey.toHexString())
 
             // Sign with the test account
-            val firstBw = BoundWitnessBuilder().signer(firstAccount).payloads(listOf(
+            val (firstBw, _) = BoundWitnessBuilder().signer(firstAccount).payloads(listOf(
                 TestConstants.debugPayload
             )).build()
             val firstAddress = firstBw.addresses.first()
@@ -143,7 +143,7 @@ class AccountPrefsRepositoryTest {
             val secondAccount = secondInstance.getAccount()
 
             // Sign with the test account
-            val secondBw = BoundWitnessBuilder().signer(secondAccount).payloads(listOf(
+            val (secondBw, _) = BoundWitnessBuilder().signer(secondAccount).payloads(listOf(
                 TestConstants.debugPayload
             )).build()
             val secondAddress = secondBw.addresses.first()

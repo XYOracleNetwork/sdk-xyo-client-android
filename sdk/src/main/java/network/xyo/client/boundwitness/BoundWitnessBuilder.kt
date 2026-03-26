@@ -81,11 +81,11 @@ open class BoundWitnessBuilder {
         bw.__signatures = this.sign(dataHash)
     }
 
-    open suspend fun build(): BoundWitness {
-        return bw.let{
+    open suspend fun build(): Pair<BoundWitness, List<Payload>> {
+        return bw.let {
             // update fields
             constructFields()
-            it
+            Pair(it, _payloads.toList())
         }
     }
 }

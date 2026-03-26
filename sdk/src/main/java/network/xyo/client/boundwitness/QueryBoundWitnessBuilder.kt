@@ -25,14 +25,14 @@ class QueryBoundWitnessBuilder : BoundWitnessBuilder() {
         return this
     }
 
-    override suspend fun build(): QueryBoundWitness {
+    override suspend fun build(): Pair<QueryBoundWitness, List<Payload>> {
         bw = QueryBoundWitness()
         // override to support additional properties for query bound witnesses
         return bw.let {
             val qbw = it as QueryBoundWitness
             qbw.query = this.queryHash.toHexString()
             constructFields()
-            it
+            Pair(qbw, _payloads.toList())
         }
     }
 

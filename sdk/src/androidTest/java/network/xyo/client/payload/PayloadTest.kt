@@ -118,7 +118,7 @@ class PayloadTest {
         CoroutineScope(Dispatchers.Main).launch {
             val response = arrayListOf(witness.observe(appContext))
             val payloads = response.mapNotNull { payload -> payload }.flatten()
-            val bwJson = BoundWitnessBuilder()
+            val (bwJson, _) = BoundWitnessBuilder()
                 .payloads(payloads)
                 .signer(Account.random())
                 .build()

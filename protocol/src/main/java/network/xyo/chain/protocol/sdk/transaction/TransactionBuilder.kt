@@ -65,7 +65,7 @@ class TransactionBuilder {
         bwBuilder.signers(signers)
         bwBuilder.payloads(payloads)
 
-        val bw = bwBuilder.build()
+        val (bw, _) = bwBuilder.build()
 
         val boundWitness = TransactionBoundWitness(
             from = from,

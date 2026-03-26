@@ -58,10 +58,11 @@ class XyoPanel(
     }
 
     private suspend fun generateBoundWitnessJson(payloads: List<Payload>): BoundWitness {
-        return BoundWitnessBuilder()
+        val (bw, _) = BoundWitnessBuilder()
             .payloads(payloads)
             .signer(account)
             .build()
+        return bw
     }
 
 

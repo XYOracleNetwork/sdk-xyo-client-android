@@ -69,8 +69,8 @@ class NodeClient(private val url: String, private val accountToUse: network.xyo.
             payloads?.let { payload ->
                 it.payloads(payload)
             }
-            it.signer(this.account).query(query).build()
-
+            val (qbw, _) = it.signer(this.account).query(query).build()
+            qbw
         }
     }
 

@@ -1,3 +1,7 @@
+package network.xyo.client.boundwitness
+
+import MemoryPreviousHashStore
+import boundWitnessSequenceTestCases
 import network.xyo.client.account.Account
 import network.xyo.client.account.Wallet
 import org.junit.jupiter.api.BeforeEach

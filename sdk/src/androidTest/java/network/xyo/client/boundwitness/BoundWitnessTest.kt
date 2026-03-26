@@ -76,7 +76,7 @@ class BoundWitnessTest {
     @Test
     fun testBoundWitnessMeta() {
         runBlocking {
-            val bw = BoundWitnessBuilder().signer(Account.random()).payloads(listOf(
+            val (bw, _) = BoundWitnessBuilder().signer(Account.random()).payloads(listOf(
                 TestPayload1()
             )).build()
             assert(bw.__signatures.size == 1)
@@ -86,7 +86,7 @@ class BoundWitnessTest {
     @Test
     fun testBoundWitnessMetaSerialization() {
         runBlocking {
-            val bw = BoundWitnessBuilder().signer(Account.random()).payloads(listOf(
+            val (bw, _) = BoundWitnessBuilder().signer(Account.random()).payloads(listOf(
                 TestPayload1()
             )).build()
             val serializedBw = JsonSerializable.toJson(bw)
@@ -103,7 +103,7 @@ class BoundWitnessTest {
             val testAccount = Wallet.fromMnemonic("abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about")
             val knownBw1DataHash = "cb8b63aaaa8da5763f3e62541421c48b9b2356b4b9da24f58359072b89549e66"
             val testPayload = TestPayload1()
-            val bw = BoundWitnessBuilder().signer(testAccount).payloads(listOf(
+            val (bw, _) = BoundWitnessBuilder().signer(testAccount).payloads(listOf(
                 testPayload
             )).build()
             val calcDataHash = bw.dataHash().toHexString()
@@ -113,7 +113,7 @@ class BoundWitnessTest {
             assertEquals(calcDataHash, calcDataHash2)
             assertNotEquals(calcJson, calcDataJson)
             assertEquals(knownBw1DataHash, calcDataHash)
-            val bw2 = BoundWitnessBuilder().signer(testAccount).payloads(listOf(
+            val (bw2, _) = BoundWitnessBuilder().signer(testAccount).payloads(listOf(
                 TestPayload1()
             )).build()
             assertEquals(bw2.previous_hashes.first(), knownBw1DataHash)
@@ -128,7 +128,7 @@ class BoundWitnessTest {
             val client = ArchivistWrapper(NodeClient("$apiDomainLocal/Archivist", null))
             val testAccount = Account.random()
             val testPayload = TestPayload1()
-            val bw = BoundWitnessBuilder().signer(testAccount).payloads(listOf(testPayload)).build()
+            val (bw, _) = BoundWitnessBuilder().signer(testAccount).payloads(listOf(testPayload)).build()
             val bwJson: String = bw.toJson()
             println("bwJson-start")
             println(bwJson)
