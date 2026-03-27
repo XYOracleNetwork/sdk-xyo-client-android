@@ -1,8 +1,7 @@
 package network.xyo.chain.protocol.rpc.transport
 
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlinx.coroutines.suspendCancellableCoroutine
+import network.xyo.chain.protocol.rpc.schema.rpcMoshi
 import network.xyo.chain.protocol.rpc.types.JsonRpcRequest
 import network.xyo.chain.protocol.rpc.types.JsonRpcResponse
 import okhttp3.Call
@@ -23,12 +22,8 @@ class HttpRpcTransport(
     private val client: OkHttpClient = defaultClient(),
 ) : RpcTransport {
 
-    private val moshi: Moshi = Moshi.Builder()
-        .addLast(KotlinJsonAdapterFactory())
-        .build()
-
-    private val requestAdapter = moshi.adapter(JsonRpcRequest::class.java)
-    private val responseAdapter = moshi.adapter(JsonRpcResponse::class.java)
+    private val requestAdapter = rpcMoshi.adapter(JsonRpcRequest::class.java)
+    private val responseAdapter = rpcMoshi.adapter(JsonRpcResponse::class.java)
 
     override suspend fun sendRawRequest(method: String, params: List<Any?>): Any? {
         val request = JsonRpcRequest(

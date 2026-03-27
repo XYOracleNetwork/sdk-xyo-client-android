@@ -1,5 +1,7 @@
 package network.xyo.client.boundwitness
 
+import network.xyo.client.boundwitness.model.BoundWitnessFields as BoundWitnessFieldsModel
+import network.xyo.client.boundwitness.model.BoundWitnessMeta
 import network.xyo.client.lib.hexStringToByteArray
 import network.xyo.client.lib.publicKeyToAddress
 import network.xyo.client.lib.recoverPublicKey
@@ -7,23 +9,39 @@ import network.xyo.client.payload.PayloadHasher
 import network.xyo.client.payload.PayloadValidator
 
 /**
- * Validates BoundWitness instances, matching JS BoundWitnessValidator.
+ * Validates any object implementing BoundWitnessFields + BoundWitnessMeta.
+ *
+ * Works with sdk's BoundWitness, protocol's BlockBoundWitness,
+ * TransactionBoundWitness, or any other implementation.
  *
  * Validates:
  * - Schema correctness
  * - Address uniqueness
- * - Array length consistency (addresses, payload_hashes, payload_schemas, previous_hashes, signatures)
- * - Signature validity
+ * - Array length consistency
+ * - Signature validity (when dataHash is provided)
  */
-class BoundWitnessValidator<T : BoundWitness>(payload: T) : PayloadValidator<T>(payload) {
+class BoundWitnessValidator(
+    private val fields: BoundWitnessFieldsModel,
+    private val meta: BoundWitnessMeta,
+    private val dataHash: ByteArray? = null,
+) {
+
+    /**
+     * Convenience constructor for objects that implement both interfaces.
+     */
+    constructor(bw: BoundWitness) : this(
+        fields = bw,
+        meta = bw,
+        dataHash = bw.dataHash(),
+    )
 
     /**
      * Validate that the schema is the BoundWitness schema.
      */
     fun schema(): List<Error> {
         val errors = mutableListOf<Error>()
-        if (payload.schema != BoundWitnessFields.SCHEMA) {
-            errors.add(Error("schema must be '${BoundWitnessFields.SCHEMA}', got '${payload.schema}'"))
+        if (fields.schema != BOUND_WITNESS_SCHEMA) {
+            errors.add(Error("schema must be '$BOUND_WITNESS_SCHEMA', got '${fields.schema}'"))
         }
         return errors
     }
@@ -33,7 +51,7 @@ class BoundWitnessValidator<T : BoundWitness>(payload: T) : PayloadValidator<T>(
      */
     fun addressesUniqueness(): List<Error> {
         val errors = mutableListOf<Error>()
-        val addresses = payload.addresses
+        val addresses = fields.addresses
         if (addresses.size != addresses.toSet().size) {
             errors.add(Error("addresses must be unique"))
         }
@@ -46,7 +64,7 @@ class BoundWitnessValidator<T : BoundWitness>(payload: T) : PayloadValidator<T>(
     fun addresses(): List<Error> {
         val errors = mutableListOf<Error>()
         errors.addAll(addressesUniqueness())
-        if (payload.addresses.isEmpty()) {
+        if (fields.addresses.isEmpty()) {
             errors.add(Error("addresses must not be empty"))
         }
         return errors
@@ -57,8 +75,8 @@ class BoundWitnessValidator<T : BoundWitness>(payload: T) : PayloadValidator<T>(
      */
     fun previousHashes(): List<Error> {
         val errors = mutableListOf<Error>()
-        if (payload.previous_hashes.size != payload.addresses.size) {
-            errors.add(Error("previous_hashes length (${payload.previous_hashes.size}) must match addresses length (${payload.addresses.size})"))
+        if (fields.previous_hashes.size != fields.addresses.size) {
+            errors.add(Error("previous_hashes length (${fields.previous_hashes.size}) must match addresses length (${fields.addresses.size})"))
         }
         return errors
     }
@@ -68,8 +86,8 @@ class BoundWitnessValidator<T : BoundWitness>(payload: T) : PayloadValidator<T>(
      */
     fun validatePayloadHashesLength(): List<Error> {
         val errors = mutableListOf<Error>()
-        if (payload.payload_hashes.size != payload.payload_schemas.size) {
-            errors.add(Error("payload_hashes length (${payload.payload_hashes.size}) must match payload_schemas length (${payload.payload_schemas.size})"))
+        if (fields.payload_hashes.size != fields.payload_schemas.size) {
+            errors.add(Error("payload_hashes length (${fields.payload_hashes.size}) must match payload_schemas length (${fields.payload_schemas.size})"))
         }
         return errors
     }
@@ -82,8 +100,8 @@ class BoundWitnessValidator<T : BoundWitness>(payload: T) : PayloadValidator<T>(
         errors.addAll(previousHashes())
         errors.addAll(validatePayloadHashesLength())
 
-        val sigCount = payload.__signatures.size
-        val addrCount = payload.addresses.size
+        val sigCount = meta.__signatures.size
+        val addrCount = fields.addresses.size
         if (sigCount != addrCount) {
             errors.add(Error("signatures length ($sigCount) must match addresses length ($addrCount)"))
         }
@@ -95,7 +113,7 @@ class BoundWitnessValidator<T : BoundWitness>(payload: T) : PayloadValidator<T>(
      */
     fun schemas(): List<Error> {
         val errors = mutableListOf<Error>()
-        payload.payload_schemas.forEachIndexed { index, schema ->
+        fields.payload_schemas.forEachIndexed { index, schema ->
             if (schema.isBlank()) {
                 errors.add(Error("payload_schemas[$index] must not be blank"))
             }
@@ -105,19 +123,20 @@ class BoundWitnessValidator<T : BoundWitness>(payload: T) : PayloadValidator<T>(
 
     /**
      * Validate all signatures against addresses using the data hash.
+     * Skipped if no data hash was provided.
      */
     fun signatures(): List<Error> {
+        val hash = dataHash ?: return emptyList()
         val errors = mutableListOf<Error>()
-        val dataHash = payload.dataHash()
 
-        payload.__signatures.forEachIndexed { index, signatureHex ->
-            val expectedAddress = payload.addresses.getOrNull(index)
+        meta.__signatures.forEachIndexed { index, signatureHex ->
+            val expectedAddress = fields.addresses.getOrNull(index)
             if (expectedAddress == null) {
                 errors.add(Error("no address at index $index for signature"))
                 return@forEachIndexed
             }
 
-            val signatureErrors = validateSignature(dataHash, expectedAddress, signatureHex)
+            val signatureErrors = validateSignature(hash, expectedAddress, signatureHex)
             errors.addAll(signatureErrors)
         }
         return errors
@@ -126,7 +145,7 @@ class BoundWitnessValidator<T : BoundWitness>(payload: T) : PayloadValidator<T>(
     /**
      * Run all validations.
      */
-    override fun validate(): List<Error> {
+    fun validate(): List<Error> {
         val errors = mutableListOf<Error>()
         errors.addAll(schema())
         errors.addAll(addresses())
@@ -137,6 +156,8 @@ class BoundWitnessValidator<T : BoundWitness>(payload: T) : PayloadValidator<T>(
     }
 
     companion object {
+        private const val BOUND_WITNESS_SCHEMA = "network.xyo.boundwitness"
+
         /**
          * Validate a single signature against an expected address.
          */

@@ -2,6 +2,6 @@ package network.xyo.client.boundwitness.model
 
 import java.io.Serializable
 
-interface BoundWitnessMeta: Serializable {
-    var __signatures: List<String>
+interface BoundWitnessMeta : Serializable {
+    val __signatures: List<String>
 }

@@ -1,14 +1,18 @@
 package network.xyo.chain.protocol.rpc.engine
 
 import network.xyo.chain.protocol.runner.MempoolRunner
+import network.xyo.chain.protocol.runner.StakeRunner
 import network.xyo.chain.protocol.viewer.AccountBalanceViewer
+import network.xyo.chain.protocol.viewer.BlockRewardViewer
 import network.xyo.chain.protocol.viewer.BlockViewer
 import network.xyo.chain.protocol.viewer.FinalizationViewer
 import network.xyo.chain.protocol.viewer.MempoolViewer
 import network.xyo.chain.protocol.viewer.NetworkStakeViewer
+import network.xyo.chain.protocol.viewer.StakeTotalsViewer
 import network.xyo.chain.protocol.viewer.StakeViewer
 import network.xyo.chain.protocol.viewer.TimeSyncViewer
 import network.xyo.chain.protocol.viewer.TransactionViewer
+import network.xyo.chain.protocol.viewer.TransferBalanceViewer
 
 /**
  * Aggregates optional viewer/runner instances.
@@ -24,6 +28,10 @@ data class RpcConnection(
     val networkStakeViewer: NetworkStakeViewer? = null,
     val mempoolViewer: MempoolViewer? = null,
     val mempoolRunner: MempoolRunner? = null,
+    val transferBalanceViewer: TransferBalanceViewer? = null,
+    val stakeTotalsViewer: StakeTotalsViewer? = null,
+    val blockRewardViewer: BlockRewardViewer? = null,
+    val stakeRunner: StakeRunner? = null,
 )
 
 /**
@@ -40,6 +48,10 @@ fun rpcMethodHandlersFromConnection(connection: RpcConnection): RpcMethodHandler
     connection.networkStakeViewer?.let { putAll(rpcMethodHandlersFromNetworkStakeViewer(it)) }
     connection.mempoolViewer?.let { putAll(rpcMethodHandlersFromMempoolViewer(it)) }
     connection.mempoolRunner?.let { putAll(rpcMethodHandlersFromMempoolRunner(it)) }
+    connection.transferBalanceViewer?.let { putAll(rpcMethodHandlersFromTransferBalanceViewer(it)) }
+    connection.stakeTotalsViewer?.let { putAll(rpcMethodHandlersFromStakeTotalsViewer(it)) }
+    connection.blockRewardViewer?.let { putAll(rpcMethodHandlersFromBlockRewardViewer(it)) }
+    connection.stakeRunner?.let { putAll(rpcMethodHandlersFromStakeRunner(it)) }
 }
 
 /** Convenience: create an RpcEngine from a connection with all registered schemas. */
