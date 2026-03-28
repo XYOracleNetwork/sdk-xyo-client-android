@@ -1,6 +1,7 @@
 package network.xyo.client.payload
 
 import network.xyo.client.lib.JsonSerializable
+import network.xyo.client.lib.JsonSerializable.Companion.MetaExclusion
 import network.xyo.client.types.Hash
 import network.xyo.client.types.HashHex
 import java.security.MessageDigest
@@ -30,18 +31,20 @@ object PayloadHasher {
     }
 
     /**
-     * Compute the data hash of a payload (excludes meta fields starting with _ or $).
+     * Compute the data hash of a payload (excludes both `_` and `$` prefix fields).
+     * Per the XYO Yellow Paper Section 3.3.
      */
     fun <T : JsonSerializable> dataHash(obj: T): Hash {
-        val json = JsonSerializable.toJson(obj, removeMeta = true)
+        val json = JsonSerializable.toJson(obj, MetaExclusion.ALL_META)
         return sha256(json)
     }
 
     /**
-     * Compute the full hash of a payload (includes all fields).
+     * Compute the hash of a payload (excludes `_` prefix fields, keeps `$` prefix fields).
+     * Per the XYO Yellow Paper Section 3.2.
      */
     fun <T : JsonSerializable> hash(obj: T): Hash {
-        val json = JsonSerializable.toJson(obj, removeMeta = false)
+        val json = JsonSerializable.toJson(obj, MetaExclusion.STORAGE_META)
         return sha256(json)
     }
 
@@ -154,10 +157,19 @@ object PayloadHasher {
     }
 
     /**
-     * Get the JSON representation of hashable fields (sorted, meta stripped).
+     * Get the JSON representation of hash-able fields (sorted, storage meta stripped).
+     * This is the canonical form used for `hash()` computation.
      */
     fun <T : JsonSerializable> hashableFields(obj: T): String {
-        return JsonSerializable.toJson(obj, removeMeta = true)
+        return JsonSerializable.toJson(obj, MetaExclusion.STORAGE_META)
+    }
+
+    /**
+     * Get the JSON representation of data-hash-able fields (sorted, all meta stripped).
+     * This is the canonical form used for `dataHash()` computation.
+     */
+    fun <T : JsonSerializable> dataHashableFields(obj: T): String {
+        return JsonSerializable.toJson(obj, MetaExclusion.ALL_META)
     }
 
     private val hexArray = "0123456789abcdef".toCharArray()
