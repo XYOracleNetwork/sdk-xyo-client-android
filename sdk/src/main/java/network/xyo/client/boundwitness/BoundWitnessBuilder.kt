@@ -15,6 +15,8 @@ open class BoundWitnessBuilder {
     protected open var bw: BoundWitness = BoundWitness()
 
     var _timestamp: Long? = null
+    protected var _sourceQuery: String? = null
+    protected var _destination: String? = null
 
     @OptIn(ExperimentalStdlibApi::class)
     val addresses: List<String>
@@ -27,6 +29,18 @@ open class BoundWitnessBuilder {
 
     open fun signer(signer: Account): BoundWitnessBuilder {
         _signers.add(signer)
+        return this
+    }
+
+    /** Set the $sourceQuery field (hash of the originating query). */
+    fun sourceQuery(sourceQuery: String): BoundWitnessBuilder {
+        _sourceQuery = sourceQuery
+        return this
+    }
+
+    /** Set the $destination field (target address for directed messages). */
+    fun destination(destination: String): BoundWitnessBuilder {
+        _destination = destination
         return this
     }
 
@@ -68,6 +82,10 @@ open class BoundWitnessBuilder {
         bw.payload_schemas = _payload_schemas
         bw.previous_hashes = _signers.map {account -> account.previousHash?.toHexString()}
         bw.addresses = addresses
+
+        // set client metadata ($-prefixed fields, not included in dataHash)
+        bw.__sourceQuery = _sourceQuery
+        bw.__destination = _destination
 
         // construct fields involved in hashing
         constructHashableFieldsFields()

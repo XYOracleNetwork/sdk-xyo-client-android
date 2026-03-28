@@ -1,8 +1,11 @@
 package network.xyo.client.payload
 
 import com.squareup.moshi.JsonClass
+import network.xyo.client.lib.JsonSerializable
+import network.xyo.client.lib.JsonSerializable.Companion.MetaExclusion
 import network.xyo.client.types.Hash
 import network.xyo.client.types.HashHex
+import org.json.JSONObject
 
 /**
  * Fluent builder for creating Payload instances, matching JS PayloadBuilder.
@@ -122,5 +125,74 @@ class PayloadBuilder(private var _schema: String) {
          */
         fun findByHash(payloads: List<Payload>, hash: HashHex): Payload? =
             PayloadHasher.findByHash(payloads, hash)
+
+        // --- Metadata Management (Yellow Paper Section 12.1) ---
+
+        /**
+         * Get the hashable fields of a payload (storage meta removed).
+         * This is the canonical form used for `hash()` computation.
+         */
+        fun hashableFields(payload: Payload): String =
+            JsonSerializable.toJson(payload, MetaExclusion.STORAGE_META)
+
+        /**
+         * Get the data-hashable fields of a payload (all meta removed).
+         * This is the canonical form used for `dataHash()` computation.
+         */
+        fun dataHashableFields(payload: Payload): String =
+            JsonSerializable.toJson(payload, MetaExclusion.ALL_META)
+
+        /**
+         * Remove storage metadata (`_` prefix fields) from a JSON string.
+         */
+        fun omitStorageMeta(json: String): String =
+            JsonSerializable.sortJson(json, MetaExclusion.STORAGE_META)
+
+        /**
+         * Remove client metadata (`$` prefix fields) from a JSON string.
+         */
+        fun omitClientMeta(json: String): String {
+            val obj = JSONObject(json)
+            val keys = obj.keys().asSequence().filter { !it.startsWith("$") }.toList()
+            val filtered = JSONObject()
+            for (key in keys) {
+                filtered.put(key, obj.get(key))
+            }
+            return JsonSerializable.sortJson(filtered.toString(), MetaExclusion.NONE)
+        }
+
+        /**
+         * Remove both storage and client metadata from a JSON string.
+         */
+        fun omitMeta(json: String): String =
+            JsonSerializable.sortJson(json, MetaExclusion.ALL_META)
+
+        /**
+         * Add hash metadata (_hash and _dataHash) to a payload's JSON.
+         * Returns a new JSON string with the hash fields added.
+         */
+        fun addHashMeta(payload: Payload): String {
+            val json = JsonSerializable.toJson(payload, MetaExclusion.NONE)
+            val obj = JSONObject(json)
+            obj.put("_hash", hashHex(payload))
+            obj.put("_dataHash", dataHashHex(payload))
+            return JsonSerializable.sortJson(obj.toString(), MetaExclusion.NONE)
+        }
+
+        /**
+         * Add full storage metadata (_hash, _dataHash, _sequence) to a payload's JSON.
+         * Returns a new JSON string with storage meta fields added.
+         */
+        fun addStorageMeta(payload: Payload, timestamp: Long = System.currentTimeMillis(), index: Int = 0): String {
+            val json = JsonSerializable.toJson(payload, MetaExclusion.NONE)
+            val obj = JSONObject(json)
+            val hashVal = hashHex(payload)
+            val dataHashVal = dataHashHex(payload)
+            obj.put("_hash", hashVal)
+            obj.put("_dataHash", dataHashVal)
+            val hashBytes = hash(payload)
+            obj.put("_sequence", Sequence.local(timestamp, index, hashBytes))
+            return JsonSerializable.sortJson(obj.toString(), MetaExclusion.NONE)
+        }
     }
 }

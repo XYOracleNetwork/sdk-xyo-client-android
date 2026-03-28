@@ -35,4 +35,27 @@ open class ArchivistWrapper(private val nodeClient: NodeClient) {
         val query = ArchivistClearQueryPayload()
         return nodeClient.query(query, null)
     }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    suspend fun next(
+        cursor: String? = null,
+        limit: Int? = null,
+        open: Boolean? = null,
+        order: String? = null
+    ): PostQueryResult {
+        val query = ArchivistNextQueryPayload(cursor, limit, open, order)
+        return nodeClient.query(query, null)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    suspend fun commit(): PostQueryResult {
+        val query = ArchivistCommitQueryPayload()
+        return nodeClient.query(query, null)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    suspend fun snapshot(): PostQueryResult {
+        val query = ArchivistSnapshotQueryPayload()
+        return nodeClient.query(query, null)
+    }
 }

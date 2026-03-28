@@ -10,4 +10,10 @@ open class BoundWitness(client: String? = "android", signatures: List<String> = 
 
     @Json(name = "\$signatures")
     final override var __signatures = signatures
+
+    @Json(name = "\$destination")
+    final override var __destination: String? = null
+
+    @Json(name = "\$sourceQuery")
+    final override var __sourceQuery: String? = null
 }
