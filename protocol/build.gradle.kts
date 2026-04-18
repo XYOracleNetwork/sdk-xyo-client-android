@@ -101,3 +101,12 @@ dependencies {
     testImplementation(libs.org.json)
     testImplementation(libs.kotlinx.coroutines.core)
 }
+
+// Run live JSON-RPC compatibility tests against the xl1-compat stub server.
+// Delegates to scripts/run-live-compat.sh, which handles server lifecycle.
+tasks.register<Exec>("liveCompatTest") {
+    group = "verification"
+    description = "Starts the xl1-compat stub server and runs Kotlin live RPC tests against it."
+    workingDir = rootProject.projectDir
+    commandLine("bash", "scripts/run-live-compat.sh")
+}
