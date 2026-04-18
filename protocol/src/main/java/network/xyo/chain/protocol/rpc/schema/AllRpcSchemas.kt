@@ -17,4 +17,9 @@ val AllRpcSchemas: RpcSchemaMap = buildMap {
     putAll(StakeRunnerRpcSchemas)
     putAll(StepViewerRpcSchemas)
     putAll(StepRewardsViewerRpcSchemas)
+    putAll(DataLakeViewerRpcSchemas)
+    putAll(NetworkStakingStepRewardsByPositionViewerRpcSchemas)
+    putAll(NetworkStakingStepRewardsByStakerViewerRpcSchemas)
+    putAll(NetworkStakingStepRewardsByStepViewerRpcSchemas)
+    putAll(NetworkStakingStepRewardsTotalViewerRpcSchemas)
 }

@@ -85,4 +85,36 @@ object RpcMethodNames {
 
     // ForkViewer
     const val FORK_VIEWER_FORK_HISTORY = "forkViewer_forkHistory"
+
+    // DataLakeViewer
+    const val DATA_LAKE_VIEWER_GET = "dataLakeViewer_get"
+    const val DATA_LAKE_VIEWER_NEXT = "dataLakeViewer_next"
+
+    // NetworkStakingStepRewardsByPositionViewer (v1.26 split-per-dimension API)
+    const val REWARDS_BY_POSITION_BONUS = "networkStakingStepRewardsByPositionViewer_bonus"
+    const val REWARDS_BY_POSITION_CLAIMED = "networkStakingStepRewardsByPositionViewer_claimed"
+    const val REWARDS_BY_POSITION_EARNED = "networkStakingStepRewardsByPositionViewer_earned"
+    const val REWARDS_BY_POSITION_TOTAL = "networkStakingStepRewardsByPositionViewer_total"
+    const val REWARDS_BY_POSITION_UNCLAIMED = "networkStakingStepRewardsByPositionViewer_unclaimed"
+
+    // NetworkStakingStepRewardsByStakerViewer
+    const val REWARDS_BY_STAKER_BONUS = "networkStakingStepRewardsByStakerViewer_bonus"
+    const val REWARDS_BY_STAKER_CLAIMED = "networkStakingStepRewardsByStakerViewer_claimed"
+    const val REWARDS_BY_STAKER_EARNED = "networkStakingStepRewardsByStakerViewer_earned"
+    const val REWARDS_BY_STAKER_TOTAL = "networkStakingStepRewardsByStakerViewer_total"
+    const val REWARDS_BY_STAKER_UNCLAIMED = "networkStakingStepRewardsByStakerViewer_unclaimed"
+
+    // NetworkStakingStepRewardsByStepViewer
+    const val REWARDS_BY_STEP_BONUS = "networkStakingStepRewardsByStepViewer_bonus"
+    const val REWARDS_BY_STEP_CLAIMED = "networkStakingStepRewardsByStepViewer_claimed"
+    const val REWARDS_BY_STEP_EARNED = "networkStakingStepRewardsByStepViewer_earned"
+    const val REWARDS_BY_STEP_TOTAL = "networkStakingStepRewardsByStepViewer_total"
+    const val REWARDS_BY_STEP_UNCLAIMED = "networkStakingStepRewardsByStepViewer_unclaimed"
+
+    // NetworkStakingStepRewardsTotalViewer
+    const val REWARDS_TOTAL_BONUS = "networkStakingStepRewardsTotalViewer_bonus"
+    const val REWARDS_TOTAL_CLAIMED = "networkStakingStepRewardsTotalViewer_claimed"
+    const val REWARDS_TOTAL_EARNED = "networkStakingStepRewardsTotalViewer_earned"
+    const val REWARDS_TOTAL_TOTAL = "networkStakingStepRewardsTotalViewer_total"
+    const val REWARDS_TOTAL_UNCLAIMED = "networkStakingStepRewardsTotalViewer_unclaimed"
 }
