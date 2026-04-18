@@ -1,0 +1,28 @@
+{
+  "name": "xl1-compat",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "JS-side vector generator and local RPC server used to verify Kotlin SDK compatibility with the XYO JS SDK and XL1 protocol.",
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "scripts": {
+    "generate": "node generate-vectors.mjs",
+    "serve": "node start-server.mjs"
+  },
+  "dependencies": {
+    "@metamask/json-rpc-engine": "10.2.4",
+    "@xyo-network/account": "5.3.30",
+    "@xyo-network/boundwitness-builder": "5.3.30",
+    "@xyo-network/elliptic": "5.3.30",
+    "@xyo-network/hash": "5.3.30",
+    "@xyo-network/payload-builder": "5.3.30",
+    "@xyo-network/wallet": "5.3.30",
+    "@xyo-network/xl1-protocol": "1.26.34",
+    "@xyo-network/xl1-protocol-model": "1.26.34",
+    "@xyo-network/xl1-protocol-sdk": "1.26.34",
+    "@xyo-network/xl1-rpc": "1.26.34",
+    "@xyo-network/xl1-rpc-server": "1.26.34"
+  }
+}

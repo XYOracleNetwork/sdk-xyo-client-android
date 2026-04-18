@@ -114,4 +114,20 @@ class JsonSerializableTest {
         val hex = JsonSerializable.bytesToHex(hash)
         assertEquals("ada56ff753c0c9b2ce5e1f823eda9ac53501db2843d8883d6cf6869c18ef7f65", hex)
     }
+
+    // Inline reference to the canonical testObject fixture from the JS
+    // ObjectHasher.spec.ts. Anchors the cross-SDK hash here so the
+    // expectation is visible without loading the vector file.
+    //
+    // Source: sdk-xyo-client-js/packages/protocol/packages/core/packages/hash/src/spec/ObjectHasher.spec.ts
+    @Test
+    fun `js ObjectHasher reference fixture hashes identically`() {
+        // JSON.stringify drops `testUndefined` and `testNullObject.x` on the
+        // JS side — the string below is what reaches the canonicalizer on
+        // either platform. `testNull` and `testNullObject.t` are kept.
+        val raw = """{"schema":"network.xyo.test","testArray":[1,2,3],"testBoolean":true,"testNull":null,"testNullObject":{"t":null},"testNumber":5,"testObject":{"t":1},"testSomeNullObject":{"s":1,"t":null},"testString":"hello there.  this is a pretty long string.  what do you think?"}"""
+        val canonical = JsonSerializable.sortJson(raw, MetaExclusion.ALL_META)
+        val hex = JsonSerializable.bytesToHex(JsonSerializable.sha256(canonical))
+        assertEquals("bdb878b6df2e3256729190d6959ceaed3986331963869f5f5091fad51e4f1731", hex)
+    }
 }

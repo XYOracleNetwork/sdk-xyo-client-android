@@ -114,13 +114,15 @@ class YellowPaperTestVectors {
         assert(!sorted.contains("\"_top\""))
     }
 
-    // Verify null handling: null object fields are removed (JS undefined),
-    // but null inside arrays is preserved (JS null in array)
+    // Verify null handling: per JS reference behavior, `null` is a legitimate
+    // value and is preserved both as an object field value and inside arrays.
+    // Only `undefined` (which JSON cannot represent) is stripped — the JS side
+    // strips it implicitly via JSON.stringify, so no Kotlin equivalent is needed.
     @Test
-    fun `null object field values are removed`() {
+    fun `null object field values are preserved`() {
         val json = """{"schema":"test","timestamp":null,"data":"value"}"""
         val sorted = JsonSerializable.sortJson(json, MetaExclusion.NONE)
-        assertEquals("""{"data":"value","schema":"test"}""", sorted)
+        assertEquals("""{"data":"value","schema":"test","timestamp":null}""", sorted)
     }
 
     @Test

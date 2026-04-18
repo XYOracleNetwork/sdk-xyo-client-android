@@ -52,13 +52,17 @@ abstract class JsonSerializable: Serializable  {
          * Build a canonical JSON string from a JSONObject with sorted keys.
          * Field exclusion only applies at the top level (depth == 0) per the Yellow Paper.
          *
-         * Per the Yellow Paper Section 2.3 (removeEmptyFields):
-         * - In JavaScript, `undefined` values are removed, `null` values are kept.
-         * - In Kotlin, nullable fields serialized as JSON `null` by Moshi correspond
-         *   to JavaScript's `undefined` (field not meaningfully set).
-         * - JSON `null` as a direct object field value is removed (matches JS behavior
-         *   where optional unset fields produce `undefined` which gets stripped).
-         * - JSON `null` inside arrays is preserved (e.g., `previous_hashes: [null]`).
+         * Per the Yellow Paper Section 2.3 and the reference JS `removeEmptyFields`
+         * implementation, only JavaScript's `undefined` is stripped during
+         * canonicalization. `null` is a legitimate value and is preserved both as
+         * an object field value and inside arrays — the JS SDK is authoritative
+         * for this contract.
+         *
+         * Moshi does not have the concept of `undefined`; Kotlin nullable fields
+         * that are unset serialize as JSON `null`. We keep them. If a Kotlin data
+         * class needs a field to be absent from the canonical form (rather than
+         * appearing as `"key":null`), suppress its serialization at the Moshi
+         * adapter level rather than in this canonicalizer.
          */
         private fun canonicalJsonString(jsonObject: JSONObject, exclusion: MetaExclusion, depth: Int): String {
             val keys = jsonObject.keys().asSequence().sorted().filter { key ->
@@ -72,13 +76,8 @@ abstract class JsonSerializable: Serializable  {
                     true
                 }
             }
-            val entries = keys.mapNotNull { key ->
+            val entries = keys.map { key ->
                 val value = jsonObject.get(key)
-                // Remove null object field values (equivalent to JS undefined removal).
-                // Null inside arrays is preserved by canonicalArrayString.
-                if (value == JSONObject.NULL) {
-                    return@mapNotNull null
-                }
                 val valueStr = canonicalValueString(value, exclusion, depth + 1)
                 "\"${escapeJsonString(key)}\":$valueStr"
             }
