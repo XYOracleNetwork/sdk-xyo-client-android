@@ -9,8 +9,21 @@ data class AccountBalanceHistoryItem(
     val transfer: TransferWithHashMeta,
 )
 
-typealias ChainQualified<T> = Map<String, T>
+data class ChainQualification(
+    val head: String,
+    val range: XL1BlockRange,
+)
+
+data class ChainQualified<T>(
+    val data: T,
+    val qualification: ChainQualification,
+)
 
 data class AccountBalanceConfig(
-    val qualifications: List<String>? = null,
-)
+    val range: XL1BlockRange? = null,
+    val head: String? = null,
+) {
+    init {
+        require(range == null || head == null) { "AccountBalanceConfig may specify range or head, but not both" }
+    }
+}
