@@ -12,7 +12,7 @@ val majorVersion: Int by rootProject.extra
 val minorVersion: Int by rootProject.extra
 val patchVersion: Int by rootProject.extra
 
-val verString = "$majorVersion.$minorVersion(Build-$patchVersion)"
+val verString = "$majorVersion.$minorVersion.$patchVersion"
 
 android {
     compileSdk = 36

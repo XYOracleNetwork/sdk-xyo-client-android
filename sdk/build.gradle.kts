@@ -16,7 +16,7 @@ val minorVersion: Int by rootProject.extra
 val patchVersion: Int by rootProject.extra
 
 val verCode = majorVersion * 10000000 + minorVersion * 10000 + patchVersion
-val verString = "$majorVersion.$minorVersion(Build-$patchVersion)"
+val verString = "$majorVersion.$minorVersion.$patchVersion"
 
 android {
     compileSdk = 36
@@ -152,4 +152,3 @@ protobuf {
         }
     }
 }
-
