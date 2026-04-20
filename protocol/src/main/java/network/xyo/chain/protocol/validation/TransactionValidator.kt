@@ -12,5 +12,5 @@ data class ValidationError(
 )
 
 fun validateTransaction(transaction: TransactionBoundWitness, validators: List<TransactionValidator>): List<ValidationError> {
-    return validators.flatMap { it.validate(transaction) }
+    return validateSdkBoundWitness(transaction, transaction) + validators.flatMap { it.validate(transaction) }
 }

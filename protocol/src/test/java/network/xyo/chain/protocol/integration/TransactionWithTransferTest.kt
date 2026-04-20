@@ -1,15 +1,14 @@
 package network.xyo.chain.protocol.integration
 
 import com.squareup.moshi.Moshi
-import com.squareup.moshi.Types
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlinx.coroutines.runBlocking
 import network.xyo.chain.protocol.model.Transfer
+import network.xyo.chain.protocol.payload.TransferPayload
 import network.xyo.chain.protocol.sdk.transaction.TransactionBuilder
 import network.xyo.chain.protocol.transaction.TransactionBoundWitness
 import network.xyo.chain.protocol.transaction.TransactionFeesBigInt
 import network.xyo.client.account.Account
-import network.xyo.client.payload.Payload
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -27,10 +26,13 @@ class TransactionWithTransferTest {
         // Create a signer
         val signer = Account.random()
 
-        // Create a transfer payload using the SDK Payload class so BoundWitnessBuilder can hash it
-        val transferPayload = Payload("network.xyo.transfer").apply {
-            // We add the transfer fields as extra JSON via the underlying JsonSerializable
-        }
+        val transferPayload = TransferPayload(
+            from = "a3f2b7c91d4e6f8a0b1c2d3e4f5a6b7c8d9e0f1a",
+            transfers = mapOf(
+                "b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3" to "0xde0b6b3a7640000",
+            ),
+            epoch = 150000L,
+        )
 
         // Build the transaction
         val fees = TransactionFeesBigInt(

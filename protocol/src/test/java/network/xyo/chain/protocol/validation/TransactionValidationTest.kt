@@ -22,6 +22,7 @@ class TransactionValidationTest {
         exp = 200L,
         fees = validFees,
         addresses = listOf("abcdef1234567890abcdef1234567890abcdef12"),
+        previous_hashes = listOf(null),
         payload_hashes = listOf("hash1"),
         payload_schemas = listOf("schema1"),
     )
@@ -152,5 +153,12 @@ class TransactionValidationTest {
         )
         val errors = validateTransaction(tx, validators)
         assertEquals(2, errors.size)
+    }
+
+    @Test
+    fun `validateTransaction includes sdk bound witness validation`() {
+        val tx = validTransaction().copy(previous_hashes = emptyList())
+        val errors = validateTransaction(tx, emptyList())
+        assertTrue(errors.any { it.code == "PREVIOUS_HASH_MISMATCH" })
     }
 }

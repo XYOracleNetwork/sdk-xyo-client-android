@@ -91,7 +91,7 @@ publishing {
 }
 
 dependencies {
-    compileOnly(project(":sdk"))
+    api(project(":sdk"))
     testImplementation(project(":sdk"))
 
     ksp(libs.moshi.codegen)

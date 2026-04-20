@@ -7,7 +7,7 @@ fun interface BlockValidator {
 }
 
 fun validateBlock(block: BlockBoundWitness, validators: List<BlockValidator>): List<ValidationError> {
-    return validators.flatMap { it.validate(block) }
+    return validateSdkBoundWitness(block, block) + validators.flatMap { it.validate(block) }
 }
 
 class BlockCumulativeBalanceValidator : BlockValidator {

@@ -12,6 +12,7 @@ class BlockValidationTest {
         previous = "prev_hash",
         epoch = 1000L,
         addresses = listOf("addr1"),
+        previous_hashes = listOf(null),
     )
 
     @Test
@@ -46,5 +47,12 @@ class BlockValidationTest {
         val block = validBlock()
         val errors = validateBlock(block, listOf(BlockCumulativeBalanceValidator()))
         assertTrue(errors.isEmpty())
+    }
+
+    @Test
+    fun `validateBlock includes sdk bound witness validation`() {
+        val block = validBlock().copy(previous_hashes = emptyList())
+        val errors = validateBlock(block, emptyList())
+        assertTrue(errors.any { it.code == "PREVIOUS_HASH_MISMATCH" })
     }
 }
