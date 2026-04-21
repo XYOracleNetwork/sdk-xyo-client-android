@@ -41,6 +41,21 @@ class JsonRpcAccountBalanceViewerTest {
     }
 
     @Test
+    fun `qualified balance schema parses bare hex strings`() {
+        val raw = listOf(
+            mapOf(testAddress to "8ac7230"),
+            mapOf("head" to "abcd1234", "range" to listOf(100L, 110L)),
+        )
+
+        @Suppress("UNCHECKED_CAST")
+        val schema = AccountBalanceViewerRpcSchemas["accountBalanceViewer_qualifiedAccountBalances"] as RpcSchema<ChainQualified<Map<String, AttoXL1>>>
+
+        val parsed = schema.parseResult(rpcMoshi, raw)
+
+        assertEquals(AttoXL1.of(java.math.BigInteger("8ac7230", 16)), parsed.data[testAddress])
+    }
+
+    @Test
     fun `qualified histories schema parses tuple wire format`() {
         val raw = listOf(
             mapOf(testAddress to emptyList<Any>()),

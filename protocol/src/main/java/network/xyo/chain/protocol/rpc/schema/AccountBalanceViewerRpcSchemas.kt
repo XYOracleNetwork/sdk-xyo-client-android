@@ -90,10 +90,10 @@ private fun parseBigIntegerString(raw: String): BigInteger {
     val trimmed = raw.trim()
     if (trimmed.isEmpty()) return BigInteger.ZERO
 
-    return if (trimmed.startsWith("0x", ignoreCase = true)) {
-        val hex = trimmed.removePrefix("0x").removePrefix("0X")
-        if (hex.isEmpty()) BigInteger.ZERO else BigInteger(hex, 16)
-    } else {
-        BigInteger(trimmed)
-    }
+    val normalized = trimmed.removePrefix("0x").removePrefix("0X")
+    if (normalized.isEmpty()) return BigInteger.ZERO
+
+    return normalized.toBigIntegerOrNull(10)
+        ?: normalized.toBigIntegerOrNull(16)
+        ?: throw NumberFormatException("Unable to parse balance value: $raw")
 }
