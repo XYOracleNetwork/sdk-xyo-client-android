@@ -59,6 +59,6 @@ fun rpcEngineFromConnection(connection: RpcConnection): RpcEngine {
     val handlers = rpcMethodHandlersFromConnection(connection)
     return RpcEngine(
         handlers = handlers,
-        schemas = network.xyo.chain.protocol.rpc.schema.AllRpcSchemas,
+        schemas = network.xyo.chain.protocol.rpc.schema.EngineAllRpcSchemas,
     )
 }

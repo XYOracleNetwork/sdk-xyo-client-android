@@ -9,6 +9,9 @@ object RpcMethodNames {
 
     // TransactionViewer
     const val TX_VIEWER_BY_HASH = "transactionViewer_byHash"
+    const val TX_VIEWER_TRANSACTION_BY_HASH = "transactionViewer_transactionByHash"
+    const val TX_VIEWER_BY_BLOCK_HASH_AND_INDEX = "transactionViewer_transactionByBlockHashAndIndex"
+    const val TX_VIEWER_BY_BLOCK_NUMBER_AND_INDEX = "transactionViewer_transactionByBlockNumberAndIndex"
 
     // AccountBalanceViewer
     const val ACCOUNT_BALANCE_VIEWER_QUALIFIED_BALANCES = "accountBalanceViewer_qualifiedAccountBalances"
@@ -69,19 +72,19 @@ object RpcMethodNames {
     const val STAKE_RUNNER_WITHDRAW_STAKE = "stakeRunner_withdrawStake"
 
     // NetworkStake StepViewer
-    const val NETWORK_STAKE_STEP_POSITION_COUNT = "networkStakeStepViewer_positionCount"
-    const val NETWORK_STAKE_STEP_POSITIONS = "networkStakeStepViewer_positions"
-    const val NETWORK_STAKE_STEP_RANDOMIZER = "networkStakeStepViewer_randomizer"
-    const val NETWORK_STAKE_STEP_STAKE = "networkStakeStepViewer_stake"
-    const val NETWORK_STAKE_STEP_STAKER_COUNT = "networkStakeStepViewer_stakerCount"
-    const val NETWORK_STAKE_STEP_STAKERS = "networkStakeStepViewer_stakers"
-    const val NETWORK_STAKE_STEP_WEIGHT = "networkStakeStepViewer_weight"
+    const val STEP_VIEWER_POSITION_COUNT = "stepViewer_positionCount"
+    const val STEP_VIEWER_POSITIONS = "stepViewer_positions"
+    const val STEP_VIEWER_RANDOMIZER = "stepViewer_randomizer"
+    const val STEP_VIEWER_STAKE = "stepViewer_stake"
+    const val STEP_VIEWER_STAKER_COUNT = "stepViewer_stakerCount"
+    const val STEP_VIEWER_STAKERS = "stepViewer_stakers"
+    const val STEP_VIEWER_WEIGHT = "stepViewer_weight"
 
-    // NetworkStake StepRewardsViewer
-    const val NETWORK_STAKE_REWARDS_BY_POSITION = "networkStakeStepRewardsViewer_byPosition"
-    const val NETWORK_STAKE_REWARDS_BY_STAKER = "networkStakeStepRewardsViewer_byStaker"
-    const val NETWORK_STAKE_REWARDS_BY_STEP = "networkStakeStepRewardsViewer_byStep"
-    const val NETWORK_STAKE_REWARDS_TOTAL = "networkStakeStepRewardsViewer_total"
+    // Legacy NetworkStake StepRewardsViewer
+    const val LEGACY_NETWORK_STAKE_REWARDS_BY_POSITION = "networkStakeStepRewardsViewer_byPosition"
+    const val LEGACY_NETWORK_STAKE_REWARDS_BY_STAKER = "networkStakeStepRewardsViewer_byStaker"
+    const val LEGACY_NETWORK_STAKE_REWARDS_BY_STEP = "networkStakeStepRewardsViewer_byStep"
+    const val LEGACY_NETWORK_STAKE_REWARDS_TOTAL = "networkStakeStepRewardsViewer_total"
 
     // ForkViewer
     const val FORK_VIEWER_FORK_HISTORY = "forkViewer_forkHistory"

@@ -9,6 +9,15 @@ val TransactionViewerRpcSchemas: RpcSchemaMap = rpcSchemaMap {
     method<SignedHydratedTransactionWithHashMeta?>(RpcMethodNames.TX_VIEWER_BY_HASH) { raw ->
         if (raw == null) null else parseTransactionByHash(raw)
     }
+    method<SignedHydratedTransactionWithHashMeta?>(RpcMethodNames.TX_VIEWER_TRANSACTION_BY_HASH) { raw ->
+        if (raw == null) null else parseTransactionByHash(raw)
+    }
+    method<SignedHydratedTransactionWithHashMeta?>(RpcMethodNames.TX_VIEWER_BY_BLOCK_HASH_AND_INDEX) { raw ->
+        if (raw == null) null else parseTransactionByHash(raw)
+    }
+    method<SignedHydratedTransactionWithHashMeta?>(RpcMethodNames.TX_VIEWER_BY_BLOCK_NUMBER_AND_INDEX) { raw ->
+        if (raw == null) null else parseTransactionByHash(raw)
+    }
 }
 
 /**

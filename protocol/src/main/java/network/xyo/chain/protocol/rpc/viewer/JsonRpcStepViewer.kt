@@ -19,30 +19,30 @@ class JsonRpcStepViewer(
     private val schemas = StepViewerRpcSchemas
 
     override suspend fun positionCount(step: Int): Int {
-        return transport.sendRequest(RpcMethodNames.NETWORK_STAKE_STEP_POSITION_COUNT, listOf(step), schemas)
+        return transport.sendRequest(RpcMethodNames.STEP_VIEWER_POSITION_COUNT, listOf(step), schemas)
     }
 
     override suspend fun positions(step: Int, options: PagedPositionsOptions?): List<Position> {
-        return transport.sendRequest(RpcMethodNames.NETWORK_STAKE_STEP_POSITIONS, listOfNotNull(step, options), schemas)
+        return transport.sendRequest(RpcMethodNames.STEP_VIEWER_POSITIONS, listOfNotNull(step, options), schemas)
     }
 
     override suspend fun randomizer(step: Int): BigInteger {
-        return transport.sendRequest(RpcMethodNames.NETWORK_STAKE_STEP_RANDOMIZER, listOf(step), schemas)
+        return transport.sendRequest(RpcMethodNames.STEP_VIEWER_RANDOMIZER, listOf(step), schemas)
     }
 
     override suspend fun stake(step: Int): BigInteger {
-        return transport.sendRequest(RpcMethodNames.NETWORK_STAKE_STEP_STAKE, listOf(step), schemas)
+        return transport.sendRequest(RpcMethodNames.STEP_VIEWER_STAKE, listOf(step), schemas)
     }
 
     override suspend fun stakerCount(step: Int): Int {
-        return transport.sendRequest(RpcMethodNames.NETWORK_STAKE_STEP_STAKER_COUNT, listOf(step), schemas)
+        return transport.sendRequest(RpcMethodNames.STEP_VIEWER_STAKER_COUNT, listOf(step), schemas)
     }
 
     override suspend fun stakers(step: Int, options: PagedStakersOptions?): List<String> {
-        return transport.sendRequest(RpcMethodNames.NETWORK_STAKE_STEP_STAKERS, listOfNotNull(step, options), schemas)
+        return transport.sendRequest(RpcMethodNames.STEP_VIEWER_STAKERS, listOfNotNull(step, options), schemas)
     }
 
     override suspend fun weight(step: Int, positionId: PositionId?): BigInteger {
-        return transport.sendRequest(RpcMethodNames.NETWORK_STAKE_STEP_WEIGHT, listOfNotNull(step, positionId), schemas)
+        return transport.sendRequest(RpcMethodNames.STEP_VIEWER_WEIGHT, listOfNotNull(step, positionId), schemas)
     }
 }

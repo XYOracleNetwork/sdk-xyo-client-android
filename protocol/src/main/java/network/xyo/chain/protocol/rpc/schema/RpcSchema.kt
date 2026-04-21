@@ -2,7 +2,6 @@ package network.xyo.chain.protocol.rpc.schema
 
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import com.squareup.moshi.Types
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
@@ -14,9 +13,31 @@ import java.lang.reflect.Type
  * @param TResult The expected return type from the RPC method.
  */
 class RpcSchema<TResult>(
+    val paramsType: Type = LIST_OF_ANY_TYPE,
     val resultType: Type,
+    val paramsTransform: ((Any?) -> List<Any?>)? = null,
+    val paramsSerialize: ((List<Any?>) -> Any?)? = null,
     val resultTransform: ((Any?) -> TResult)? = null,
 ) {
+    fun paramsAdapter(moshi: Moshi): JsonAdapter<List<Any?>> {
+        @Suppress("UNCHECKED_CAST")
+        return moshi.adapter<List<Any?>>(paramsType)
+    }
+
+    fun parseParams(moshi: Moshi, raw: Any?): List<Any?> {
+        if (paramsTransform != null) {
+            return paramsTransform.invoke(raw)
+        }
+        return paramsAdapter(moshi).fromJsonValue(raw) ?: emptyList()
+    }
+
+    fun serializeParams(moshi: Moshi, params: List<Any?>): Any? {
+        if (paramsSerialize != null) {
+            return paramsSerialize.invoke(params)
+        }
+        return paramsAdapter(moshi).toJsonValue(params)
+    }
+
     fun resultAdapter(moshi: Moshi): JsonAdapter<TResult> {
         @Suppress("UNCHECKED_CAST")
         return moshi.adapter<TResult>(resultType)
@@ -39,6 +60,8 @@ class RpcSchema<TResult>(
 
 /** A map of RPC method names to their schema definitions. */
 typealias RpcSchemaMap = Map<String, RpcSchema<*>>
+
+private val LIST_OF_ANY_TYPE: Type = object : TypeToken<List<Any?>>() {}.type
 
 /**
  * Captures a reified type as a [Type], preserving generic type parameters.
@@ -68,6 +91,34 @@ class RpcSchemaMapBuilder {
         schemas[name] = RpcSchema<TResult>(
             resultType = type,
             resultTransform = transform,
+        )
+    }
+
+    inline fun <reified TResult> method(
+        name: String,
+        noinline paramsTransform: (Any?) -> List<Any?>,
+        noinline paramsSerialize: (List<Any?>) -> Any?,
+        noinline resultTransform: (Any?) -> TResult,
+    ) {
+        val type = object : TypeToken<TResult>() {}.type
+        schemas[name] = RpcSchema(
+            resultType = type,
+            paramsTransform = paramsTransform,
+            paramsSerialize = paramsSerialize,
+            resultTransform = resultTransform,
+        )
+    }
+
+    inline fun <reified TResult> method(
+        name: String,
+        noinline paramsTransform: (Any?) -> List<Any?>,
+        noinline paramsSerialize: (List<Any?>) -> Any?,
+    ) {
+        val type = object : TypeToken<TResult>() {}.type
+        schemas[name] = RpcSchema<TResult>(
+            resultType = type,
+            paramsTransform = paramsTransform,
+            paramsSerialize = paramsSerialize,
         )
     }
 

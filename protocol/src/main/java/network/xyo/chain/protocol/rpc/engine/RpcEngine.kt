@@ -25,7 +25,7 @@ class RpcEngine(
 
         return try {
             @Suppress("UNCHECKED_CAST")
-            val params = request.params as? List<Any?> ?: emptyList()
+            val params = (schema as network.xyo.chain.protocol.rpc.schema.RpcSchema<Any?>).parseParams(rpcMoshi, request.params)
             val result = handler.handle(params)
             val serialized = schema.serializeResult(rpcMoshi, result)
             JsonRpcResponse(id = request.id, result = serialized)

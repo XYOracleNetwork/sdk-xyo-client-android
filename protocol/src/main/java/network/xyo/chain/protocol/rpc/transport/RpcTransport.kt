@@ -18,7 +18,8 @@ suspend fun <TResult> RpcTransport.sendRequest(
     params: List<Any?> = emptyList(),
     schema: RpcSchema<TResult>,
 ): TResult {
-    val raw = sendRawRequest(method, params)
+    val serializedParams = schema.serializeParams(rpcMoshi, params)
+    val raw = sendRawRequest(method, serializedParams as? List<Any?> ?: emptyList())
     return schema.parseResult(rpcMoshi, raw)
 }
 
@@ -33,7 +34,8 @@ suspend fun <TResult> RpcTransport.sendRequest(
 ): TResult {
     val schema = schemas[method]
         ?: throw RpcTransportException("No schema registered for method: $method")
-    val raw = sendRawRequest(method, params)
+    val serializedParams = schema.serializeParams(rpcMoshi, params)
+    val raw = sendRawRequest(method, serializedParams as? List<Any?> ?: emptyList())
     @Suppress("UNCHECKED_CAST")
     return (schema as RpcSchema<TResult>).parseResult(rpcMoshi, raw)
 }

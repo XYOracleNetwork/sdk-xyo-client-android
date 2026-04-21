@@ -1,25 +1,22 @@
 package network.xyo.chain.protocol.rpc.schema
 
-/** Aggregated map of all RPC method schemas, mirroring AllRpcSchemas from xl1-protocol. */
+/** Aggregated upstream-compatible RPC schema map, mirroring xl1-protocol's AllRpcSchemas. */
 val AllRpcSchemas: RpcSchemaMap = buildMap {
-    putAll(BlockViewerRpcSchemas)
     putAll(AccountBalanceViewerRpcSchemas)
-    putAll(TransactionViewerRpcSchemas)
-    putAll(StakeViewerRpcSchemas)
+    putAll(BlockViewerRpcSchemas)
+    putAll(DataLakeViewerRpcSchemas)
     putAll(FinalizationViewerRpcSchemas)
-    putAll(TimeSyncViewerRpcSchemas)
-    putAll(NetworkStakeViewerRpcSchemas)
     putAll(MempoolViewerRpcSchemas)
     putAll(MempoolRunnerRpcSchemas)
-    putAll(TransferBalanceViewerRpcSchemas)
-    putAll(StakeTotalsViewerRpcSchemas)
-    putAll(BlockRewardViewerRpcSchemas)
-    putAll(StakeRunnerRpcSchemas)
+    putAll(NetworkStakeViewerRpcSchemas)
+    putAll(TimeSyncViewerRpcSchemas)
     putAll(StepViewerRpcSchemas)
-    putAll(StepRewardsViewerRpcSchemas)
-    putAll(DataLakeViewerRpcSchemas)
-    putAll(NetworkStakingStepRewardsByPositionViewerRpcSchemas)
-    putAll(NetworkStakingStepRewardsByStakerViewerRpcSchemas)
-    putAll(NetworkStakingStepRewardsByStepViewerRpcSchemas)
+    putAll(StakeTotalsViewerRpcSchemas)
+    putAll(StakeViewerRpcSchemas)
+    putAll(NetworkStakingStepRewardsViewerRpcSchemas)
     putAll(NetworkStakingStepRewardsTotalViewerRpcSchemas)
+    putAll(NetworkStakingStepRewardsByStepViewerRpcSchemas)
+    putAll(NetworkStakingStepRewardsByStakerViewerRpcSchemas)
+    putAll(NetworkStakingStepRewardsByPositionViewerRpcSchemas)
+    putAll(TransactionViewerRpcSchemas)
 }
