@@ -110,3 +110,12 @@ tasks.register<Exec>("liveCompatTest") {
     workingDir = rootProject.projectDir
     commandLine("bash", "scripts/run-live-compat.sh")
 }
+
+// Run a real XL1 CLI chain from npm and exercise the Kotlin JSON-RPC client
+// against it end-to-end.
+tasks.register<Exec>("cliE2eTest") {
+    group = "verification"
+    description = "Starts @xyo-network/xl1-cli from npm and runs Kotlin protocol e2e tests against it."
+    workingDir = rootProject.projectDir
+    commandLine("bash", "scripts/run-e2e-chain.sh")
+}

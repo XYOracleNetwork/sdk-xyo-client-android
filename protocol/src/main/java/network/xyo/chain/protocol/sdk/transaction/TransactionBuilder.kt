@@ -5,9 +5,12 @@ import network.xyo.chain.protocol.chain.ChainId
 import network.xyo.chain.protocol.transaction.HydratedTransaction
 import network.xyo.chain.protocol.transaction.TransactionBoundWitness
 import network.xyo.chain.protocol.transaction.TransactionFeesBigInt
+import network.xyo.chain.protocol.transaction.TransactionFeesHex
 import network.xyo.client.account.model.Account
-import network.xyo.client.boundwitness.BoundWitnessBuilder
+import network.xyo.client.lib.JsonSerializable
 import network.xyo.client.payload.Payload
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
 class TransactionBuilder {
     private var chain: ChainId? = null
@@ -60,26 +63,44 @@ class TransactionBuilder {
             ?: signers.firstOrNull()?.address?.toHexString()
             ?: error("From address or at least one signer must be provided")
 
-        // Use BoundWitnessBuilder to hash payloads and sign
-        val bwBuilder = BoundWitnessBuilder()
-        bwBuilder.signers(signers)
-        bwBuilder.payloads(payloads)
+        val payloadHashes = payloads.map { payload -> payload.hash().toHexString() }
+        val autoScript = payloadHashes.map { payloadHash -> "elevate|$payloadHash" }
+        val transactionScript = (scripts + autoScript).distinct().ifEmpty { null }
+        val timestamp = System.currentTimeMillis()
+        val addresses = signers.map { signer -> signer.address.toHexString() }
+        val previousHashes = signers.map { signer -> signer.previousHash?.toHexString() }
+        val normalizedFees = txFees.toHex().normalized()
 
-        val (bw, _) = bwBuilder.build()
+        val signable = SignableTransactionBoundWitness(
+            from = from,
+            chain = chainId,
+            nbf = nbfBlock.value,
+            exp = expBlock.value,
+            fees = normalizedFees,
+            script = transactionScript,
+            addresses = addresses,
+            payload_hashes = payloadHashes,
+            payload_schemas = payloads.map { payload -> payload.schema },
+            previous_hashes = previousHashes,
+            timestamp = timestamp,
+        )
+
+        val dataHash = JsonSerializable.sha256(signable, JsonSerializable.Companion.MetaExclusion.ALL_META)
+        val signatures = signers.map { signer -> JsonSerializable.bytesToHex(signer.sign(dataHash)) }
 
         val boundWitness = TransactionBoundWitness(
             from = from,
             chain = chainId,
             nbf = nbfBlock.value,
             exp = expBlock.value,
-            fees = txFees.toHex(),
-            script = scripts.ifEmpty { null },
-            addresses = bw.addresses,
-            payload_hashes = bw.payload_hashes,
-            payload_schemas = bw.payload_schemas,
-            previous_hashes = bw.previous_hashes,
-            timestamp = bw.timestamp ?: System.currentTimeMillis(),
-            signatures = bw.__signatures,
+            fees = normalizedFees,
+            script = transactionScript,
+            addresses = addresses,
+            payload_hashes = payloadHashes,
+            payload_schemas = payloads.map { payload -> payload.schema },
+            previous_hashes = previousHashes,
+            timestamp = timestamp,
+            signatures = signatures,
         )
 
         return HydratedTransaction(
@@ -88,3 +109,27 @@ class TransactionBuilder {
         )
     }
 }
+
+@JsonClass(generateAdapter = true)
+data class SignableTransactionBoundWitness(
+    val from: String,
+    val chain: ChainId,
+    val nbf: Long,
+    val exp: Long,
+    val fees: network.xyo.chain.protocol.transaction.TransactionFeesHex,
+    val script: List<String>? = null,
+    val addresses: List<String> = emptyList(),
+    val payload_hashes: List<String> = emptyList(),
+    val payload_schemas: List<String> = emptyList(),
+    val previous_hashes: List<String?> = emptyList(),
+    val schema: String = TransactionBoundWitness.SCHEMA,
+    val timestamp: Long? = null,
+    @Json(name = "\$signatures") val signatures: List<String> = emptyList(),
+) : JsonSerializable()
+
+private fun TransactionFeesHex.normalized(): TransactionFeesHex = TransactionFeesHex(
+    base = base.removePrefix("0x").removePrefix("0X"),
+    gasLimit = gasLimit.removePrefix("0x").removePrefix("0X"),
+    gasPrice = gasPrice.removePrefix("0x").removePrefix("0X"),
+    priority = priority.removePrefix("0x").removePrefix("0X"),
+)
