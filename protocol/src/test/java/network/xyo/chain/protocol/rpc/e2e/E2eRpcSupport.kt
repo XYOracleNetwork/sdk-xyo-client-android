@@ -9,6 +9,7 @@ import network.xyo.chain.protocol.rpc.transport.HttpRpcTransport
 import network.xyo.chain.protocol.transaction.HydratedTransaction
 import network.xyo.chain.protocol.transaction.SignedHydratedTransaction
 import network.xyo.chain.protocol.transaction.SignedTransactionBoundWitness
+import network.xyo.chain.protocol.viewer.BlockViewer
 import network.xyo.chain.protocol.viewer.AccountBalanceViewer
 import network.xyo.chain.protocol.xl1.AttoXL1
 import network.xyo.client.account.Wallet
@@ -84,6 +85,20 @@ internal object E2eRpcSupport {
             delay(pollIntervalMs)
         }
         error("Timed out waiting for $address balance >= $expectedMinimum")
+    }
+
+    suspend fun awaitBlockAtLeast(
+        viewer: BlockViewer,
+        expectedMinimum: Long,
+        maxAttempts: Int = 60,
+        pollIntervalMs: Long = 1000L,
+    ): Long {
+        repeat(maxAttempts) {
+            val currentBlock = viewer.currentBlock().boundWitness.block
+            if (currentBlock >= expectedMinimum) return currentBlock
+            delay(pollIntervalMs)
+        }
+        error("Timed out waiting for block >= $expectedMinimum")
     }
 }
 

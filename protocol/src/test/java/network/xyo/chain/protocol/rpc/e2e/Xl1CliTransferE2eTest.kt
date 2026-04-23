@@ -24,57 +24,81 @@ class Xl1CliTransferE2eTest {
 
     @OptIn(ExperimentalStdlibApi::class)
     @Test
-    fun `transfers from the genesis reward address to another address`() = runBlocking {
+    fun `transfers from the genesis reward address across several produced blocks`() = runBlocking {
         val sender = E2eRpcSupport.genesisRewardWallet()
         val senderAddress = sender.address.toHexString()
-        val recipient = Account.random()
-        val recipientAddress = recipient.address.toHexString()
+        val recipients = List(3) { Account.random() }
         val amount = AttoXL1.of(BigInteger("1000000000000000000"))
+        val initialHead = blockViewer.currentBlock()
 
         val initialBalances = accountBalanceViewer.qualifiedAccountBalances(
-            listOf(senderAddress, recipientAddress),
+            listOf(senderAddress) + recipients.map { it.address.toHexString() },
             network.xyo.chain.protocol.model.AccountBalanceConfig(),
         )
         val initialSenderBalance = initialBalances.data[senderAddress] ?: AttoXL1.ZERO
-        val initialRecipientBalance = initialBalances.data[recipientAddress] ?: AttoXL1.ZERO
         val maxFeeExposure = AttoXL1.of(
             DefaultTransactionFees.default.base +
                 DefaultTransactionFees.default.priority +
                 DefaultTransactionFees.default.gasLimit,
         )
-        val requiredSenderBalance = amount + maxFeeExposure
+        val requiredSenderBalance = AttoXL1.of(
+            (amount.value + maxFeeExposure.value).multiply(BigInteger.valueOf(recipients.size.toLong())),
+        )
 
         assertTrue(
             initialSenderBalance >= requiredSenderBalance,
-            "sender must cover transfer amount ($amount) plus max fee exposure ($maxFeeExposure); actual=$initialSenderBalance",
+            "sender must cover ${recipients.size} transfers plus fees; required=$requiredSenderBalance actual=$initialSenderBalance",
         )
-        assertEquals(AttoXL1.ZERO, initialRecipientBalance, "fresh recipient should start at zero")
+        recipients.forEach { recipient ->
+            val recipientAddress = recipient.address.toHexString()
+            val initialRecipientBalance = initialBalances.data[recipientAddress] ?: AttoXL1.ZERO
+            assertEquals(AttoXL1.ZERO, initialRecipientBalance, "fresh recipient should start at zero")
+        }
 
-        val head = blockViewer.currentBlock()
-        val transaction = TransactionBuilder()
-            .chain(head.boundWitness.chain)
-            .from(senderAddress)
-            .signer(sender)
-            .payload(
-                TransferPayload(
-                    from = senderAddress,
-                    transfers = mapOf(recipientAddress to amount.toHex().removePrefix("0x")),
-                    epoch = System.currentTimeMillis(),
-                ),
+        var observedBlock = initialHead.boundWitness.block
+        recipients.forEach { recipient ->
+            val recipientAddress = recipient.address.toHexString()
+            val currentHead = blockViewer.currentBlock()
+            val transaction = TransactionBuilder()
+                .chain(currentHead.boundWitness.chain)
+                .from(senderAddress)
+                .signer(sender)
+                .payload(
+                    TransferPayload(
+                        from = senderAddress,
+                        transfers = mapOf(recipientAddress to amount.toHex().removePrefix("0x")),
+                        epoch = System.currentTimeMillis(),
+                    ),
+                )
+                .fees(DefaultTransactionFees.default)
+                .range(currentHead.boundWitness.block, currentHead.boundWitness.block + 1000)
+                .build()
+
+            val signedTransaction = E2eRpcSupport.toSignedTransaction(transaction)
+            mempoolRunner.submitTransactions(listOf(signedTransaction)).single()
+
+            val advancedBlock = E2eRpcSupport.awaitBlockAtLeast(
+                viewer = blockViewer,
+                expectedMinimum = observedBlock + 1,
             )
-            .fees(DefaultTransactionFees.default)
-            .range(head.boundWitness.block, head.boundWitness.block + 1000)
-            .build()
+            assertTrue(
+                advancedBlock > observedBlock,
+                "expected a new block after submitting transfer to $recipientAddress",
+            )
+            observedBlock = advancedBlock
 
-        val signedTransaction = E2eRpcSupport.toSignedTransaction(transaction)
-        mempoolRunner.submitTransactions(listOf(signedTransaction)).single()
+            val finalBalances = E2eRpcSupport.awaitBalanceAtLeast(
+                viewer = accountBalanceViewer,
+                address = recipientAddress,
+                expectedMinimum = amount,
+            )
 
-        val finalBalances = E2eRpcSupport.awaitBalanceAtLeast(
-            viewer = accountBalanceViewer,
-            address = recipientAddress,
-            expectedMinimum = initialRecipientBalance + amount,
+            assertEquals(amount, finalBalances.data[recipientAddress])
+        }
+
+        assertTrue(
+            observedBlock >= initialHead.boundWitness.block + recipients.size,
+            "expected at least ${recipients.size} new blocks after genesis; initial=${initialHead.boundWitness.block} final=$observedBlock",
         )
-
-        assertEquals(initialRecipientBalance + amount, finalBalances.data[recipientAddress])
     }
 }
