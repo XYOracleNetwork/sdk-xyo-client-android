@@ -7,6 +7,7 @@ import network.xyo.client.lib.Secp256k1CurveConstants
 import network.xyo.client.lib.hexStringToByteArray
 import network.xyo.client.lib.publicKeyToAddress
 import network.xyo.client.lib.recoverPublicKey
+import network.xyo.client.lib.toByteArrayPadded
 import org.bouncycastle.jcajce.provider.digest.Keccak
 import tech.figure.hdwallet.ec.PrivateKey
 import tech.figure.hdwallet.ec.extensions.toBytesPadded
@@ -19,7 +20,7 @@ open class Account private constructor (private val _privateKey: PrivateKey, pri
     Account {
 
     constructor(privateKey: ByteArray, previousHash: ByteArray? = null) : this(PrivateKey.fromBytes(privateKey, secp256k1Curve), previousHash)
-    constructor(privateKey: BigInteger, previousHash: ByteArray? = null) : this(privateKey.toByteArray(), previousHash)
+    constructor(privateKey: BigInteger, previousHash: ByteArray? = null) : this(privateKey.toByteArrayPadded(32), previousHash)
 
     private val _address = addressFromUncompressedPublicKey(publicKeyUncompressed)
 
@@ -42,9 +43,15 @@ open class Account private constructor (private val _privateKey: PrivateKey, pri
     }
 
     override fun verify(msg: ByteArray, signature: ByteArray): Boolean {
-        val recoveredPublicKey = recoverPublicKey(msg, signature) ?: return false
-        val recoveredAddress = publicKeyToAddress(recoveredPublicKey)
-        return recoveredAddress.contentEquals(address)
+        if (signature.size != 64) return false
+        for (v in 0..1) {
+            val recoveredPublicKey = recoverPublicKey(msg, signature, v) ?: continue
+            val recoveredAddress = publicKeyToAddress(recoveredPublicKey)
+            if (recoveredAddress.contentEquals(address)) {
+                return true
+            }
+        }
+        return false
     }
 
     companion object: AccountStatic<Account> {
@@ -63,7 +70,7 @@ open class Account private constructor (private val _privateKey: PrivateKey, pri
         }
 
         fun addressFromUncompressedPublicKey(key: ByteArray): ByteArray {
-            assert(key.size == 64, ) { "Invalid Key Length" }
+            require(key.size == 64) { "Invalid Key Length: expected 64, got ${key.size}" }
             val publicKeyHash = toKeccak(key)
             return publicKeyHash.copyOfRange(12, publicKeyHash.size)
         }
@@ -77,11 +84,13 @@ open class Account private constructor (private val _privateKey: PrivateKey, pri
         private fun generatePrivateKeyBytes(): ByteArray {
             val secureRandom = SecureRandom()
             val keyBytes = ByteArray(32)
-            secureRandom.nextBytes(keyBytes)
-            while (BigInteger(keyBytes) > Secp256k1CurveConstants.n) {
+            while (true) {
                 secureRandom.nextBytes(keyBytes)
+                val bi = BigInteger(1, keyBytes)
+                if (bi > BigInteger.ZERO && bi < Secp256k1CurveConstants.n) {
+                    return keyBytes
+                }
             }
-            return keyBytes
         }
     }
 }

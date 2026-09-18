@@ -13,7 +13,7 @@
 // Prints "READY <port>" to stdout once listening — the Kotlin test harness
 // parses that to know when to start firing requests.
 
-import { JsonRpcEngineV2 } from '@metamask/json-rpc-engine/v2'
+import { JsonRpcEngineV2 } from '@ariestools/json-rpc-engine'
 import {
   AllRpcSchemas,
   createRequestSchema,

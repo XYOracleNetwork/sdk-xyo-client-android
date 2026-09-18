@@ -29,6 +29,8 @@ class RpcEngine(
             val result = handler.handle(params)
             val serialized = schema.serializeResult(rpcMoshi, result)
             JsonRpcResponse(id = request.id, result = serialized)
+        } catch (e: kotlinx.coroutines.CancellationException) {
+            throw e
         } catch (e: IllegalArgumentException) {
             errorResponse(request.id, JsonRpcErrorCodes.INVALID_PARAMS, e.message ?: "Invalid params")
         } catch (e: Exception) {

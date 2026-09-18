@@ -3,7 +3,6 @@ package network.xyo.chain.protocol.rpc.schema
 import network.xyo.chain.protocol.block.SignedBlockBoundWitness
 import network.xyo.chain.protocol.block.SignedHydratedBlockWithHashMeta
 import network.xyo.chain.protocol.rpc.types.RpcMethodNames
-import network.xyo.client.payload.Payload
 import network.xyo.client.payload.model.Payload as PayloadInterface
 
 val BlockViewerRpcSchemas: RpcSchemaMap = rpcSchemaMap {
@@ -37,9 +36,6 @@ private fun parseBlock(raw: Any?): SignedHydratedBlockWithHashMeta {
     val hash = bwMap["_hash"] as? String ?: ""
     val boundWitness = rpcMoshi.adapter(SignedBlockBoundWitness::class.java).fromJsonValue(bwMap)
         ?: error("Failed to deserialize SignedBlockBoundWitness")
-    val payloads = payloadsList.map { payloadMap ->
-        rpcMoshi.adapter(Payload::class.java).fromJsonValue(payloadMap)
-            ?: Payload(payloadMap["schema"] as? String ?: "unknown")
-    }
+    val payloads = parseRpcPayloads(payloadsList)
     return SignedHydratedBlockWithHashMeta(boundWitness, payloads, hash)
 }

@@ -12,7 +12,7 @@ interface BlockBoundWitnessFields {
     val previous: String?
     val protocol: Int?
     val step_hashes: List<String>?
-    val epoch: Long
+    val epoch: Long?
 }
 
 @JsonClass(generateAdapter = true)
@@ -22,7 +22,7 @@ data class BlockBoundWitness(
     override val previous: String?,
     override val protocol: Int? = null,
     override val step_hashes: List<String>? = null,
-    @Json(name = "\$epoch") override val epoch: Long,
+    @Json(name = "\$epoch") override val epoch: Long? = null,
     override val addresses: List<String> = emptyList(),
     override val payload_hashes: List<String> = emptyList(),
     override val payload_schemas: List<String> = emptyList(),
@@ -48,7 +48,7 @@ data class SignedBlockBoundWitness(
     val previous: String?,
     val protocol: Int? = null,
     val step_hashes: List<String>? = null,
-    @Json(name = "\$epoch") val epoch: Long,
+    @Json(name = "\$epoch") val epoch: Long? = null,
     val addresses: List<String> = emptyList(),
     val payload_hashes: List<String> = emptyList(),
     val payload_schemas: List<String> = emptyList(),

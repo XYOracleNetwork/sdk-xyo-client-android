@@ -6,7 +6,11 @@ import java.math.BigInteger
 class TransactionGasValidator : TransactionValidator {
     override fun validate(transaction: TransactionBoundWitness): List<ValidationError> {
         val errors = mutableListOf<ValidationError>()
-        val fees = transaction.fees.toBigInt()
+        val fees = try {
+            transaction.fees.toBigInt()
+        } catch (e: Exception) {
+            return listOf(ValidationError("INVALID_FEES", "Invalid fee hex format: ${e.message}"))
+        }
 
         if (fees.gasLimit <= BigInteger.ZERO) {
             errors.add(ValidationError("INVALID_GAS_LIMIT", "gasLimit must be positive"))

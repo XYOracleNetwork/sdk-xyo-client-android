@@ -21,10 +21,16 @@ open class QuantAccount private constructor (
     private var _previousHash: ByteArray? = null
 ): Account {
 
+    private constructor(seed: ByteArray, keyPair: Pair<MLDSAPrivateKeyParameters, MLDSAPublicKeyParameters>, previousHash: ByteArray?) : this(
+        seed,
+        keyPair.first,
+        keyPair.second,
+        previousHash
+    )
+
     constructor(seed: ByteArray, previousHash: ByteArray? = null) : this(
         seed,
-        generateKeyPair(seed).first,
-        generateKeyPair(seed).second,
+        generateKeyPair(seed),
         previousHash
     )
 

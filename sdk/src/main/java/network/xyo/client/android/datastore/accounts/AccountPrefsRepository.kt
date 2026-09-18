@@ -5,12 +5,10 @@ import android.util.Log
 import androidx.datastore.core.DataStore
 import network.xyo.data.AccountPrefsDataStoreProtos.AccountPrefsDataStore
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 import network.xyo.client.account.Account
 import network.xyo.client.settings.AccountPreferences
 import network.xyo.client.settings.SettingsInterface
 import network.xyo.client.settings.defaultXyoSdkSettings
-import network.xyo.client.lib.xyoScope
 
 
 class AccountPrefsRepository(context: Context, settings: SettingsInterface = defaultXyoSdkSettings) {
@@ -30,22 +28,12 @@ class AccountPrefsRepository(context: Context, settings: SettingsInterface = def
 
     @OptIn(ExperimentalStdlibApi::class)
     suspend fun initializeAccount(account: network.xyo.client.account.model.Account): network.xyo.client.account.model.Account? {
-        var updatedKey: String? = null
-        val job = xyoScope.launch {
-            val savedKey = accountPrefsDataStore.data.first().accountKey
-            if (savedKey.isNullOrEmpty()) {
-                // no saved key so save the passed in one
-                updatedKey = null
-                setAccountKey(account.privateKey.toHexString())
-            } else {
-                updatedKey = null
-                Log.w("xyoClient", "Key already exists.  Clear it first before initializing prefs with new account")
-            }
-        }
-        job.join()
-        return if (updatedKey != null) {
+        val savedKey = accountPrefsDataStore.data.first().accountKey
+        return if (savedKey.isNullOrEmpty()) {
+            setAccountKey(account.privateKey.toHexString())
             account
         } else {
+            Log.w("xyoClient", "Key already exists.  Clear it first before initializing prefs with new account")
             null
         }
     }
@@ -58,31 +46,25 @@ class AccountPrefsRepository(context: Context, settings: SettingsInterface = def
             setAccountKey(newAccount.privateKey.toHexString())
             newAccount.privateKey.toHexString()
         } else {
-            return savedKey
+            savedKey
         }
     }
 
     private suspend fun setAccountKey(accountKey: String): DataStore<AccountPrefsDataStore> {
-        val job = xyoScope.launch {
-            this@AccountPrefsRepository.accountPrefsDataStore.updateData { currentPrefs ->
-                currentPrefs.toBuilder()
-                    .setAccountKey(accountKey)
-                    .build()
-            }
+        accountPrefsDataStore.updateData { currentPrefs ->
+            currentPrefs.toBuilder()
+                .setAccountKey(accountKey)
+                .build()
         }
-        job.join()
         return accountPrefsDataStore
     }
 
     suspend fun clearSavedAccountKey(): DataStore<AccountPrefsDataStore> {
-        val job = xyoScope.launch {
-            this@AccountPrefsRepository.accountPrefsDataStore.updateData { currentPrefs ->
-                currentPrefs.toBuilder()
-                    .setAccountKey("")
-                    .build()
-            }
+        accountPrefsDataStore.updateData { currentPrefs ->
+            currentPrefs.toBuilder()
+                .setAccountKey("")
+                .build()
         }
-        job.join()
         return accountPrefsDataStore
     }
 

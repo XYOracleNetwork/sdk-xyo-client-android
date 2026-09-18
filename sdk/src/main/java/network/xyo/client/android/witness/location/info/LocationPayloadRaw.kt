@@ -6,19 +6,11 @@ import network.xyo.client.payload.Payload
 
 // Extension function for safely retrieving typed values from a Bundle
 private fun Bundle.getTypedValue(key: String): Any? {
-    return when {
-        containsKey(key) -> {
-            when {
-                getString(key) != null -> getString(key)
-                getInt(key, Int.MIN_VALUE) != Int.MIN_VALUE -> getInt(key)
-                getLong(key, Long.MIN_VALUE) != Long.MIN_VALUE -> getLong(key)
-                getFloat(key, Float.MIN_VALUE) != Float.MIN_VALUE -> getFloat(key)
-                getDouble(key, Double.MIN_VALUE) != Double.MIN_VALUE -> getDouble(key)
-                getBoolean(key) -> getBoolean(key)
-                else -> null
-            }
-        }
-        else -> null
+    return if (containsKey(key)) {
+        @Suppress("DEPRECATION")
+        get(key)
+    } else {
+        null
     }
 }
 

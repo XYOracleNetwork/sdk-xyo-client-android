@@ -13,11 +13,12 @@ import network.xyo.client.payload.Payload
 data class XyoPanelReportQueryResult(val bw: BoundWitness, val apiResults: List<PostQueryResult>?, val payloads: List<Payload>?)
 
 class XyoPanel(
-    val context: Context,
+    context: Context,
     val account: Account,
     private val witnesses: List<XyoWitness<Payload>>?,
     private val nodeUrlsAndAccounts: ArrayList<Pair<String, Account?>>?
 ) {
+    val context: Context = context.applicationContext
     private var nodes: MutableList<NodeClient>? = null
 
     constructor(

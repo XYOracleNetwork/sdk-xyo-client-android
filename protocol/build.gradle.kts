@@ -7,9 +7,9 @@ plugins {
 
 group = "network.xyo"
 
-val majorVersion: Int by rootProject.extra
-val minorVersion: Int by rootProject.extra
-val patchVersion: Int by rootProject.extra
+val majorVersion = rootProject.extra["majorVersion"] as Int
+val minorVersion = rootProject.extra["minorVersion"] as Int
+val patchVersion = rootProject.extra["patchVersion"] as Int
 
 val verString = "$majorVersion.$minorVersion.$patchVersion"
 
@@ -77,12 +77,22 @@ publishing {
                         .find { it.name().toString().endsWith("dependencies") }
                         ?: node.appendNode("dependencies")
                 }
-                configurations.getByName("implementation").allDependencies.forEach { dep ->
-                    if (dep.name != "unspecified" && dep !is ProjectDependency) {
-                        val dependencyNode = (dependenciesNode as groovy.util.Node).appendNode("dependency")
-                        dependencyNode.appendNode("groupId", dep.group)
-                        dependencyNode.appendNode("artifactId", dep.name)
-                        dependencyNode.appendNode("version", dep.version)
+                listOf("api", "implementation").forEach { configName ->
+                    configurations.findByName(configName)?.dependencies?.forEach { dep ->
+                        if (dep.name != "unspecified") {
+                            val dependencyNode = (dependenciesNode as groovy.util.Node).appendNode("dependency")
+                            if (dep is ProjectDependency) {
+                                dependencyNode.appendNode("groupId", "com.github.xyoraclenetwork.sdk-xyo-client-android")
+                                dependencyNode.appendNode("artifactId", "sdk-xyo-client-android-sdk")
+                                dependencyNode.appendNode("version", verString)
+                            } else {
+                                dependencyNode.appendNode("groupId", dep.group)
+                                dependencyNode.appendNode("artifactId", dep.name)
+                                val version = if (dep.name == "kotlin-stdlib") libs.versions.kotlin.get() else dep.version
+                                dependencyNode.appendNode("version", version)
+                            }
+                            dependencyNode.appendNode("scope", if (configName == "api") "compile" else "runtime")
+                        }
                     }
                 }
             }
@@ -91,8 +101,8 @@ publishing {
 }
 
 dependencies {
-    api(project(":sdk"))
-    testImplementation(project(":sdk"))
+    api(dependencyFactory.createProjectDependency(":sdk"))
+    testImplementation(dependencyFactory.createProjectDependency(":sdk"))
 
     ksp(libs.moshi.codegen)
 

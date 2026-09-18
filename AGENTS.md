@@ -29,7 +29,7 @@ Instrumentation tests require a connected device/emulator:
 
 ## Build Configuration
 
-- **Gradle**: 9.5.1 (use `./gradlew` wrapper)
+- **Gradle**: 9.7.1 (use `./gradlew` wrapper)
 - **Kotlin**: 2.3.20, JVM target 17
 - **Android**: compileSdk 36, minSdk 23, targetSdk 36
 - **Dependency versions**: Centralized in `gradle/libs.versions.toml`

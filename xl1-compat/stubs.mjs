@@ -18,14 +18,20 @@ const dataHashForBlock = (n) => `d${n.toString(16).padStart(63, '0')}`
 const epochForBlock = (n) => BASE_EPOCH + n * MS_PER_BLOCK
 
 function createSyntheticBlock(blockNumber) {
+  const timeHash = `e${blockNumber.toString(16).padStart(63, '0')}`
+  const time = {
+    schema: 'network.xyo.time',
+    epoch: epochForBlock(blockNumber),
+    _hash: timeHash,
+    _dataHash: timeHash,
+  }
   const bw = {
-    $epoch: epochForBlock(blockNumber),
     $signatures: [STUB_SIGNATURE],
     addresses: [STUB_ADDRESS],
     block: blockNumber,
     chain: CHAIN_ID,
-    payload_hashes: [],
-    payload_schemas: [],
+    payload_hashes: [timeHash],
+    payload_schemas: [time.schema],
     previous: blockNumber > 0 ? hashForBlock(blockNumber - 1) : null,
     previous_hashes: [blockNumber > 0 ? hashForBlock(blockNumber - 1) : null],
     schema: 'network.xyo.boundwitness',
@@ -34,7 +40,7 @@ function createSyntheticBlock(blockNumber) {
     _dataHash: dataHashForBlock(blockNumber),
   }
   // SignedHydratedBlockWithHashMeta is a tuple [bw, payloads]
-  return [bw, []]
+  return [bw, [time]]
 }
 
 export class StubBlockViewer {
@@ -115,7 +121,7 @@ export class StubTimeSyncViewer {
 
   async currentTimePayload() {
     return {
-      schema: 'network.xyo.timestamp',
+      schema: 'network.xyo.time',
       epoch: TIME_SYNC_EPOCH_MS,
       xl1: TIME_SYNC_XL1_BLOCK,
       ethereum: TIME_SYNC_ETHEREUM_BLOCK,

@@ -1,6 +1,6 @@
-val majorVersion by extra(3)
-val minorVersion by extra(1)
-val patchVersion by extra(17)
+extra.set("majorVersion", 3)
+extra.set("minorVersion", 1)
+extra.set("patchVersion", 17)
 
 plugins {
     alias(libs.plugins.android.library) apply false

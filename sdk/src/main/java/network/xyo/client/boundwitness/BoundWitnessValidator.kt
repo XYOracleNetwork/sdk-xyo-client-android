@@ -165,15 +165,23 @@ class BoundWitnessValidator(
             val errors = mutableListOf<Error>()
             try {
                 val signature = hexStringToByteArray(signatureHex)
-                val recoveredPublicKey = recoverPublicKey(hash, signature)
-                if (recoveredPublicKey == null) {
-                    errors.add(Error("could not recover public key from signature"))
+                if (signature.size != 64) {
+                    errors.add(Error("signature must be 64 bytes"))
                     return errors
                 }
-                val recoveredAddress = publicKeyToAddress(recoveredPublicKey)
-                val recoveredAddressHex = PayloadHasher.bytesToHex(recoveredAddress)
-                if (recoveredAddressHex != expectedAddressHex) {
-                    errors.add(Error("signature address mismatch: expected $expectedAddressHex, got $recoveredAddressHex"))
+                val normalizedExpected = expectedAddressHex.removePrefix("0x").lowercase()
+                var matched = false
+                for (v in 0..1) {
+                    val recoveredPublicKey = recoverPublicKey(hash, signature, v) ?: continue
+                    val recoveredAddress = publicKeyToAddress(recoveredPublicKey)
+                    val recoveredAddressHex = PayloadHasher.bytesToHex(recoveredAddress).lowercase()
+                    if (recoveredAddressHex == normalizedExpected) {
+                        matched = true
+                        break
+                    }
+                }
+                if (!matched) {
+                    errors.add(Error("signature address mismatch: expected $expectedAddressHex"))
                 }
             } catch (e: Exception) {
                 errors.add(Error("signature validation failed: ${e.message}"))

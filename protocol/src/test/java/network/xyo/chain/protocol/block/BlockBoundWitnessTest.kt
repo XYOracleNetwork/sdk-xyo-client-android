@@ -64,4 +64,12 @@ class BlockBoundWitnessTest {
         )
         assertEquals(listOf("hash1", "hash2"), block.step_hashes)
     }
+
+    @Test
+    fun `epoch is optional unsigned client meta`() {
+        val block = BlockBoundWitness(
+            block = 0L, chain = "abc123", previous = null,
+        )
+        assertNull(block.epoch)
+    }
 }

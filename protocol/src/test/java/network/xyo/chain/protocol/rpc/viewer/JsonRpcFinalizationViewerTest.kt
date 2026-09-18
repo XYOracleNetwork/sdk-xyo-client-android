@@ -5,7 +5,9 @@ import network.xyo.chain.protocol.rpc.transport.HttpRpcTransport
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable
 
+@EnabledIfEnvironmentVariable(named = "RUN_REMOTE_RPC_TESTS", matches = "true")
 class JsonRpcFinalizationViewerTest {
 
     private val transport = HttpRpcTransport("https://beta.api.chain.xyo.network/rpc")

@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable
 
 class JsonRpcAccountBalanceViewerTest {
 
@@ -73,6 +74,7 @@ class JsonRpcAccountBalanceViewerTest {
     }
 
     @Test
+    @EnabledIfEnvironmentVariable(named = "RUN_REMOTE_RPC_TESTS", matches = "true")
     fun `qualifiedAccountBalances reaches the server`() {
         val result = runBlocking {
             viewer.qualifiedAccountBalances(listOf(testAddress), AccountBalanceConfig())

@@ -65,6 +65,13 @@ class TransactionValidationTest {
     }
 
     @Test
+    fun `from validator passes for post-quantum qm65 address`() {
+        val tx = validTransaction().copy(from = "qm651qyyq79says4nyw2qga892hrrdfchsluxleee2j")
+        val errors = TransactionFromValidator().validate(tx)
+        assertTrue(errors.isEmpty())
+    }
+
+    @Test
     fun `from validator catches blank from`() {
         val tx = validTransaction().copy(from = "")
         val errors = TransactionFromValidator().validate(tx)
@@ -91,6 +98,13 @@ class TransactionValidationTest {
     fun `gas validator passes for valid fees`() {
         val errors = TransactionGasValidator().validate(validTransaction())
         assertTrue(errors.isEmpty())
+    }
+
+    @Test
+    fun `gas validator catches malformed fee string without throwing`() {
+        val tx = validTransaction().copy(fees = validFees.copy(gasPrice = "not_hex"))
+        val errors = TransactionGasValidator().validate(tx)
+        assertTrue(errors.any { it.code == "INVALID_FEES" })
     }
 
     @Test

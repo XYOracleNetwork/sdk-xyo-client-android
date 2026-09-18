@@ -5,13 +5,13 @@ import kotlin.coroutines.CoroutineContext
 
 class ClientCoroutineScope : CoroutineScope {
 
-    private var parentJob = Job()
+    private var parentJob: CompletableJob = SupervisorJob()
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default + parentJob
 
     fun onStart() {
-        parentJob = Job()
+        parentJob = SupervisorJob()
     }
 
     fun onStop() {

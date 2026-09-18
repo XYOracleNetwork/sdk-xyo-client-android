@@ -12,7 +12,7 @@
     "serve": "node start-server.mjs"
   },
   "dependencies": {
-    "@metamask/json-rpc-engine": "10.5.0",
+    "@ariestools/json-rpc-engine": "~8.1.4",
     "@xylabs/sdk-js": "6.1.4",
     "zod": "^4.4.3",
     "ethers": "^6.13.0",

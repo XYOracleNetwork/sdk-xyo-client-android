@@ -10,9 +10,9 @@ plugins {
 
 group = "network.xyo"
 
-val majorVersion: Int by rootProject.extra
-val minorVersion: Int by rootProject.extra
-val patchVersion: Int by rootProject.extra
+val majorVersion = rootProject.extra["majorVersion"] as Int
+val minorVersion = rootProject.extra["minorVersion"] as Int
+val patchVersion = rootProject.extra["patchVersion"] as Int
 
 val verCode = majorVersion * 10000000 + minorVersion * 10000 + patchVersion
 val verString = "$majorVersion.$minorVersion.$patchVersion"
@@ -73,6 +73,7 @@ android {
 }
 
 dependencies {
+    api(libs.kotlin.stdlib)
     api(libs.kotlin.reflect)
     api(libs.kotlinx.coroutines.core)
     api(libs.moshi.kotlin)
@@ -117,19 +118,22 @@ publishing {
                         .find { it.name().toString().endsWith("dependencies") }
                         ?: node.appendNode("dependencies")
                 }
-                configurations.getByName("implementation").allDependencies.forEach { dep ->
-                    if (dep.name != "unspecified") {
-                        val dependencyNode = (dependenciesNode as groovy.util.Node).appendNode("dependency")
-                        dependencyNode.appendNode("groupId", dep.group)
-                        dependencyNode.appendNode("artifactId", dep.name)
-                        dependencyNode.appendNode("version", dep.version)
+                listOf("api", "implementation").forEach { configName ->
+                    configurations.findByName(configName)?.dependencies?.forEach { dep ->
+                        if (dep.name != "unspecified") {
+                            val dependencyNode = (dependenciesNode as groovy.util.Node).appendNode("dependency")
+                            dependencyNode.appendNode("groupId", dep.group)
+                            dependencyNode.appendNode("artifactId", dep.name)
+                            dependencyNode.appendNode("version", dep.version)
+                            dependencyNode.appendNode("scope", if (configName == "api") "compile" else "runtime")
 
-                        // Exclude old BouncyCastle from hdwallet transitive
-                        if (dep.name == "hdwallet") {
-                            val exclusionsNode = dependencyNode.appendNode("exclusions")
-                            val exclusionNode = exclusionsNode.appendNode("exclusion")
-                            exclusionNode.appendNode("groupId", "org.bouncycastle")
-                            exclusionNode.appendNode("artifactId", "bcprov-jdk15on")
+                            // Exclude old BouncyCastle from hdwallet transitive
+                            if (dep.name == "hdwallet") {
+                                val exclusionsNode = dependencyNode.appendNode("exclusions")
+                                val exclusionNode = exclusionsNode.appendNode("exclusion")
+                                exclusionNode.appendNode("groupId", "org.bouncycastle")
+                                exclusionNode.appendNode("artifactId", "bcprov-jdk15on")
+                            }
                         }
                     }
                 }

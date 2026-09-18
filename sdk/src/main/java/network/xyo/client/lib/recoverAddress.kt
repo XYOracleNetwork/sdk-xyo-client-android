@@ -82,14 +82,35 @@ private fun toKeccak(bytes: ByteArray): ByteArray {
     return keccak.digest()
 }
 
+fun BigInteger.toByteArrayPadded(length: Int): ByteArray {
+    val bytes = toByteArray()
+    if (bytes.size == length) return bytes
+    if (bytes.size == length + 1 && bytes[0] == 0.toByte()) {
+        return bytes.copyOfRange(1, bytes.size)
+    }
+    if (bytes.size < length) {
+        return ByteArray(length - bytes.size) + bytes
+    }
+    return bytes.takeLast(length).toByteArray()
+}
+
 // Convert public key to Ethereum address
 fun publicKeyToAddress(publicKey: ByteArray): ByteArray {
-    val hash = toKeccak(publicKey.sliceArray(1 until publicKey.size))
-    return hash.sliceArray(12 until hash.size)
+    val keyWithoutPrefix = if (publicKey.size == 65 && publicKey[0] == 0x04.toByte()) {
+        publicKey.copyOfRange(1, publicKey.size)
+    } else {
+        publicKey
+    }
+    val hash = toKeccak(keyWithoutPrefix)
+    return hash.copyOfRange(12, hash.size)
 }
 
 // Main function to recover address
 fun recoverPublicKey(messageHash: ByteArray, signature: ByteArray): ByteArray? {
+    return recoverPublicKey(messageHash, signature, 0) ?: recoverPublicKey(messageHash, signature, 1)
+}
+
+fun recoverPublicKey(messageHash: ByteArray, signature: ByteArray, v: Int): ByteArray? {
     if (signature.size != 64) return null
 
     val r = BigInteger(1, signature.copyOfRange(0, 32))
@@ -97,9 +118,6 @@ fun recoverPublicKey(messageHash: ByteArray, signature: ByteArray): ByteArray? {
 
     val messageHashBI = BigInteger(1, messageHash)
 
-    val publicPoint = recoverPublicKey(messageHashBI, r, s, 0) ?: recoverPublicKey(messageHashBI, r, s, 1) ?: return null
-    val uncompressedKey =
-            publicPoint.x.toByteArray().padStart(32, 0) +
-            publicPoint.y.toByteArray().padStart(32, 0)
-    return uncompressedKey
+    val publicPoint = recoverPublicKey(messageHashBI, r, s, v) ?: return null
+    return publicPoint.x.toByteArrayPadded(32) + publicPoint.y.toByteArrayPadded(32)
 }
