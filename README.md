@@ -27,6 +27,12 @@ Primary SDK for using the XYO Protocol 2.0 from Android.
 ### Adding to Project
 [See instructions on JitPack](https://jitpack.io/#xyoraclenetwork/sdk-xyo-client-android)
 
+Available artifacts under `com.github.xyoraclenetwork.sdk-xyo-client-android`:
+- `sdk-xyo-client-android-sdk` — Core XYO client (accounts, wallets, payloads, bound witnesses, panels, node/archivist client; requires only `INTERNET`)
+- `sdk-xyo-client-android-protocol` — XL1 chain protocol, denominations, transactions, and JSON-RPC viewers/runners
+- `sdk-xyo-client-android-witness-system-info` *(optional)* — Android device/OS/network system-info witness (`XyoSystemInfoWitness`)
+- `sdk-xyo-client-android-witness-location` *(optional)* — Android fused-location witness (`XyoLocationWitness`)
+
 ### Configure XYO Panel
 ```kotlin
 var panel = XyoPanel(context, "test", listOf(NodeClient), listOf(XyoSystemInfoWitness()))

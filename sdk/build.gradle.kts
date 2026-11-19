@@ -78,8 +78,6 @@ dependencies {
     api(libs.kotlinx.coroutines.core)
     api(libs.moshi.kotlin)
     ksp(libs.moshi.codegen)
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.play.services.location)
     implementation(libs.hdwallet) {
         exclude(group = "org.bouncycastle", module = "bcprov-jdk15on")
     }

@@ -1,0 +1,2 @@
+-keep class network.xyo.client.android.witness.system.info.** { *; }
+-keepclassmembers class network.xyo.client.android.witness.system.info.** { *; }

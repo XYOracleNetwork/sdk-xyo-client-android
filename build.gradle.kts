@@ -1,6 +1,6 @@
 extra.set("majorVersion", 3)
-extra.set("minorVersion", 1)
-extra.set("patchVersion", 17)
+extra.set("minorVersion", 3)
+extra.set("patchVersion", 0)
 
 plugins {
     alias(libs.plugins.android.library) apply false
@@ -16,7 +16,12 @@ tasks.register<Delete>("clean") {
 tasks.register("test") {
     description = "Run tests for all modules"
     group = "verification"
-    dependsOn(":sdk:test", ":protocol:test")
+    dependsOn(
+        ":sdk:test",
+        ":protocol:test",
+        ":witness-system-info:test",
+        ":witness-location:test",
+    )
 }
 
 tasks.register("testProtocol") {

@@ -21,3 +21,5 @@ plugins {
 rootProject.name = "XYO Client"
 include(":sdk")
 include(":protocol")
+include(":witness-system-info")
+include(":witness-location")

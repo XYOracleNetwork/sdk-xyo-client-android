@@ -1,4 +1,4 @@
 jdk:
   - openjdk18
 install:
-  - ./gradlew :sdk:publishToMavenLocal :protocol:publishToMavenLocal
+  - ./gradlew :sdk:publishToMavenLocal :protocol:publishToMavenLocal :witness-system-info:publishToMavenLocal :witness-location:publishToMavenLocal

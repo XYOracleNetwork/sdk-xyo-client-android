@@ -4,12 +4,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Android SDK for XYO Protocol 2.0. Pure Kotlin, two modules:
+Android SDK for XYO Protocol 2.0. Pure Kotlin, multi-module:
 
-- **`sdk`** — Core SDK (`network.xyo.client`): accounts/wallets, bound witnesses, payloads, witnesses, node communication, archivist integration, Android data storage via protobuf DataStore
+- **`sdk`** — Core SDK (`network.xyo.client`): accounts/wallets, bound witnesses, payloads, base `XyoWitness` / `XyoPanel` abstractions, node communication, archivist integration, Android data storage via protobuf DataStore (requires only `INTERNET`)
 - **`protocol`** — XYO Chain Protocol (`network.xyo.chain.protocol`): XL1 token denominations, transactions, RPC framework, block/mempool/stake runners, chain viewers
+- **`witness-system-info`** — Optional Android system/network witness (`network.xyo.client.android.witness.system.info`): `XyoSystemInfoWitness` & payloads (`ACCESS_NETWORK_STATE`, `ACCESS_WIFI_STATE` with optional `android.hardware.wifi`)
+- **`witness-location`** — Optional Android location witness (`network.xyo.client.android.witness.location.info`): `XyoLocationWitness`, `WitnessLocationHandler`, `LocationActivity`, Google Play Services Location
 
-The `protocol` module depends on `sdk`.
+`protocol`, `witness-system-info`, and `witness-location` depend on `sdk`.
 
 ## Build Commands
 

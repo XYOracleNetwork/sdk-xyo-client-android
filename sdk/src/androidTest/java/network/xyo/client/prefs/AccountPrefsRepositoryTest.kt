@@ -5,13 +5,14 @@ import androidx.test.platform.app.InstrumentationRegistry
 import kotlinx.coroutines.runBlocking
 import network.xyo.client.lib.TestConstants
 import network.xyo.client.android.witness.XyoPanel
+import network.xyo.client.android.witness.XyoWitness
 import network.xyo.client.account.Account
 import network.xyo.client.boundwitness.BoundWitnessBuilder
 import network.xyo.client.android.datastore.accounts.AccountPrefsRepository
+import network.xyo.client.payload.Payload
 import network.xyo.client.settings.AccountPreferences
 import network.xyo.client.settings.PreviousHashStorePreferences
 import network.xyo.client.settings.SettingsInterface
-import network.xyo.client.android.witness.system.info.XyoSystemInfoWitness
 import org.junit.Before
 import org.junit.Test
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -41,7 +42,7 @@ class AccountPrefsRepositoryTest {
 
             val panel = XyoPanel(
                 appContext, testAccount, arrayListOf(Pair(apiDomainBeta, null)), listOf(
-                    XyoSystemInfoWitness()
+                    XyoWitness<Payload>()
                 )
             )
             panel.resolveNodes()
@@ -50,7 +51,7 @@ class AccountPrefsRepositoryTest {
 
             val panel2 = XyoPanel(
                 appContext, testAccount, arrayListOf(Pair(apiDomainBeta, null)), listOf(
-                    XyoSystemInfoWitness()
+                    XyoWitness<Payload>()
                 )
             )
             panel2.resolveNodes()
